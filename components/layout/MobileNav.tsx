@@ -106,7 +106,7 @@ export function MobileNav({ navLinks }: MobileNavProps) {
 
               {/* Student Info Card inside Mobile Drawer */}
               <div className="mt-6 bg-blue-950/70 p-3.5 rounded-2xl border border-blue-900/80 flex items-center gap-3">
-                <div className="w-9 h-9 rounded-xl bg-blue-600 flex items-center justify-center text-white shrink-0 font-bold text-xs">
+                <div className="w-9 h-9 rounded-full bg-blue-600 flex items-center justify-center text-white shrink-0 font-bold text-xs">
                   <User className="w-4 h-4" />
                 </div>
                 <div className="truncate text-right">

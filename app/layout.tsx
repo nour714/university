@@ -25,8 +25,8 @@ export default function RootLayout({
   return (
     <html lang="ar" dir="rtl" className={`${cairo.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-row bg-[#f8fafc] text-slate-900 font-sans">
-        {/* Desktop Sidebar (Server Component) */}
-        <Sidebar currentPath="/courses" />
+        {/* Desktop Sidebar */}
+        <Sidebar />
 
         {/* Main Content Area */}
         <div className="flex-1 flex flex-col min-w-0 min-h-screen">

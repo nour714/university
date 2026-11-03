@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { 
   BookOpen, 
   GraduationCap,
@@ -11,16 +12,20 @@ import {
   HelpCircle,
   ClipboardCheck,
   KeyRound,
-  MoreHorizontal
+  MoreHorizontal,
+  LayoutDashboard
 } from 'lucide-react';
 
 export const NAVIGATION_LINKS = [
-  { name: 'مكتبة المقررات', href: '/courses', icon: 'BookOpen', active: true },
+  { name: 'الرئيسية', href: '/', icon: 'LayoutDashboard', active: true },
+  { name: 'مكتبة المقررات', href: '/courses', icon: 'BookOpen', active: false },
 ];
 
-export function Sidebar({ currentPath = '/courses' }: { currentPath?: string }) {
+export function Sidebar({ currentPath }: { currentPath?: string }) {
   const [isExpanded, setIsExpanded] = useState(false);
-  const isCoursesActive = currentPath.startsWith('/courses');
+  const pathname = usePathname() || currentPath || '/';
+  const isHomeActive = pathname === '/';
+  const isCoursesActive = pathname.startsWith('/courses');
 
   return (
     <aside className="hidden lg:flex flex-col items-start p-3.5 shrink-0 sticky top-0 h-screen select-none z-40">
@@ -83,7 +88,41 @@ export function Sidebar({ currentPath = '/courses' }: { currentPath?: string }) 
             </p>
           )}
 
-          {/* 1. مكتبة المقررات */}
+          {/* 1. الرئيسية (لوحة التحكم) */}
+          <div className="relative group w-full">
+            <Link
+              href="/"
+              className={`flex items-center gap-3.5 rounded-2xl transition-all duration-200 ${
+                isExpanded 
+                  ? 'px-4 py-3 w-full' 
+                  : 'w-12 h-12 justify-center mx-auto'
+              } ${
+                isHomeActive
+                  ? 'bg-blue-600 text-white font-bold shadow-lg shadow-blue-600/40 border border-blue-400/60'
+                  : 'text-slate-300 hover:text-white hover:bg-blue-900/40'
+              }`}
+              aria-label="الرئيسية"
+            >
+              <LayoutDashboard className="w-5 h-5 shrink-0 stroke-[2.2]" />
+
+              {isExpanded && (
+                <div className="flex-1 flex items-center justify-between animate-fadeIn">
+                  <span className="text-sm font-bold">الرئيسية</span>
+                  {isHomeActive && <span className="w-2 h-2 rounded-full bg-white animate-pulse" />}
+                </div>
+              )}
+            </Link>
+
+            {!isExpanded && (
+              <div className="absolute right-16 top-1/2 -translate-y-1/2 hidden group-hover:flex items-center z-50 pointer-events-none">
+                <div className="bg-[#172554] text-white text-xs font-bold px-3 py-1.5 rounded-xl border border-blue-700 shadow-xl whitespace-nowrap">
+                  الصفحة الرئيسية
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* 2. مكتبة المقررات */}
           <div className="relative group w-full">
             <Link
               href="/courses"
@@ -103,7 +142,7 @@ export function Sidebar({ currentPath = '/courses' }: { currentPath?: string }) 
               {isExpanded && (
                 <div className="flex-1 flex items-center justify-between animate-fadeIn">
                   <span className="text-sm font-bold">مكتبة المقررات</span>
-                  <span className="w-2 h-2 rounded-full bg-white animate-pulse" />
+                  {isCoursesActive && <span className="w-2 h-2 rounded-full bg-white animate-pulse" />}
                 </div>
               )}
             </Link>
@@ -117,7 +156,7 @@ export function Sidebar({ currentPath = '/courses' }: { currentPath?: string }) 
             )}
           </div>
 
-          {/* 2. الاختبارات (Exams) */}
+          {/* 3. الاختبارات (Exams) */}
           <div className="relative group w-full">
             <button
               type="button"

@@ -1,5 +1,25 @@
-import { redirect } from 'next/navigation';
+import type { Metadata } from 'next';
+import { CURRENT_STUDENT } from '@/data/student';
+import { StudentHero } from '@/components/home/StudentHero';
+import { StudentStatsGrid } from '@/components/home/StudentStatsGrid';
+import { QuickCoursesAction } from '@/components/home/QuickCoursesAction';
+
+export const metadata: Metadata = {
+  title: 'الرئيسية | لوحة تحكم الطالب - كلية الذكاء الاصطناعي',
+  description: 'لوحة التحكم الأكاديمية للطالب - استعراض المعدل التراكمي، الساعات المسجلة، المستوى، وعدد المقرارات.',
+};
 
 export default function HomePage() {
-  redirect('/courses');
+  return (
+    <div className="space-y-6 sm:space-y-8 animate-fadeIn pb-4">
+      {/* 1. Student Hero Profile Banner */}
+      <StudentHero student={CURRENT_STUDENT} />
+
+      {/* 2. Four Bento KPI Stat Cards */}
+      <StudentStatsGrid student={CURRENT_STUDENT} />
+
+      {/* 3. Quick Action Access Card to Courses Library */}
+      <QuickCoursesAction coursesCount={CURRENT_STUDENT.coursesCount} />
+    </div>
+  );
 }

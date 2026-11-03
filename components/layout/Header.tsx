@@ -1,4 +1,6 @@
+import Link from 'next/link';
 import { GraduationCap, User, Sparkles } from 'lucide-react';
+import { CURRENT_STUDENT } from '@/data/student';
 
 export function Header() {
   return (
@@ -26,34 +28,28 @@ export function Header() {
           </div>
         </div>
 
-        {/* Left side: Modern Integrated Student Profile Capsule */}
+        {/* Left side: Clean Student Profile */}
         <div className="flex items-center gap-2 shrink-0">
-          <div 
-            className="flex items-center gap-2 sm:gap-3 bg-slate-50 hover:bg-slate-100/80 border border-slate-200/90 rounded-2xl py-1 sm:py-1.5 px-2 sm:px-3 transition-all cursor-pointer group shadow-2xs"
-            title="الملف الشخصي للطالب"
+          <Link 
+            href="/"
+            className="flex items-center gap-2.5 sm:gap-3 transition-all cursor-pointer group"
+            title="الرئيسية - الملف الشخصي للطالب"
           >
-            {/* Student Avatar with Online Badge */}
-            <div className="relative shrink-0">
-              <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-700 text-white flex items-center justify-center font-bold text-xs shadow-xs group-hover:scale-105 transition-transform">
-                <User className="w-4 h-4 stroke-[2.5]" />
-              </div>
-              {/* Online Green Indicator Dot pinned to Avatar */}
-              <span 
-                className="absolute -bottom-0.5 -left-0.5 w-2 sm:w-2.5 h-2 sm:h-2.5 bg-emerald-500 border-2 border-white rounded-full shadow-xs" 
-                title="متصل الآن"
-              />
+            {/* Circular Avatar: Clean without outer box or status dot */}
+            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-gradient-to-br from-blue-600 to-indigo-700 text-white flex items-center justify-center font-bold text-xs shadow-sm shadow-blue-600/20 group-hover:scale-105 transition-transform shrink-0">
+              <User className="w-4 h-4 stroke-[2.5]" />
             </div>
 
             {/* Student Name and Academic Level */}
             <div className="text-right hidden sm:block">
               <p className="text-xs sm:text-sm font-bold text-slate-800 group-hover:text-blue-600 transition-colors leading-tight">
-                عبد الرحمن خالد
+                {CURRENT_STUDENT.fullName}
               </p>
               <p className="text-[10px] text-slate-500 font-medium mt-0.5 leading-tight">
-                طالب • ذكاء اصطناعي
+                {CURRENT_STUDENT.level} • {CURRENT_STUDENT.faculty}
               </p>
             </div>
-          </div>
+          </Link>
         </div>
       </div>
     </header>

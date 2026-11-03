@@ -1,5 +1,5 @@
 import { Suspense } from 'react';
-import { Menu, GraduationCap, UserCircle, Sparkles } from 'lucide-react';
+import { Menu, GraduationCap, User, Sparkles } from 'lucide-react';
 import { MobileNav } from './MobileNav';
 import { NAVIGATION_LINKS } from './Sidebar';
 
@@ -7,7 +7,7 @@ export function Header() {
   return (
     <header className="sticky top-3.5 z-30 mx-4 sm:mx-6 lg:mx-8 mb-2 transition-all">
       {/* Floating Pill Container with Curved Sides */}
-      <div className="bg-white/95 backdrop-blur-md rounded-[26px] border border-slate-200/90 shadow-md shadow-slate-200/50 px-4 sm:px-6 py-3 flex items-center justify-between gap-4">
+      <div className="bg-white/95 backdrop-blur-md rounded-[26px] border border-slate-200/90 shadow-md shadow-slate-200/50 px-4 sm:px-6 py-2.5 flex items-center justify-between gap-4">
         {/* Right side: Mobile Menu + Academic Title */}
         <div className="flex items-center gap-3 min-w-0">
           <Suspense fallback={
@@ -36,19 +36,33 @@ export function Header() {
           </div>
         </div>
 
-        {/* Left side: Student Profile & Online Status */}
+        {/* Left side: Modern Integrated Student Profile Capsule */}
         <div className="flex items-center gap-3 shrink-0">
-          <div className="text-left hidden md:block">
-            <div className="flex items-center justify-end gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              <p className="text-sm font-bold text-slate-800">عبد الرحمن خالد</p>
+          <div 
+            className="flex items-center gap-3 bg-slate-50 hover:bg-slate-100/80 border border-slate-200/90 rounded-2xl py-1.5 px-3 transition-all cursor-pointer group shadow-2xs"
+            title="الملف الشخصي للطالب"
+          >
+            {/* Student Avatar with Online Badge */}
+            <div className="relative shrink-0">
+              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-700 text-white flex items-center justify-center font-bold text-xs shadow-xs group-hover:scale-105 transition-transform">
+                <User className="w-4 h-4 stroke-[2.5]" />
+              </div>
+              {/* Online Green Indicator Dot pinned to Avatar */}
+              <span 
+                className="absolute -bottom-0.5 -left-0.5 w-2.5 h-2.5 bg-emerald-500 border-2 border-white rounded-full shadow-xs" 
+                title="متصل الآن"
+              />
             </div>
-            <p className="text-xs text-slate-500 font-medium">طالب • المستوى الثالث (ذكاء اصطناعي)</p>
-          </div>
-          
-          {/* Avatar Capsule */}
-          <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-blue-50 to-slate-100 border border-slate-200/80 flex items-center justify-center text-slate-700 hover:border-blue-500 hover:shadow-sm transition-all cursor-pointer">
-            <UserCircle className="w-6 h-6 text-blue-700" />
+
+            {/* Student Name and Academic Level (Clean Arabic RTL typography) */}
+            <div className="text-right hidden sm:block">
+              <p className="text-xs sm:text-sm font-bold text-slate-800 group-hover:text-blue-600 transition-colors leading-tight">
+                عبد الرحمن خالد
+              </p>
+              <p className="text-[11px] text-slate-500 font-medium mt-0.5 leading-tight">
+                طالب • المستوى الثالث (ذكاء اصطناعي)
+              </p>
+            </div>
           </div>
         </div>
       </div>

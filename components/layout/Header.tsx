@@ -9,7 +9,7 @@ export function Header() {
       {/* Floating Pill Container with Curved Sides */}
       <div className="bg-white/95 backdrop-blur-md rounded-[20px] sm:rounded-[24px] border border-slate-200/90 shadow-md shadow-slate-200/40 px-3 sm:px-5 py-1.5 sm:py-2 flex items-center justify-between gap-2.5 sm:gap-4">
         {/* Right side: Academic Title */}
-        <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+        <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
           <div className="truncate">
             <div className="flex items-center gap-1.5 sm:gap-2 mb-0.5">
               <span className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-blue-50 text-blue-700 border border-blue-200/70">

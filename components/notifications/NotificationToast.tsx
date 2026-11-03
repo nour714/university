@@ -46,7 +46,7 @@ export function NotificationToast() {
   };
 
   return (
-    <div className="fixed top-4 left-4 right-4 sm:right-auto sm:left-6 sm:w-96 z-50 animate-slideIn">
+    <div className="fixed top-2.5 inset-x-3 sm:top-4 sm:left-6 sm:right-auto sm:w-96 z-50 animate-slideIn">
       <div className="bg-white/95 backdrop-blur-md rounded-2xl p-3.5 border border-slate-200/90 shadow-2xl shadow-blue-950/20 flex items-start gap-3 relative overflow-hidden">
         {/* Accent top stripe */}
         <div className={`absolute top-0 inset-x-0 h-1 ${

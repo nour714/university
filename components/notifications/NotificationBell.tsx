@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { 
   Bell, 
   CheckCheck, 
@@ -10,14 +11,14 @@ import {
   Sparkles, 
   FileText, 
   X, 
-  ExternalLink,
-  PlusCircle,
-  Trash2
+  Trash2,
+  ChevronLeft
 } from 'lucide-react';
 import { useNotifications } from '@/context/NotificationContext';
 import { AcademicNotification, NotificationType } from '@/types/notification';
 
 export function NotificationBell() {
+  const router = useRouter();
   const { 
     notifications, 
     unreadCount, 
@@ -54,6 +55,18 @@ export function NotificationBell() {
     };
   }, [isOpen]);
 
+  // Lock body scroll on mobile when open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isOpen]);
+
   // Filter notifications by tab
   const filteredNotifications = notifications.filter((n) => {
     if (activeTab === 'all') return true;
@@ -81,9 +94,17 @@ export function NotificationBell() {
       case 'exam':
         return 'اختبار';
       case 'material':
-        return 'ملف';
+        return 'محتوى';
       case 'announcement':
         return 'إعلان';
+    }
+  };
+
+  const handleNotificationClick = (notif: AcademicNotification) => {
+    markAsRead(notif.id);
+    setIsOpen(false);
+    if (notif.actionUrl) {
+      router.push(notif.actionUrl);
     }
   };
 
@@ -94,13 +115,13 @@ export function NotificationBell() {
         ref={buttonRef}
         type="button"
         onClick={() => setIsOpen((prev) => !prev)}
-        className="relative w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-slate-50 hover:bg-slate-100 text-slate-700 hover:text-blue-600 flex items-center justify-center border border-slate-200/90 shadow-xs transition-all duration-200 active:scale-95 cursor-pointer group"
+        className="relative w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-slate-50 hover:bg-slate-100 text-slate-700 hover:text-blue-600 flex items-center justify-center border border-slate-200/90 shadow-2xs transition-all duration-200 active:scale-95 cursor-pointer group"
         aria-label="الإشعارات الأكاديمية"
         title="الإشعارات الأكاديمية"
       >
         <Bell className="w-4 h-4 sm:w-4.5 sm:h-4.5 group-hover:rotate-12 transition-transform duration-200" />
         
-        {/* Unread Badge */}
+        {/* Unread Badge with Pulse Ring */}
         {unreadCount > 0 && (
           <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-rose-600 text-white text-[10px] font-black flex items-center justify-center border-2 border-white shadow-xs animate-bounce">
             {unreadCount > 9 ? '+9' : unreadCount}
@@ -108,95 +129,74 @@ export function NotificationBell() {
         )}
       </button>
 
-      {/* Floating Panel / Drawer */}
+      {/* Floating Panel (Bottom Sheet on Mobile, Popover Dropdown on Desktop) */}
       {isOpen && (
         <>
-          {/* Mobile Overlay */}
+          {/* Backdrop Overlay */}
           <div 
-            className="fixed inset-0 bg-black/40 backdrop-blur-2xs z-40 sm:hidden"
+            className="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 animate-fadeIn"
             onClick={() => setIsOpen(false)}
           />
 
           {/* Panel Container */}
           <div
             ref={panelRef}
-            className="fixed inset-x-2 bottom-2 sm:bottom-auto sm:inset-x-auto sm:absolute sm:left-0 sm:top-12 z-50 w-auto sm:w-[410px] max-h-[85vh] sm:max-h-[580px] bg-white rounded-2xl sm:rounded-3xl border border-slate-200/90 shadow-2xl flex flex-col overflow-hidden animate-fadeIn"
+            className="fixed inset-x-0 bottom-0 sm:bottom-auto sm:inset-x-auto sm:absolute sm:left-0 sm:top-12 z-50 w-full sm:w-[420px] max-h-[88vh] sm:max-h-[580px] bg-white rounded-t-[28px] sm:rounded-3xl border-t sm:border border-slate-200/90 shadow-2xl flex flex-col overflow-hidden animate-slideUp sm:animate-fadeIn"
           >
+            {/* Mobile Drag Indicator Handle */}
+            <div className="sm:hidden w-full pt-2.5 pb-1 flex justify-center bg-gradient-to-l from-slate-900 to-[#172554]">
+              <div className="w-12 h-1.5 rounded-full bg-slate-400/60" />
+            </div>
+
             {/* Header */}
-            <div className="p-3.5 sm:p-4 bg-gradient-to-l from-slate-900 to-[#172554] text-white flex items-center justify-between shrink-0">
-              <div className="flex items-center gap-2">
-                <div className="w-7 h-7 rounded-lg bg-blue-500/20 text-blue-300 flex items-center justify-center border border-blue-400/30">
+            <div className="px-4 py-3 sm:px-5 sm:py-3.5 bg-gradient-to-l from-slate-900 to-[#172554] text-white flex items-center justify-between shrink-0">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-xl bg-blue-500/20 text-blue-300 flex items-center justify-center border border-blue-400/30 shrink-0">
                   <Bell className="w-4 h-4" />
                 </div>
                 <div>
-                  <h3 className="text-xs sm:text-sm font-extrabold text-white">
+                  <h3 className="text-sm font-extrabold text-white tracking-tight">
                     الإشعارات الأكاديمية
                   </h3>
-                  <p className="text-[10px] text-blue-200/80 font-medium">
+                  <p className="text-[11px] text-blue-200/90 font-medium">
                     {unreadCount > 0 ? `${unreadCount} إشعار جديد غير مقروء` : 'جميع الإشعارات مقروءة'}
                   </p>
                 </div>
               </div>
 
-              <div className="flex items-center gap-1.5">
+              <div className="flex items-center gap-2">
                 {unreadCount > 0 && (
                   <button
                     type="button"
                     onClick={markAllAsRead}
-                    className="inline-flex items-center gap-1 text-[10px] font-bold text-blue-200 hover:text-white bg-blue-500/20 hover:bg-blue-500/30 px-2 py-1 rounded-lg border border-blue-400/20 transition-all cursor-pointer"
+                    className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-bold text-blue-100 hover:text-white bg-blue-500/25 hover:bg-blue-500/35 active:scale-95 rounded-xl border border-blue-400/30 transition-all cursor-pointer"
                     title="تحديد الكل كمقروء"
                   >
                     <CheckCheck className="w-3.5 h-3.5" />
-                    <span className="hidden sm:inline">قراءة الكل</span>
+                    <span>قراءة الكل</span>
                   </button>
                 )}
 
                 <button
                   type="button"
                   onClick={() => setIsOpen(false)}
-                  className="text-slate-300 hover:text-white p-1 rounded-lg hover:bg-white/10 transition-colors cursor-pointer"
-                  aria-label="إغلاق"
+                  className="w-8 h-8 rounded-xl text-slate-300 hover:text-white flex items-center justify-center hover:bg-white/10 active:scale-95 transition-colors cursor-pointer"
+                  aria-label="إغلاق الإشعارات"
                 >
                   <X className="w-4 h-4" />
                 </button>
               </div>
             </div>
 
-            {/* Quick Testing Simulator Bar */}
-            <div className="bg-slate-50/90 border-b border-slate-200/80 p-2 sm:px-3 sm:py-2 flex items-center justify-between gap-1.5 shrink-0">
-              <span className="text-[10px] font-bold text-slate-500 flex items-center gap-1">
-                <PlusCircle className="w-3.5 h-3.5 text-blue-600" />
-                تجربة فورية:
-              </span>
-              <div className="flex items-center gap-1.5">
-                <button
-                  type="button"
-                  onClick={simulateLectureNotification}
-                  className="px-2 py-1 rounded-md text-[10px] font-bold bg-blue-100 hover:bg-blue-200 text-blue-800 transition-all active:scale-95 cursor-pointer"
-                  title="محاكاة نزول محاضرة جديدة"
-                >
-                  + محاضرة جديدة
-                </button>
-                <button
-                  type="button"
-                  onClick={simulateExamNotification}
-                  className="px-2 py-1 rounded-md text-[10px] font-bold bg-rose-100 hover:bg-rose-200 text-rose-800 transition-all active:scale-95 cursor-pointer"
-                  title="محاكاة إشعار اختبار"
-                >
-                  + إشعار اختبار
-                </button>
-              </div>
-            </div>
-
-            {/* Category Filter Tabs */}
-            <div className="flex items-center gap-1 p-2 border-b border-slate-100 bg-white shrink-0 overflow-x-auto no-scrollbar">
+            {/* Category Filter Tabs (Swipeable on Mobile) */}
+            <div className="flex items-center gap-1.5 px-3 py-2 border-b border-slate-100 bg-slate-50/70 shrink-0 overflow-x-auto no-scrollbar">
               <button
                 type="button"
                 onClick={() => setActiveTab('all')}
-                className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer shrink-0 active:scale-95 ${
                   activeTab === 'all'
                     ? 'bg-blue-600 text-white shadow-xs'
-                    : 'text-slate-600 hover:bg-slate-100'
+                    : 'text-slate-600 bg-white hover:bg-slate-100 border border-slate-200/80'
                 }`}
               >
                 الكل ({notifications.length})
@@ -204,10 +204,10 @@ export function NotificationBell() {
               <button
                 type="button"
                 onClick={() => setActiveTab('lecture')}
-                className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer shrink-0 active:scale-95 ${
                   activeTab === 'lecture'
                     ? 'bg-blue-600 text-white shadow-xs'
-                    : 'text-slate-600 hover:bg-slate-100'
+                    : 'text-slate-600 bg-white hover:bg-slate-100 border border-slate-200/80'
                 }`}
               >
                 المحاضرات ({notifications.filter((n) => n.type === 'lecture').length})
@@ -215,10 +215,10 @@ export function NotificationBell() {
               <button
                 type="button"
                 onClick={() => setActiveTab('exam')}
-                className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer shrink-0 active:scale-95 ${
                   activeTab === 'exam'
                     ? 'bg-blue-600 text-white shadow-xs'
-                    : 'text-slate-600 hover:bg-slate-100'
+                    : 'text-slate-600 bg-white hover:bg-slate-100 border border-slate-200/80'
                 }`}
               >
                 الاختبارات ({notifications.filter((n) => n.type === 'exam').length})
@@ -226,10 +226,10 @@ export function NotificationBell() {
               <button
                 type="button"
                 onClick={() => setActiveTab('announcement')}
-                className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer shrink-0 active:scale-95 ${
                   activeTab === 'announcement'
                     ? 'bg-blue-600 text-white shadow-xs'
-                    : 'text-slate-600 hover:bg-slate-100'
+                    : 'text-slate-600 bg-white hover:bg-slate-100 border border-slate-200/80'
                 }`}
               >
                 إعلانات ({notifications.filter((n) => n.type === 'announcement').length})
@@ -237,85 +237,70 @@ export function NotificationBell() {
             </div>
 
             {/* Notifications Scrollable List */}
-            <div className="flex-1 overflow-y-auto divide-y divide-slate-100 p-1 sm:p-2 space-y-1">
+            <div className="flex-1 overflow-y-auto divide-y divide-slate-100 p-2 sm:p-2.5 space-y-1.5">
               {filteredNotifications.length > 0 ? (
                 filteredNotifications.map((notif) => (
                   <div
                     key={notif.id}
-                    className={`p-2.5 sm:p-3 rounded-xl transition-all relative group flex items-start gap-2.5 ${
+                    onClick={() => handleNotificationClick(notif)}
+                    className={`p-3 rounded-2xl transition-all cursor-pointer relative group flex items-start gap-3 active:scale-[0.99] ${
                       !notif.isRead
-                        ? 'bg-blue-50/70 border border-blue-200/60 shadow-2xs'
-                        : 'bg-white hover:bg-slate-50/80 border border-transparent'
+                        ? 'bg-blue-50/80 border border-blue-200/80 shadow-2xs'
+                        : 'bg-white hover:bg-slate-50 border border-slate-100'
                     }`}
                   >
                     {/* Icon */}
-                    <div className="w-8 h-8 rounded-lg bg-white border border-slate-200 shadow-2xs flex items-center justify-center shrink-0 mt-0.5">
+                    <div className="w-9 h-9 rounded-xl bg-white border border-slate-200/80 shadow-2xs flex items-center justify-center shrink-0 mt-0.5">
                       {getIcon(notif.type)}
                     </div>
 
-                    {/* Details */}
+                    {/* Notification Content */}
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between gap-1.5 mb-1">
                         <div className="flex items-center gap-1.5 min-w-0">
-                          <span className="text-[10px] font-bold px-1.5 py-0.2 rounded-md bg-slate-100 text-slate-700 border border-slate-200 shrink-0">
+                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 border border-slate-200 shrink-0">
                             {getTypeLabel(notif.type)}
                           </span>
                           {notif.courseCode && (
-                            <span className="text-[10px] font-extrabold px-1.5 py-0.2 rounded-md bg-blue-100/80 text-blue-700 border border-blue-200 shrink-0">
+                            <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-md bg-blue-100 text-blue-700 border border-blue-200 shrink-0">
                               {notif.courseCode}
                             </span>
                           )}
                           {!notif.isRead && (
-                            <span className="w-2 h-2 rounded-full bg-blue-600 shrink-0" />
+                            <span className="w-2 h-2 rounded-full bg-blue-600 shrink-0 animate-pulse" />
                           )}
                         </div>
-                        <span className="text-[10px] text-slate-400 font-medium shrink-0">
+                        <span className="text-[11px] text-slate-400 font-medium shrink-0">
                           {notif.timeAgo}
                         </span>
                       </div>
 
-                      <h4 className="text-xs font-bold text-slate-900 leading-snug mb-0.5">
+                      <h4 className={`text-xs sm:text-sm font-bold text-slate-900 leading-snug mb-1 ${!notif.isRead ? 'font-extrabold' : ''}`}>
                         {notif.title}
                       </h4>
-                      <p className="text-[11px] text-slate-600 leading-relaxed mb-2 line-clamp-2">
+                      <p className="text-xs text-slate-600 leading-relaxed mb-2 line-clamp-2">
                         {notif.message}
                       </p>
 
-                      {/* Action Link & Dismiss */}
-                      <div className="flex items-center justify-between pt-1 border-t border-slate-100/80">
-                        {notif.actionUrl ? (
-                          <Link
-                            href={notif.actionUrl}
-                            onClick={() => {
-                              markAsRead(notif.id);
-                              setIsOpen(false);
-                            }}
-                            className="inline-flex items-center gap-1 text-[11px] font-bold text-blue-600 hover:text-blue-800 transition-colors"
-                          >
-                            <span>عرض التفاصيل</span>
-                            <ExternalLink className="w-3 h-3" />
-                          </Link>
-                        ) : <span />}
+                      {/* Footer Actions */}
+                      <div className="flex items-center justify-between pt-1.5 border-t border-slate-100">
+                        <span className="inline-flex items-center gap-1 text-[11px] font-bold text-blue-600 group-hover:text-blue-800">
+                          <span>عرض المقرر الآن</span>
+                          <ChevronLeft className="w-3.5 h-3.5 transition-transform group-hover:-translate-x-0.5" />
+                        </span>
 
-                        <div className="flex items-center gap-1">
-                          {!notif.isRead && (
-                            <button
-                              type="button"
-                              onClick={() => markAsRead(notif.id)}
-                              className="text-[10px] text-blue-600 hover:underline px-1.5 py-0.5 font-medium cursor-pointer"
-                            >
-                              تعليم كمقروء
-                            </button>
-                          )}
-                          <button
-                            type="button"
-                            onClick={() => removeNotification(notif.id)}
-                            className="text-slate-400 hover:text-rose-600 p-1 rounded-md hover:bg-rose-50 transition-colors cursor-pointer"
-                            title="حذف الإشعار"
-                          >
-                            <Trash2 className="w-3 h-3" />
-                          </button>
-                        </div>
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            removeNotification(notif.id);
+                          }}
+                          className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 active:scale-95 transition-all cursor-pointer"
+                          title="حذف الإشعار"
+                          aria-label="حذف الإشعار"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
                       </div>
                     </div>
                   </div>
@@ -327,21 +312,41 @@ export function NotificationBell() {
                     <Bell className="w-6 h-6" />
                   </div>
                   <p className="text-xs font-bold text-slate-700 mb-1">
-                    لا توجد إشعارات حالياً
+                    لا توجد إشعارات في هذا القسم
                   </p>
-                  <p className="text-[11px] text-slate-400 max-w-[200px] mx-auto">
+                  <p className="text-[11px] text-slate-400 max-w-[220px] mx-auto">
                     أي تحديث جديد للمحاضرات أو الاختبارات سيظهر لك هنا فوراً.
                   </p>
                 </div>
               )}
             </div>
 
-            {/* Footer */}
-            <div className="p-2.5 bg-slate-50 border-t border-slate-200/80 text-center shrink-0">
+            {/* Footer with Instant Testing Buttons & Course Link */}
+            <div className="p-3 bg-slate-50 border-t border-slate-200/80 flex flex-col sm:flex-row items-center justify-between gap-2 shrink-0">
+              {/* Quick Testing buttons */}
+              <div className="flex items-center gap-1.5 w-full sm:w-auto justify-center">
+                <button
+                  type="button"
+                  onClick={simulateLectureNotification}
+                  className="flex-1 sm:flex-none px-2.5 py-1.5 rounded-xl text-[11px] font-bold bg-blue-100 hover:bg-blue-200 text-blue-800 active:scale-95 transition-all cursor-pointer text-center"
+                  title="محاكاة نزول محاضرة جديدة"
+                >
+                  + تجربة محاضرة
+                </button>
+                <button
+                  type="button"
+                  onClick={simulateExamNotification}
+                  className="flex-1 sm:flex-none px-2.5 py-1.5 rounded-xl text-[11px] font-bold bg-rose-100 hover:bg-rose-200 text-rose-800 active:scale-95 transition-all cursor-pointer text-center"
+                  title="محاكاة إشعار اختبار"
+                >
+                  + تجربة اختبار
+                </button>
+              </div>
+
               <Link
                 href="/courses"
                 onClick={() => setIsOpen(false)}
-                className="text-xs font-bold text-blue-600 hover:text-blue-800 transition-colors"
+                className="text-xs font-bold text-blue-600 hover:text-blue-800 transition-colors py-1"
               >
                 تصفح كافة المقررات الدراسية ←
               </Link>
@@ -352,4 +357,3 @@ export function NotificationBell() {
     </div>
   );
 }
-

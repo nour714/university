@@ -13,6 +13,7 @@ import {
 export function BottomNav() {
   const pathname = usePathname();
   const isCoursesActive = pathname.startsWith('/courses');
+  const isCodesActive = pathname.startsWith('/codes');
   const isHomeActive = pathname === '/';
 
   return (
@@ -61,15 +62,18 @@ export function BottomNav() {
         </Link>
 
         {/* 4. Key Icon (أكوادي) */}
-        <button
-          type="button"
-          onClick={(e) => e.preventDefault()}
-          className="flex flex-col items-center justify-center py-1.5 px-2.5 text-slate-400 hover:text-white transition-colors cursor-pointer group"
-          title="أكوادي (قريباً)"
+        <Link
+          href="/codes"
+          className={`flex flex-col items-center justify-center py-1.5 px-3 rounded-2xl transition-all ${
+            isCodesActive
+              ? 'bg-blue-600 text-white font-bold shadow-md shadow-blue-600/40 border border-blue-400/50'
+              : 'text-slate-300 hover:text-white'
+          }`}
+          title="أكوادي الأكاديمية"
         >
-          <KeyRound className="w-5 h-5 group-hover:scale-105 transition-transform" />
-          <span className="text-[10px] font-medium mt-0.5 text-slate-300">أكوادي</span>
-        </button>
+          <KeyRound className="w-5 h-5 stroke-[2.2]" />
+          <span className="text-[10px] font-bold mt-0.5">أكوادي</span>
+        </Link>
 
         {/* 5. More Icon (المزيد) */}
         <button

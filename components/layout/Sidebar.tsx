@@ -25,6 +25,7 @@ export function Sidebar({ currentPath }: { currentPath?: string }) {
   const pathname = usePathname() || currentPath || '/';
   const isHomeActive = pathname === '/';
   const isCoursesActive = pathname.startsWith('/courses');
+  const isCodesActive = pathname.startsWith('/codes');
 
   return (
     <aside className="hidden lg:flex flex-col items-start p-3.5 shrink-0 sticky top-0 h-screen select-none z-40">
@@ -184,26 +185,32 @@ export function Sidebar({ currentPath }: { currentPath?: string }) {
 
           {/* 4. أكوادي (My Codes) */}
           <div className="relative group w-full">
-            <button
-              type="button"
-              onClick={(e) => e.preventDefault()}
-              className={`flex items-center gap-3.5 rounded-2xl text-slate-400 hover:text-white hover:bg-blue-900/40 transition-all duration-200 cursor-pointer ${
+            <Link
+              href="/codes"
+              className={`flex items-center gap-3.5 rounded-2xl transition-all duration-200 cursor-pointer ${
                 isExpanded 
-                  ? 'px-4 py-2.5 w-full text-right' 
+                  ? 'px-4 py-3 w-full' 
                   : 'w-12 h-12 justify-center mx-auto'
+              } ${
+                isCodesActive
+                  ? 'bg-blue-600 text-white font-bold shadow-lg shadow-blue-600/40 border border-blue-400/60'
+                  : 'text-slate-300 hover:text-white hover:bg-blue-900/40'
               }`}
               title="أكوادي"
             >
-              <KeyRound className="w-5 h-5 shrink-0 group-hover:scale-105 transition-transform" />
+              <KeyRound className="w-5 h-5 shrink-0 stroke-[2.2]" />
               {isExpanded && (
-                <span className="text-sm font-medium animate-fadeIn">أكوادي</span>
+                <div className="flex-1 flex items-center justify-between animate-fadeIn">
+                  <span className="text-sm font-bold">أكوادي</span>
+                  {isCodesActive && <span className="w-2 h-2 rounded-full bg-white animate-pulse" />}
+                </div>
               )}
-            </button>
+            </Link>
 
             {!isExpanded && (
               <div className="absolute right-16 top-1/2 -translate-y-1/2 hidden group-hover:flex items-center z-50 pointer-events-none">
                 <div className="bg-[#172554] text-white text-xs font-semibold px-3 py-1.5 rounded-xl border border-blue-700 shadow-xl whitespace-nowrap">
-                  أكوادي
+                  أكوادي الأكاديمية
                 </div>
               </div>
             )}

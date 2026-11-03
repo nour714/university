@@ -10,6 +10,9 @@ interface CourseDetailPageProps {
   }>;
 }
 
+// Allow blocking route for params access in Next.js 16
+export const instant = false;
+
 // Generate static routes for all courses for blazing fast Edge SSG performance
 export function generateStaticParams() {
   return COURSES_DATA.map((course) => ({

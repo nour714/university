@@ -76,11 +76,6 @@ export function CodesManager() {
     setInputCode(formatted);
   };
 
-  const handleQuickFill = (codeToFill: string) => {
-    setErrorMessage('');
-    setInputCode(formatCodeInput(codeToFill));
-  };
-
   const handleRedeem = (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMessage('');
@@ -280,24 +275,6 @@ export function CodesManager() {
                 <span>{errorMessage}</span>
               </div>
             )}
-
-            {/* Quick Demo Codes Tags */}
-            <div className="pt-2 border-t border-slate-100 flex flex-wrap items-center gap-2">
-              <span className="text-[11px] font-bold text-slate-400">
-                أكواد تجريبية سريعة:
-              </span>
-              {DEMO_REDEEMABLE_CODES.map((d) => (
-                <button
-                  key={d.code}
-                  type="button"
-                  onClick={() => handleQuickFill(d.code)}
-                  className="px-2.5 py-1 rounded-lg text-[10px] font-mono font-bold bg-slate-100 hover:bg-blue-50 text-slate-700 hover:text-blue-700 border border-slate-200 hover:border-blue-200 transition-all cursor-pointer active:scale-95"
-                  title={`تعبئة كود ${d.courseName}`}
-                >
-                  {d.code} ({d.courseCode})
-                </button>
-              ))}
-            </div>
           </form>
 
           {/* Success Box after activation */}
@@ -422,3 +399,4 @@ export function CodesManager() {
     </div>
   );
 }
+

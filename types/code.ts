@@ -10,3 +10,4 @@ export interface StudentCode {
   semester: string;
   status: 'active' | 'expired';
 }
+

@@ -74,12 +74,9 @@ export function CourseCard({ course }: CourseCardProps) {
           </h2>
 
           {/* Doctor Info */}
-          <div className="flex items-center gap-2 text-xs text-slate-700 bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+          <div className="flex items-center gap-2 text-xs text-slate-700 bg-slate-50 px-3 py-2 rounded-xl border border-slate-100">
             <User className="w-4 h-4 text-slate-600 shrink-0" />
-            <div className="truncate">
-              <span className="font-semibold">{course.doctorName}</span>
-              <span className="text-slate-600 text-[11px] block truncate">{course.doctorTitle}</span>
-            </div>
+            <span className="font-semibold truncate">{course.doctorName}</span>
           </div>
         </div>
       </div>

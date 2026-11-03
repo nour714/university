@@ -1,6 +1,6 @@
 import { Course } from '@/types/course';
 
-export const COURSES_DATA: Course[] = [
+const RAW_COURSES_DATA: Course[] = [
   {
     id: 'ai-301',
     code: 'AI301',
@@ -554,3 +554,18 @@ export const COURSES_DATA: Course[] = [
   },
 ];
 
+
+// Automatically compute accurate item counts directly from actual content items
+export const COURSES_DATA: Course[] = RAW_COURSES_DATA.map((course) => {
+  const items = course.content || [];
+  return {
+    ...course,
+    itemsCount: {
+      files: items.filter((i) => i.type === 'file').length,
+      videos: items.filter((i) => i.type === 'video').length,
+      images: items.filter((i) => i.type === 'image').length,
+      links: items.filter((i) => i.type === 'link').length,
+      total: items.length,
+    },
+  };
+});

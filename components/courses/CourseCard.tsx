@@ -88,7 +88,7 @@ export function CourseCard({ course }: CourseCardProps) {
         <div className="flex items-center justify-between text-xs text-slate-600 mb-3">
           <span className="font-medium text-xs">المحتويات الأكاديمية:</span>
           <span className="font-bold text-slate-900 bg-white px-2.5 py-0.5 rounded-md border border-slate-200 shadow-2xs text-xs">
-            {course.itemsCount.total} عنصر
+            {course.content.length} عنصر
           </span>
         </div>
 

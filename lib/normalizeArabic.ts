@@ -43,3 +43,4 @@ export function matchesSearch(target: string | undefined | null, query: string):
 
   return false;
 }
+

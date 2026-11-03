@@ -60,15 +60,15 @@ export function BottomNav() {
           <GraduationCap className="w-6 h-6 stroke-[2.4]" />
         </Link>
 
-        {/* 4. Key Icon (المفتاح / الصلاحيات) */}
+        {/* 4. Key Icon (أكوادي) */}
         <button
           type="button"
           onClick={(e) => e.preventDefault()}
           className="flex flex-col items-center justify-center py-1.5 px-2.5 text-slate-400 hover:text-white transition-colors cursor-pointer group"
-          title="المفتاح (قريباً)"
+          title="أكوادي (قريباً)"
         >
           <KeyRound className="w-5 h-5 group-hover:scale-105 transition-transform" />
-          <span className="text-[10px] font-medium mt-0.5 text-slate-300">المفتاح</span>
+          <span className="text-[10px] font-medium mt-0.5 text-slate-300">أكوادي</span>
         </button>
 
         {/* 5. More Icon (المزيد) */}

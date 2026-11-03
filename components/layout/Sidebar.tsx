@@ -182,7 +182,7 @@ export function Sidebar({ currentPath }: { currentPath?: string }) {
             )}
           </div>
 
-          {/* 3. المفتاح (Key) */}
+          {/* 4. أكوادي (My Codes) */}
           <div className="relative group w-full">
             <button
               type="button"
@@ -192,18 +192,18 @@ export function Sidebar({ currentPath }: { currentPath?: string }) {
                   ? 'px-4 py-2.5 w-full text-right' 
                   : 'w-12 h-12 justify-center mx-auto'
               }`}
-              title="المفتاح"
+              title="أكوادي"
             >
               <KeyRound className="w-5 h-5 shrink-0 group-hover:scale-105 transition-transform" />
               {isExpanded && (
-                <span className="text-sm font-medium animate-fadeIn">المفتاح</span>
+                <span className="text-sm font-medium animate-fadeIn">أكوادي</span>
               )}
             </button>
 
             {!isExpanded && (
               <div className="absolute right-16 top-1/2 -translate-y-1/2 hidden group-hover:flex items-center z-50 pointer-events-none">
                 <div className="bg-[#172554] text-white text-xs font-semibold px-3 py-1.5 rounded-xl border border-blue-700 shadow-xl whitespace-nowrap">
-                  المفتاح والصلاحيات
+                  أكوادي
                 </div>
               </div>
             )}

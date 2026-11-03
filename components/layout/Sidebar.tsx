@@ -1,21 +1,13 @@
 import Link from 'next/link';
 import { 
   BookOpen, 
-  Calendar, 
-  Bell, 
   GraduationCap, 
-  FolderKanban, 
-  Layers, 
   HelpCircle,
   Sparkles
 } from 'lucide-react';
 
 export const NAVIGATION_LINKS = [
   { name: 'مكتبة المقررات', href: '/courses', icon: 'BookOpen', active: true },
-  { name: 'الجدول الدراسي', href: '#schedule', icon: 'Calendar', active: false },
-  { name: 'لوحة الإعلانات', href: '#announcements', icon: 'Bell', active: false },
-  { name: 'المشاريع والأبحاث', href: '#projects', icon: 'FolderKanban', active: false },
-  { name: 'الأقسام العلمية', href: '#departments', icon: 'Layers', active: false },
 ];
 
 export function Sidebar({ currentPath = '/courses' }: { currentPath?: string }) {
@@ -56,11 +48,7 @@ export function Sidebar({ currentPath = '/courses' }: { currentPath?: string }) 
                       : 'text-slate-300 hover:bg-blue-900/40 hover:text-white'
                   }`}
                 >
-                  {item.icon === 'BookOpen' && <BookOpen className="w-5 h-5" />}
-                  {item.icon === 'Calendar' && <Calendar className="w-5 h-5 text-slate-400" />}
-                  {item.icon === 'Bell' && <Bell className="w-5 h-5 text-slate-400" />}
-                  {item.icon === 'FolderKanban' && <FolderKanban className="w-5 h-5 text-slate-400" />}
-                  {item.icon === 'Layers' && <Layers className="w-5 h-5 text-slate-400" />}
+                  <BookOpen className="w-5 h-5" />
                   <span>{item.name}</span>
                   {isActive && (
                     <span className="mr-auto w-1.5 h-1.5 rounded-full bg-white animate-pulse" />

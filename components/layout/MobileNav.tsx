@@ -7,11 +7,7 @@ import {
   Menu, 
   X, 
   BookOpen, 
-  Calendar, 
-  Bell, 
-  GraduationCap, 
-  FolderKanban, 
-  Layers
+  GraduationCap
 } from 'lucide-react';
 
 interface MobileNavProps {
@@ -83,11 +79,7 @@ export function MobileNav({ navLinks }: MobileNavProps) {
                           : 'text-slate-300 hover:bg-blue-900/40 hover:text-white'
                       }`}
                     >
-                      {link.icon === 'BookOpen' && <BookOpen className="w-5 h-5" />}
-                      {link.icon === 'Calendar' && <Calendar className="w-5 h-5" />}
-                      {link.icon === 'Bell' && <Bell className="w-5 h-5" />}
-                      {link.icon === 'FolderKanban' && <FolderKanban className="w-5 h-5" />}
-                      {link.icon === 'Layers' && <Layers className="w-5 h-5" />}
+                      <BookOpen className="w-5 h-5" />
                       <span>{link.name}</span>
                     </Link>
                   );

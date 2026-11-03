@@ -1,13 +1,8 @@
 import Link from 'next/link';
 import { Course } from '@/types/course';
 import { 
-  FileText, 
-  Video, 
-  Image as ImageIcon, 
-  Link2, 
   ArrowLeft, 
   User, 
-  Layers, 
   BrainCircuit, 
   Cpu, 
   MessageSquareText, 
@@ -74,16 +69,9 @@ export function CourseCard({ course }: CourseCardProps) {
 
         {/* Card Body: Title & Professor */}
         <div className="p-5 pt-4">
-          <h2 className="text-lg font-bold text-slate-900 group-hover:text-blue-600 transition-colors line-clamp-1 mb-1">
+          <h2 className="text-lg font-bold text-slate-900 group-hover:text-blue-600 transition-colors line-clamp-1 mb-4">
             {course.title}
           </h2>
-          <p className="text-xs text-slate-600 line-clamp-1 font-mono mb-3" dir="ltr">
-            {course.englishTitle}
-          </p>
-
-          <p className="text-xs text-slate-600 line-clamp-2 leading-relaxed mb-4">
-            {course.description}
-          </p>
 
           {/* Doctor Info */}
           <div className="flex items-center gap-2 text-xs text-slate-700 bg-slate-50 p-2.5 rounded-xl border border-slate-100">
@@ -100,36 +88,9 @@ export function CourseCard({ course }: CourseCardProps) {
       <div className="p-5 pt-3 border-t border-slate-100 bg-slate-50/60">
         <div className="flex items-center justify-between text-xs text-slate-600 mb-3">
           <span className="font-medium">المحتويات الأكاديمية:</span>
-          <span className="font-bold text-slate-900 bg-white px-2 py-0.5 rounded-md border border-slate-200 shadow-2xs">
+          <span className="font-bold text-slate-900 bg-white px-2.5 py-1 rounded-md border border-slate-200 shadow-2xs">
             {course.itemsCount.total} عنصر
           </span>
-        </div>
-
-        {/* Item type badges breakdown */}
-        <div className="grid grid-cols-4 gap-1.5 mb-4 text-center">
-          <div className="bg-white p-1.5 rounded-lg border border-slate-100 flex flex-col items-center justify-center">
-            <FileText className="w-3.5 h-3.5 text-blue-600 mb-0.5" />
-            <span className="text-[11px] font-bold text-slate-800">{course.itemsCount.files}</span>
-            <span className="text-[9px] text-slate-600">ملفات</span>
-          </div>
-
-          <div className="bg-white p-1.5 rounded-lg border border-slate-100 flex flex-col items-center justify-center">
-            <Video className="w-3.5 h-3.5 text-indigo-600 mb-0.5" />
-            <span className="text-[11px] font-bold text-slate-800">{course.itemsCount.videos}</span>
-            <span className="text-[9px] text-slate-600">فيديوهات</span>
-          </div>
-
-          <div className="bg-white p-1.5 rounded-lg border border-slate-100 flex flex-col items-center justify-center">
-            <ImageIcon className="w-3.5 h-3.5 text-amber-600 mb-0.5" />
-            <span className="text-[11px] font-bold text-slate-800">{course.itemsCount.images}</span>
-            <span className="text-[9px] text-slate-600">صور</span>
-          </div>
-
-          <div className="bg-white p-1.5 rounded-lg border border-slate-100 flex flex-col items-center justify-center">
-            <Link2 className="w-3.5 h-3.5 text-emerald-600 mb-0.5" />
-            <span className="text-[11px] font-bold text-slate-800">{course.itemsCount.links}</span>
-            <span className="text-[9px] text-slate-600">روابط</span>
-          </div>
         </div>
 
         {/* Main CTA */}

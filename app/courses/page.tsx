@@ -42,24 +42,24 @@ async function CoursesList({ searchParams }: CoursesPageProps) {
 
       {/* Course Cards Grid (Server Rendered) */}
       {filteredCourses.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
           {filteredCourses.map((course) => (
             <CourseCard key={course.id} course={course} />
           ))}
         </div>
       ) : (
         /* Empty State */
-        <div className="bg-white rounded-3xl p-12 text-center border border-slate-200/80 shadow-xs max-w-lg mx-auto my-8">
-          <div className="w-16 h-16 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center mx-auto mb-4 border border-blue-100">
-            <FolderSearch className="w-8 h-8" />
+        <div className="bg-white rounded-3xl p-8 sm:p-12 text-center border border-slate-200/80 shadow-xs max-w-lg mx-auto my-6 sm:my-8">
+          <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center mx-auto mb-4 border border-blue-100">
+            <FolderSearch className="w-7 h-7 sm:w-8 sm:h-8" />
           </div>
-          <h3 className="text-lg font-bold text-slate-800 mb-1">لم يتم العثور على مقررات مطابقة</h3>
+          <h3 className="text-base sm:text-lg font-bold text-slate-800 mb-1">لم يتم العثور على مقررات مطابقة</h3>
           <p className="text-xs text-slate-500 mb-6 leading-relaxed">
             تأكد من كتابة اسم المقرر أو كود المادة بشكل صحيح.
           </p>
           <Link
             href="/courses"
-            className="inline-flex items-center justify-center px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-md shadow-blue-600/20 transition-all"
+            className="inline-flex items-center justify-center px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-md shadow-blue-600/20 transition-all min-h-[44px]"
           >
             عرض كافة المقررات
           </Link>
@@ -71,11 +71,11 @@ async function CoursesList({ searchParams }: CoursesPageProps) {
 
 function CoursesSkeleton() {
   return (
-    <div className="space-y-6">
-      <div className="h-16 bg-white rounded-2xl border border-slate-200 animate-pulse" />
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+    <div className="space-y-4 sm:space-y-6">
+      <div className="h-14 bg-white rounded-2xl border border-slate-200 animate-pulse" />
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
         {[1, 2, 3, 4, 5, 6].map((n) => (
-          <div key={n} className="h-64 bg-white rounded-2xl border border-slate-200 animate-pulse" />
+          <div key={n} className="h-56 bg-white rounded-2xl border border-slate-200 animate-pulse" />
         ))}
       </div>
     </div>
@@ -84,18 +84,18 @@ function CoursesSkeleton() {
 
 export default function CoursesPage({ searchParams }: CoursesPageProps) {
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Page Hero Header (Static Server Shell) */}
-      <div className="bg-gradient-to-l from-[#172554] to-blue-900 rounded-3xl p-6 sm:p-8 text-white shadow-xl relative overflow-hidden">
+      <div className="bg-gradient-to-l from-[#172554] to-blue-900 rounded-2xl sm:rounded-3xl p-5 sm:p-8 text-white shadow-xl relative overflow-hidden">
         <div className="relative z-10 max-w-2xl">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/20 text-blue-200 text-xs font-semibold mb-3 border border-blue-400/20">
+          <div className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1 rounded-full bg-blue-500/20 text-blue-200 text-[10px] sm:text-xs font-semibold mb-2.5 sm:mb-3 border border-blue-400/20">
             <Sparkles className="w-3.5 h-3.5 text-blue-300" />
             <span>مستودع المعرفة المفتوح لطلاب الكلية</span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight mb-2">
+          <h1 className="text-xl sm:text-3xl font-extrabold tracking-tight mb-2">
             مكتبة المقررات الدراسية
           </h1>
-          <p className="text-sm sm:text-base text-blue-100/90 leading-relaxed">
+          <p className="text-xs sm:text-sm md:text-base text-blue-100/90 leading-relaxed">
             تصفح وحمّل المحاضرات، سلايدات الشرح، الفيديوهات التعليمية، والروابط البرمجية المعتمدة لجميع الفرق والأقسام العلمية في كلية الذكاء الاصطناعي.
           </p>
         </div>

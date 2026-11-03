@@ -352,3 +352,4 @@ export function NotificationBell() {
     </div>
   );
 }
+

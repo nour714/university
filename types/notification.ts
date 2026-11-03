@@ -14,3 +14,4 @@ export interface AcademicNotification {
   priority?: 'normal' | 'urgent';
   actionUrl?: string;
 }
+

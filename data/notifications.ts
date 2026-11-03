@@ -83,3 +83,4 @@ export const INITIAL_NOTIFICATIONS: AcademicNotification[] = [
     actionUrl: '/courses',
   },
 ];
+

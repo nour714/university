@@ -118,3 +118,4 @@ export function NotificationToast() {
     </div>
   );
 }
+

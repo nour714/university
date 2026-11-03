@@ -28,20 +28,20 @@ export function Header() {
           </div>
         </div>
 
-        {/* Left side: Clean Student Profile */}
+        {/* Left side: Clean Student Profile with Hover Reveal */}
         <div className="flex items-center gap-2 shrink-0">
           <Link 
             href="/"
-            className="flex items-center gap-2.5 sm:gap-3 transition-all cursor-pointer group"
+            className="flex items-center transition-all cursor-pointer group"
             title="الرئيسية - الملف الشخصي للطالب"
           >
-            {/* Circular Avatar: Clean without outer box or status dot */}
-            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-gradient-to-br from-blue-600 to-indigo-700 text-white flex items-center justify-center font-bold text-xs shadow-sm shadow-blue-600/20 group-hover:scale-105 transition-transform shrink-0">
+            {/* Circular Avatar */}
+            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-gradient-to-br from-blue-600 to-indigo-700 text-white flex items-center justify-center font-bold text-xs shadow-sm shadow-blue-600/20 group-hover:scale-105 group-hover:shadow-md group-hover:shadow-blue-600/30 transition-all shrink-0">
               <User className="w-4 h-4 stroke-[2.5]" />
             </div>
 
-            {/* Student Name and Academic Level */}
-            <div className="text-right hidden sm:block">
+            {/* Student Name and Academic Level - Appears smoothly when hovering over the icon */}
+            <div className="text-right hidden sm:flex flex-col max-w-0 opacity-0 overflow-hidden group-hover:max-w-[280px] group-hover:opacity-100 group-hover:ms-2.5 transition-all duration-300 ease-out whitespace-nowrap pointer-events-none group-hover:pointer-events-auto">
               <p className="text-xs sm:text-sm font-bold text-slate-800 group-hover:text-blue-600 transition-colors leading-tight">
                 {CURRENT_STUDENT.fullName}
               </p>

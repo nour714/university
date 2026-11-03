@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import { CourseContentItem, ContentType } from '@/types/course';
+import { matchesSearch } from '@/lib/normalizeArabic';
 import { 
   FileText, 
   Video, 
@@ -45,12 +46,11 @@ export function CourseContentBrowser({ items, courseCode }: CourseContentBrowser
         return false;
       }
 
-      // Search query filter
+      // Search query filter with Arabic normalization
       if (searchQuery.trim()) {
-        const q = searchQuery.toLowerCase().trim();
-        const matchTitle = item.title.toLowerCase().includes(q);
-        const matchDesc = item.description?.toLowerCase().includes(q) || false;
-        const matchFormat = item.format.toLowerCase().includes(q);
+        const matchTitle = matchesSearch(item.title, searchQuery);
+        const matchDesc = matchesSearch(item.description, searchQuery);
+        const matchFormat = matchesSearch(item.format, searchQuery);
         if (!matchTitle && !matchDesc && !matchFormat) {
           return false;
         }
@@ -111,11 +111,16 @@ export function CourseContentBrowser({ items, courseCode }: CourseContentBrowser
         <div className="relative">
           <Search className="w-4 h-4 text-slate-400 absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
           <input
-            type="text"
+            type="search"
+            inputMode="search"
+            enterKeyHint="search"
+            autoComplete="off"
+            autoCorrect="off"
+            spellCheck={false}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder={`ابحث داخل محتويات ${courseCode} (محاضرة، PDF، فيديو)...`}
-            className="w-full pr-10 sm:pr-11 pl-12 sm:pl-4 py-2 sm:py-2.5 rounded-lg sm:rounded-xl border border-slate-200 bg-slate-50/50 hover:bg-white focus:bg-white focus:border-blue-600 focus:ring-3 focus:ring-blue-600/10 text-xs sm:text-sm text-slate-800 placeholder:text-slate-400 transition-all outline-hidden"
+            className="w-full pr-10 sm:pr-11 pl-12 sm:pl-14 py-2 sm:py-2.5 rounded-lg sm:rounded-xl border border-slate-200 bg-slate-50/50 hover:bg-white focus:bg-white focus:border-blue-600 focus:ring-3 focus:ring-blue-600/10 text-xs sm:text-sm text-slate-800 placeholder:text-slate-400 transition-all outline-hidden"
           />
           {searchQuery && (
             <button

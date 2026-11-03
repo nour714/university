@@ -1,88 +1,13 @@
-import { Suspense } from 'react';
 import { COURSES_DATA } from '@/data/courses';
-import { CourseCard } from '@/components/courses/CourseCard';
-import { CourseFilters } from '@/components/courses/CourseFilters';
-import { Sparkles, FolderSearch } from 'lucide-react';
-import Link from 'next/link';
-
-interface CoursesPageProps {
-  searchParams: Promise<{
-    q?: string;
-  }>;
-}
+import { CoursesCatalog } from '@/components/courses/CoursesCatalog';
+import { Sparkles } from 'lucide-react';
 
 export const metadata = {
   title: 'مكتبة المقررات الأكاديمية | كلية الذكاء الاصطناعي',
   description: 'استكشف المقررات الدراسية، المحاضرات، التمارين، والوسائط لكل الأقسام والمستويات.',
 };
 
-// Async Server Component that consumes searchParams inside Suspense
-async function CoursesList({ searchParams }: CoursesPageProps) {
-  const params = await searchParams;
-  const query = (params.q || '').trim().toLowerCase();
-
-  // Filter courses on the server by query
-  const filteredCourses = COURSES_DATA.filter((course) => {
-    if (query) {
-      const matchTitle = course.title.toLowerCase().includes(query);
-      const matchCode = course.code.toLowerCase().includes(query);
-      const matchEng = course.englishTitle.toLowerCase().includes(query);
-      const matchDoc = course.doctorName.toLowerCase().includes(query);
-      if (!matchTitle && !matchCode && !matchEng && !matchDoc) {
-        return false;
-      }
-    }
-    return true;
-  });
-
-  return (
-    <>
-      {/* Interactive Search Bar Client Component */}
-      <CourseFilters />
-
-      {/* Course Cards Grid (Server Rendered) */}
-      {filteredCourses.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-4">
-          {filteredCourses.map((course) => (
-            <CourseCard key={course.id} course={course} />
-          ))}
-        </div>
-      ) : (
-        /* Empty State */
-        <div className="bg-white rounded-3xl p-8 sm:p-12 text-center border border-slate-200/80 shadow-xs max-w-lg mx-auto my-6 sm:my-8">
-          <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center mx-auto mb-4 border border-blue-100">
-            <FolderSearch className="w-7 h-7 sm:w-8 sm:h-8" />
-          </div>
-          <h3 className="text-base sm:text-lg font-bold text-slate-800 mb-1">لم يتم العثور على مقررات مطابقة</h3>
-          <p className="text-xs text-slate-500 mb-6 leading-relaxed">
-            تأكد من كتابة اسم المقرر أو كود المادة بشكل صحيح.
-          </p>
-          <Link
-            href="/courses"
-            className="inline-flex items-center justify-center px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-md shadow-blue-600/20 transition-all min-h-[44px]"
-          >
-            عرض كافة المقررات
-          </Link>
-        </div>
-      )}
-    </>
-  );
-}
-
-function CoursesSkeleton() {
-  return (
-    <div className="space-y-4 sm:space-y-6">
-      <div className="h-14 bg-white rounded-2xl border border-slate-200 animate-pulse" />
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
-        {[1, 2, 3, 4, 5, 6].map((n) => (
-          <div key={n} className="h-56 bg-white rounded-2xl border border-slate-200 animate-pulse" />
-        ))}
-      </div>
-    </div>
-  );
-}
-
-export default function CoursesPage({ searchParams }: CoursesPageProps) {
+export default function CoursesPage() {
   return (
     <div className="space-y-3 sm:space-y-4">
       {/* Page Hero Header: Compact & Sleek */}
@@ -104,10 +29,8 @@ export default function CoursesPage({ searchParams }: CoursesPageProps) {
         <div className="absolute -left-10 -bottom-10 w-48 h-48 rounded-full bg-blue-500/10 blur-2xl pointer-events-none" />
       </div>
 
-      {/* Dynamic Search & Grid Streaming inside Suspense */}
-      <Suspense fallback={<CoursesSkeleton />}>
-        <CoursesList searchParams={searchParams} />
-      </Suspense>
+      {/* Dynamic Search & Grid (Rock-solid on Mobile & Desktop) */}
+      <CoursesCatalog courses={COURSES_DATA} />
     </div>
   );
 }

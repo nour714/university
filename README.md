@@ -1,36 +1,147 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🎓 بوابة المقررات الأكاديمية | كلية الذكاء الاصطناعي
+> **Faculty of Artificial Intelligence — Academic Course Portal**  
+> منصة أكاديمية تفاعلية حديثة، فائقة السرعة، مصممة لاستيعاب حركة الطلاب الضخمة بكفاءة واستهلاك أدنى للموارد مع تجربة مستخدم استثنائية على كافة الأجهزة (Mobile-First).
 
-## Getting Started
+---
 
-First, run the development server:
+## 🌟 نظرة عامة (Overview)
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+بوابة إلكترونية متطورة مخصصة لطلاب وأعضاء هيئة التدريس بكلية الذكاء الاصطناعي، تتيح استعراض المقررات الدراسية، تحميل المحاضرات والمذكرات بصيغة PDF، مشاهدة الفيديوهات التعليمية، تصفح المخططات المعمارية والخرائط الذهنية، والوصول إلى الروابط البرمجية ومستودعات GitHub المعتمدة.
+
+تم بناء المنصة وفق أحدث معايير هندسة البرمجيات:
+- ⚡ **أداء فائق و سرعة استجابة لحظية**: بالاعتماد على خوادم Edge وتوليد الصفحات الثابتة (SSG) ومكونات الخادم (Server Components).
+- 📱 **تصميم متجاوب بالكامل (Mobile-First)**: تجربة تصفح مثالية وسلسة على مختلف مقاسات الهواتف الذكية والأجهزة اللوحية والشاشات العريضة.
+- 🎨 **هوية بصرية أكاديمية راقية**: ألوان كحلية ملكية (`#172554`)، لمسات زرقاء ديناميكية (`#2563EB`)، وشعار ذهبي مميز يعكس فخامة الصرح الجامعي.
+- ♿ **دعم كامل للغة العربية (RTL)**: استخدام خط **Cairo** العربي الجذاب، واعتماد الخصائص المنطقية للـ CSS (`margin-inline`, `padding-inline`) ومطابقة معايير إمكانية الوصول **WCAG 2.1 AA**.
+
+---
+
+## 🚀 المميزات الرئيسية (Key Features)
+
+### 1. الصفحة الرئيسية ولوحة التحكم (`/`)
+- **بانر ترحيبي عائم**: يعرض بيانات الطالب الأكاديمية، العام الدراسي الحالي، والقسم العلمي.
+- **شبكة إحصائيات بنتو (Bento Stats Grid)**: عرض فوري لـ:
+  - المعدل التراكمي (GPA) مع التقدير الجامعي.
+  - عدد الساعات المسجلة المعتمدة.
+  - المستوى الدراسي الحالي وحالة القيد.
+  - عدد المقررات النشطة لهذا الفصل.
+- **بطاقة وصول سريعة**: للانتقال المباشر لمكتبة المقررات الدراسية.
+
+### 2. مكتبة المقررات الأكاديمية (`/courses`)
+- **بحث فوري وسريع**: تصفية المقررات في الوقت الفعلي حسب اسم المادة، كود المقرر، اسم الدكتور، أو القسم.
+- **بطاقات مقررات أنيقة**: توضح كود المقرر، المستوى الدراسي، الفصل، القسم، اسم أستاذ المادة، وإجمالي المحتويات الأكاديمية مع أزرار لمس مريحة للهواتف (بارتفاع 44px كحد أدنى).
+
+### 3. صفحة تفاصيل وتصفح محتويات المقرر (`/courses/[id]`)
+- **رأس صفحة كحلي متدرج**: يضم كود المادة، عنوان المقرر، اسم أستاذ المادة، وزر عودة سريع للمكتبة بلون متباين.
+- **متصفح محتويات تفاعلي متعدد التبويبات**:
+  - 📄 **جميع المحتويات (All)**: استعراض شامل لكل ما يخص المادة.
+  - 📚 **المحاضرات والملفات (Files)**: مذكرات وسلايدات وشيتات بصيغة PDF.
+  - 🎥 **الفيديوهات (Videos)**: تسجيلات القاعات الذكية وشروحات المعامل مع إيضاح مدة كل فيديو.
+  - 📊 **المخططات والصور (Images)**: الخرائط الذهنية والمعماريات الرقمية بدقة عالية.
+  - 🔗 **الروابط البرمجية (Links)**: دفاتر Google Colab ومستودعات GitHub والمراجع الرسمية.
+- **عرض مزدوج ذكي**:
+  - **عرض الجدول المنظم (Desktop Table)**: للشاشات الكبيرة بنمط سحابي أنيق مستوحى من Google Drive.
+  - **عرض البطاقات السريعة (Mobile Cards)**: للهواتف الذكية مع إمكانية "العرض المباشر" أو "تنزيل الملف" بنقرة واحدة.
+
+### 4. نظام الملاحة الهجين (Navigation System)
+- **شريط علوي عائم (Floating Pill Header)**: يحتوي على عنوان الكلية، العام الأكاديمي، وأيقونة الملف الشخصي للطالب الدائرية النظيفة.
+- **شريط جانبي للشاشات الكبيرة (Desktop Sidebar Dock)**: كبسولة ملاحة عائمة كحلية تضم شعار الكلية الذهبي، زر مكتبة المقررات، إمكانية التمدد والطي، وأزرار الاختصارات الإضافية.
+- **شريط سفلي للموبايل (Mobile Bottom Dock)**: شريط عائم منحني الحواف في أسفل الشاشة، يسهل الوصول لجميع الأقسام الرئيسية بإبهام اليد الواحدة.
+
+---
+
+## 🛠️ البنية التقنية (Tech Stack)
+
+| التقنية | الاستخدام |
+| :--- | :--- |
+| **Next.js 16.4 (App Router)** | إطار العمل الأساسي، Partial Prerendering، والتوليد الثابت للمسارات |
+| **React 19** | مكتبة واجهة المستخدم وأحدث الـ Hooks التفاعلية |
+| **Tailwind CSS v4** | تنسيق وتصميم الواجهات بأنظمة الألوان الحديثة |
+| **Turbopack** | محرك البناء فائق السرعة للتطوير والإنتاج |
+| **TypeScript** | أمان الأنماط ومنع الأخطاء البرمجية |
+| **Lucide React** | حزمة الأيقونات العصرية والمتناسقة |
+| **Cairo Font** | الخط العربي الرسمي للمنصة عبر `next/font/google` |
+
+---
+
+## 📁 الهيكل التنظيمي للمشروع (Project Structure)
+
+```text
+├── app/
+│   ├── layout.tsx              # الهيكل العام، الخطوط، والشريط الجانبي والسفلي
+│   ├── globals.css             # إعدادات Tailwind v4 والـ Cairo Font والـ RTL
+│   ├── page.tsx                # الصفحة الرئيسية (لوحة تحكم الطالب)
+│   ├── courses/
+│   │   ├── page.tsx            # صفحة مكتبة المقررات وشريط البحث
+│   │   └── [id]/
+│   │       └── page.tsx        # صفحة تفاصيل وتصفح محتويات المقرر
+│   └── favicon.ico             # أيقونة الموقع
+├── components/
+│   ├── course-detail/
+│   │   └── CourseContentBrowser.tsx # متصفح التبويبات والجدول والبطاقات للمقرر
+│   ├── courses/
+│   │   ├── CourseCard.tsx      # بطاقة عرض المقرر الفردي
+│   │   └── CourseFilters.tsx   # حقل البحث التفاعلي المتزامن مع الـ URL
+│   ├── home/
+│   │   ├── StudentHero.tsx     # بانر الطالب الترحيبي
+│   │   ├── StudentStatsGrid.tsx# بطاقات إحصائيات الـ Bento
+│   │   └── QuickCoursesAction.tsx # بطاقة الوصول السريع
+│   └── layout/
+│       ├── Header.tsx          # الهيدر العائم وشارة الطالب الدائرية
+│       ├── Sidebar.tsx         # القائمة الجانبية للشاشات الكبيرة
+│       ├── BottomNav.tsx       # الشريط السفلي العائم للهواتف الذكية
+│       └── MobileNav.tsx       # مكون الملاحة البديل للموبايل
+├── data/
+│   ├── courses.ts              # بيانات المقررات والمحاضرات والملفات والوسائط
+│   └── student.ts              # بيانات الملف الشخصي للطالب والساعات والمعدل
+├── types/
+│   └── course.ts               # تعريفات TypeScript للمقررات والمحتويات
+├── next.config.ts              # إعدادات Next.js والسماح بالشبكة المحلية
+├── package.json                # حزم التبعيات وأوامر التشغيل
+└── README.md                   # التوثيق الشامل للمشروع
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 💻 التشغيل والتثبيت (Getting Started)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 1. المتطلبات الأساسية
+- تثبيت بيئة **Node.js** (الإصدار 18 أو أحدث).
+- مدير الحزم `npm` أو `pnpm` أو `yarn`.
 
-## Learn More
+### 2. تثبيت الحزم
+```bash
+npm install
+```
 
-To learn more about Next.js, take a look at the following resources:
+### 3. تشغيل خادم التطوير (Development Server)
+تم ضبط المشروع مسبقاً ليعمل على المنفذ المخصص **`5500`**:
+```bash
+npm run dev
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- **محلياً على جهازك**: [http://localhost:5500](http://localhost:5500)
+- **من هاتفك عبر شبكة الواي فاي المحلية**: `http://<YOUR_LOCAL_IP>:5500` (مثل `http://192.168.1.4:5500`)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### 4. إنشاء النسخة الإنتاجية (Production Build)
+```bash
+npm run build
+```
 
-## Deploy on Vercel
+### 5. تشغيل خادم الإنتاج (Production Server)
+```bash
+npm run start
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+---
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 🔒 معايير الأمان والجودة (Engineering Standards)
+- **أمان المدخلات**: تنظيف وتعقيم معاملات البحث وروابط التنزيل.
+- **حماية الـ Secrets**: لا توجد أي مفاتيح حساسة مكشوفة في الواجهة الأمامية.
+- **توليد مسارات ثابتة (SSG)**: استخدام `generateStaticParams` لضمان تحميل صفحات المقررات في أجزاء من الثانية (Zero TTFB).
+- **منع تحذيرات مسارات الـ Instant Shell**: ضبط `export const instant = false` للمسارات ذات المعاملات الديناميكية في Next.js 16.
+
+---
+
+## 🏛️ الترخيص والحقوق (License)
+مشروع تم تطويره لصالح **كلية الذكاء الاصطناعي** © 2026. جميع الحقوق محفوظة.

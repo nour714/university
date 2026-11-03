@@ -4,6 +4,8 @@ import './globals.css';
 import { Sidebar } from '@/components/layout/Sidebar';
 import { Header } from '@/components/layout/Header';
 import { BottomNav } from '@/components/layout/BottomNav';
+import { NotificationProvider } from '@/context/NotificationContext';
+import { NotificationToast } from '@/components/notifications/NotificationToast';
 
 const cairo = Cairo({
   subsets: ['arabic', 'latin'],
@@ -25,18 +27,23 @@ export default function RootLayout({
   return (
     <html lang="ar" dir="rtl" className={`${cairo.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-row bg-[#f8fafc] text-slate-900 font-sans">
-        {/* Desktop Sidebar */}
-        <Sidebar />
+        <NotificationProvider>
+          {/* Real-time Global Academic Toast Banner */}
+          <NotificationToast />
 
-        {/* Main Content Area */}
-        <div className="flex-1 flex flex-col min-w-0 min-h-screen">
-          <Header />
-          <main className="flex-1 p-3 sm:p-6 lg:p-8 pb-24 lg:pb-8 max-w-7xl w-full mx-auto">
-            {children}
-          </main>
-          {/* Floating Mobile Bottom Navigation Bar */}
-          <BottomNav />
-        </div>
+          {/* Desktop Sidebar */}
+          <Sidebar />
+
+          {/* Main Content Area */}
+          <div className="flex-1 flex flex-col min-w-0 min-h-screen">
+            <Header />
+            <main className="flex-1 p-3 sm:p-6 lg:p-8 pb-24 lg:pb-8 max-w-7xl w-full mx-auto">
+              {children}
+            </main>
+            {/* Floating Mobile Bottom Navigation Bar */}
+            <BottomNav />
+          </div>
+        </NotificationProvider>
       </body>
     </html>
   );

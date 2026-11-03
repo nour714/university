@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { GraduationCap, User, Sparkles } from 'lucide-react';
 import { CURRENT_STUDENT } from '@/data/student';
+import { NotificationBell } from '@/components/notifications/NotificationBell';
 
 export function Header() {
   return (
@@ -27,8 +28,12 @@ export function Header() {
           </div>
         </div>
 
-        {/* Left side: Clean Student Profile with Hover Reveal (Cinematic Slow Motion) */}
-        <div className="flex items-center gap-2 shrink-0">
+        {/* Left side: Notifications Bell + Student Profile */}
+        <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
+          {/* Academic Notifications Bell */}
+          <NotificationBell />
+
+          {/* Student Profile Avatar with Hover Reveal */}
           <Link 
             href="/"
             className="flex items-center transition-all duration-700 cursor-pointer group"

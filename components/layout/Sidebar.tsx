@@ -8,8 +8,7 @@ import {
   LogOut,
   ChevronRight,
   Sparkles,
-  HelpCircle,
-  X
+  HelpCircle
 } from 'lucide-react';
 
 export const NAVIGATION_LINKS = [
@@ -28,18 +27,20 @@ export function Sidebar({ currentPath = '/courses' }: { currentPath?: string }) 
           isExpanded ? 'w-64 px-5' : 'w-[76px] px-2 items-center'
         }`}
       >
-        {/* Top Section: Distinctive Interactive Logo */}
-        <div className="w-full shrink-0">
-          <div className="flex items-center justify-between gap-3">
+        {/* Top Section: Distinctive University Emblem Logo */}
+        <div className={`w-full shrink-0 pb-4 border-b border-blue-900/60 ${isExpanded ? '' : 'flex justify-center'}`}>
+          <div className="flex items-center justify-between gap-3 w-full">
             <button
               type="button"
               onClick={() => setIsExpanded(!isExpanded)}
-              className="group flex items-center gap-3.5 text-right w-full outline-hidden"
-              title={isExpanded ? 'طي القائمة الجانبية' : 'فتح القائمة الجانبية بالكامل'}
+              className={`group flex items-center gap-3.5 outline-hidden transition-all ${
+                isExpanded ? 'w-full text-right' : 'justify-center mx-auto'
+              }`}
+              title={isExpanded ? 'طي القائمة الجانبية' : 'اضغط لفتح القائمة الجانبية'}
             >
-              {/* Distinctive Logo Icon (Royal Blue Gradient with Glowing Border) */}
-              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-700 border-2 border-blue-300/90 text-white flex items-center justify-center shrink-0 shadow-lg shadow-blue-600/50 group-hover:scale-110 group-hover:shadow-blue-500/70 transition-all duration-300">
-                <GraduationCap className="w-6 h-6 stroke-[2.3] drop-shadow-xs" />
+              {/* Distinctive University Crest (Gold/Amber Emblem with Royal Navy Trim) */}
+              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-amber-400 via-amber-500 to-amber-600 border-2 border-amber-200 text-[#172554] flex items-center justify-center shrink-0 shadow-lg shadow-amber-500/35 ring-2 ring-amber-400/40 ring-offset-2 ring-offset-[#172554] group-hover:scale-110 group-hover:shadow-amber-400/60 transition-all duration-300 cursor-pointer">
+                <GraduationCap className="w-6 h-6 stroke-[2.4] drop-shadow-2xs" />
               </div>
 
               {/* Text shown ONLY when expanded */}
@@ -49,7 +50,7 @@ export function Sidebar({ currentPath = '/courses' }: { currentPath?: string }) 
                     <span className="font-extrabold text-sm text-white tracking-tight truncate">
                       كلية الذكاء الاصطناعي
                     </span>
-                    <Sparkles className="w-3.5 h-3.5 text-blue-400 shrink-0" />
+                    <Sparkles className="w-3.5 h-3.5 text-amber-400 shrink-0" />
                   </div>
                   <p className="text-[11px] text-blue-200 truncate">المنصة الأكاديمية</p>
                 </div>
@@ -70,7 +71,7 @@ export function Sidebar({ currentPath = '/courses' }: { currentPath?: string }) 
           </div>
         </div>
 
-        {/* Middle Section: Navigation Items */}
+        {/* Middle Section: ONLY the original content (مكتبة المقررات) */}
         <div className="flex-1 my-6 flex flex-col justify-start w-full">
           {/* Header Title when expanded */}
           {isExpanded && (
@@ -116,7 +117,7 @@ export function Sidebar({ currentPath = '/courses' }: { currentPath?: string }) 
             {!isExpanded && (
               <div className="absolute right-16 top-1/2 -translate-y-1/2 hidden group-hover:flex items-center z-50 pointer-events-none">
                 <div className="bg-[#172554] text-white text-xs font-bold px-3 py-1.5 rounded-xl border border-blue-700 shadow-xl whitespace-nowrap">
-                  اضغط على اللوجو لفتح القائمة كاملة
+                  مكتبة المقررات الأكاديمية
                 </div>
               </div>
             )}
@@ -172,7 +173,7 @@ export function Sidebar({ currentPath = '/courses' }: { currentPath?: string }) 
         </div>
 
         {/* Ambient subtle glow */}
-        <div className="absolute -top-12 -left-12 w-28 h-28 bg-blue-500/20 rounded-full blur-2xl pointer-events-none" />
+        <div className="absolute -top-12 -left-12 w-28 h-28 bg-amber-500/10 rounded-full blur-2xl pointer-events-none" />
       </div>
     </aside>
   );

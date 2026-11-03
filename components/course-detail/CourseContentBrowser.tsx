@@ -104,18 +104,18 @@ export function CourseContentBrowser({ items, courseCode }: CourseContentBrowser
   };
 
   return (
-    <div className="space-y-4 sm:space-y-5">
+    <div className="space-y-3.5 sm:space-y-4">
       {/* Search & Tabs Controller */}
-      <div className="bg-white rounded-2xl p-3.5 sm:p-5 border border-slate-200/90 shadow-xs space-y-3.5 sm:space-y-4">
+      <div className="bg-white rounded-xl sm:rounded-2xl p-2.5 sm:p-3.5 border border-slate-200/90 shadow-xs space-y-2.5 sm:space-y-3">
         {/* In-Course Search */}
         <div className="relative">
-          <Search className="w-4 h-4 sm:w-5 sm:h-5 text-slate-400 absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+          <Search className="w-4 h-4 text-slate-400 absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder={`ابحث داخل محتويات ${courseCode} (محاضرة، PDF، فيديو)...`}
-            className="w-full pr-10 sm:pr-11 pl-12 sm:pl-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50/50 hover:bg-white focus:bg-white focus:border-blue-600 focus:ring-3 focus:ring-blue-600/10 text-xs sm:text-sm text-slate-800 placeholder:text-slate-400 transition-all outline-hidden"
+            className="w-full pr-10 sm:pr-11 pl-12 sm:pl-4 py-2 sm:py-2.5 rounded-lg sm:rounded-xl border border-slate-200 bg-slate-50/50 hover:bg-white focus:bg-white focus:border-blue-600 focus:ring-3 focus:ring-blue-600/10 text-xs sm:text-sm text-slate-800 placeholder:text-slate-400 transition-all outline-hidden"
           />
           {searchQuery && (
             <button

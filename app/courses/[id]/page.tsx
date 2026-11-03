@@ -40,9 +40,9 @@ export default async function CourseDetailPage({ params }: CourseDetailPageProps
   }
 
   return (
-    <div className="space-y-4 sm:space-y-6">
+    <div className="space-y-3.5 sm:space-y-4">
       {/* Top Header: Blue Banner with Preserved Light Back Button */}
-      <div className="bg-gradient-to-l from-[#172554] to-blue-900 text-white rounded-2xl sm:rounded-3xl p-4 sm:p-5 shadow-xl relative overflow-hidden border border-blue-900/60 flex flex-col sm:flex-row sm:items-center justify-between gap-3.5">
+      <div className="bg-gradient-to-l from-[#172554] to-blue-900 text-white rounded-2xl p-3 sm:py-3.5 sm:px-4.5 shadow-lg relative overflow-hidden border border-blue-900/60 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         {/* Course Info + Back Button */}
         <div className="flex items-center gap-2.5 sm:gap-3 flex-wrap sm:flex-nowrap relative z-10">
           {/* Preserved Light Back Button (زي ما هو بخلفيته الفاتحة) */}

@@ -4,9 +4,9 @@ import { CURRENT_STUDENT } from '@/data/student';
 
 export function Header() {
   return (
-    <header className="sticky top-2 sm:top-3.5 z-30 mx-2 sm:mx-6 lg:mx-8 mb-2 transition-all">
+    <header className="sticky top-1.5 sm:top-2.5 z-30 mx-2 sm:mx-6 lg:mx-8 mb-1.5 sm:mb-2 transition-all">
       {/* Floating Pill Container with Curved Sides */}
-      <div className="bg-white/95 backdrop-blur-md rounded-[22px] sm:rounded-[26px] border border-slate-200/90 shadow-md shadow-slate-200/40 px-3 sm:px-6 py-2 sm:py-2.5 flex items-center justify-between gap-2.5 sm:gap-4">
+      <div className="bg-white/95 backdrop-blur-md rounded-[20px] sm:rounded-[24px] border border-slate-200/90 shadow-md shadow-slate-200/40 px-3 sm:px-5 py-1.5 sm:py-2 flex items-center justify-between gap-2.5 sm:gap-4">
         {/* Right side: Academic Title */}
         <div className="flex items-center gap-2 sm:gap-3 min-w-0">
           <div className="truncate">

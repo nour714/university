@@ -8,10 +8,6 @@ import Link from 'next/link';
 interface CoursesPageProps {
   searchParams: Promise<{
     q?: string;
-    level?: string;
-    dept?: string;
-    semester?: string;
-    sort?: string;
   }>;
 }
 
@@ -20,22 +16,13 @@ export const metadata = {
   description: 'استكشف المقررات الدراسية، المحاضرات، التمارين، والوسائط لكل الأقسام والمستويات.',
 };
 
-// Filter options extracted from data
-const departments = Array.from(new Set(COURSES_DATA.map((c) => c.department)));
-const levels = Array.from(new Set(COURSES_DATA.map((c) => c.level))).sort((a, b) => a - b);
-const semesters = Array.from(new Set(COURSES_DATA.map((c) => c.semester)));
-
 // Async Server Component that consumes searchParams inside Suspense
 async function CoursesList({ searchParams }: CoursesPageProps) {
   const params = await searchParams;
   const query = (params.q || '').trim().toLowerCase();
-  const levelFilter = params.level ? Number(params.level) : null;
-  const deptFilter = params.dept || null;
-  const semesterFilter = params.semester || null;
-  const sortOption = params.sort || 'default';
 
-  // Filter courses on the server
-  let filteredCourses = COURSES_DATA.filter((course) => {
+  // Filter courses on the server by query
+  const filteredCourses = COURSES_DATA.filter((course) => {
     if (query) {
       const matchTitle = course.title.toLowerCase().includes(query);
       const matchCode = course.code.toLowerCase().includes(query);
@@ -45,38 +32,13 @@ async function CoursesList({ searchParams }: CoursesPageProps) {
         return false;
       }
     }
-
-    if (levelFilter && course.level !== levelFilter) {
-      return false;
-    }
-
-    if (deptFilter && course.department !== deptFilter) {
-      return false;
-    }
-
-    if (semesterFilter && course.semester !== semesterFilter) {
-      return false;
-    }
-
     return true;
   });
 
-  // Sort courses
-  if (sortOption === 'alpha') {
-    filteredCourses = [...filteredCourses].sort((a, b) => a.title.localeCompare(b.title, 'ar'));
-  } else if (sortOption === 'latest') {
-    filteredCourses = [...filteredCourses].sort((a, b) => b.itemsCount.total - a.itemsCount.total);
-  }
-
   return (
     <>
-      {/* Interactive Search & Filter Client Component */}
-      <CourseFilters
-        departments={departments}
-        levels={levels}
-        semesters={semesters}
-        totalResults={filteredCourses.length}
-      />
+      {/* Interactive Search Bar Client Component */}
+      <CourseFilters />
 
       {/* Course Cards Grid (Server Rendered) */}
       {filteredCourses.length > 0 ? (
@@ -93,13 +55,13 @@ async function CoursesList({ searchParams }: CoursesPageProps) {
           </div>
           <h3 className="text-lg font-bold text-slate-800 mb-1">لم يتم العثور على مقررات مطابقة</h3>
           <p className="text-xs text-slate-500 mb-6 leading-relaxed">
-            جرب تعديل كلمات البحث أو إلغاء تحديد بعض الفلاتر لعرض المقررات المتاحة.
+            تأكد من كتابة اسم المقرر أو كود المادة بشكل صحيح.
           </p>
           <Link
             href="/courses"
             className="inline-flex items-center justify-center px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-md shadow-blue-600/20 transition-all"
           >
-            إعادة تعيين جميع الفلاتر
+            عرض كافة المقررات
           </Link>
         </div>
       )}
@@ -110,7 +72,7 @@ async function CoursesList({ searchParams }: CoursesPageProps) {
 function CoursesSkeleton() {
   return (
     <div className="space-y-6">
-      <div className="h-28 bg-white rounded-2xl border border-slate-200 animate-pulse" />
+      <div className="h-16 bg-white rounded-2xl border border-slate-200 animate-pulse" />
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
         {[1, 2, 3, 4, 5, 6].map((n) => (
           <div key={n} className="h-64 bg-white rounded-2xl border border-slate-200 animate-pulse" />
@@ -143,7 +105,7 @@ export default function CoursesPage({ searchParams }: CoursesPageProps) {
         <div className="absolute right-1/2 -top-10 w-48 h-48 rounded-full bg-indigo-500/10 blur-2xl pointer-events-none" />
       </div>
 
-      {/* Dynamic Filter & Grid Streaming inside Suspense */}
+      {/* Dynamic Search & Grid Streaming inside Suspense */}
       <Suspense fallback={<CoursesSkeleton />}>
         <CoursesList searchParams={searchParams} />
       </Suspense>

@@ -2,7 +2,13 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { BookOpen, GraduationCap } from 'lucide-react';
+import { 
+  BookOpen, 
+  GraduationCap, 
+  ClipboardCheck, 
+  KeyRound, 
+  MoreHorizontal 
+} from 'lucide-react';
 
 export function BottomNav() {
   const pathname = usePathname();
@@ -11,34 +17,66 @@ export function BottomNav() {
   return (
     <nav 
       aria-label="شريط التنقل السفلي للموبايل"
-      className="fixed bottom-3.5 inset-x-4 max-w-[280px] mx-auto z-40 lg:hidden"
+      className="fixed bottom-3.5 inset-x-3 max-w-md mx-auto z-40 lg:hidden"
     >
       {/* Floating Pill with Curved Sides */}
-      <div className="bg-[#172554]/95 backdrop-blur-xl border border-blue-900/80 rounded-full p-2 px-3.5 shadow-2xl shadow-blue-950/70 flex items-center justify-between gap-3">
-        {/* 1. Distinctive University Crest Emblem */}
+      <div className="bg-[#172554]/95 backdrop-blur-xl border border-blue-900/80 rounded-full px-3 py-1.5 shadow-2xl shadow-blue-950/70 flex items-center justify-around gap-1">
+        
+        {/* 1. Courses Library (Active Button) */}
         <Link
           href="/courses"
-          className="w-10 h-10 rounded-full bg-gradient-to-br from-amber-400 via-amber-500 to-amber-600 border border-amber-200 text-[#172554] flex items-center justify-center shadow-md shadow-amber-500/35 shrink-0 active:scale-95 transition-transform"
-          title="كلية الذكاء الاصطناعي"
-        >
-          <GraduationCap className="w-5 h-5 stroke-[2.4]" />
-        </Link>
-
-        {/* Subtle Divider */}
-        <div className="h-5 w-px bg-blue-800/60 shrink-0" />
-
-        {/* 2. Courses Library Button (Active Blue Pill) */}
-        <Link
-          href="/courses"
-          className={`flex items-center justify-center gap-2 py-2 px-4 rounded-full font-bold text-xs transition-all flex-1 active:scale-95 ${
+          className={`flex flex-col items-center justify-center py-1.5 px-3 rounded-2xl transition-all ${
             isCoursesActive
-              ? 'bg-blue-600 text-white shadow-md shadow-blue-600/40 border border-blue-400/50'
-              : 'text-slate-300 hover:text-white hover:bg-blue-900/40'
+              ? 'bg-blue-600 text-white font-bold shadow-md shadow-blue-600/40 border border-blue-400/50'
+              : 'text-slate-300 hover:text-white'
           }`}
         >
-          <BookOpen className="w-4 h-4 stroke-[2.2]" />
-          <span>مكتبة المقررات</span>
+          <BookOpen className="w-5 h-5 stroke-[2.2]" />
+          <span className="text-[10px] font-bold mt-0.5">المقررات</span>
         </Link>
+
+        {/* 2. Exams / Tests Icon (الاختبارات) */}
+        <button
+          type="button"
+          onClick={(e) => e.preventDefault()}
+          className="flex flex-col items-center justify-center py-1.5 px-2.5 text-slate-400 hover:text-white transition-colors cursor-pointer group"
+          title="الاختبارات (قريباً)"
+        >
+          <ClipboardCheck className="w-5 h-5 group-hover:scale-105 transition-transform" />
+          <span className="text-[10px] font-medium mt-0.5 text-slate-300">الاختبارات</span>
+        </button>
+
+        {/* 3. Center College Emblem Logo */}
+        <Link
+          href="/courses"
+          className="w-11 h-11 -mt-3 rounded-full bg-gradient-to-br from-amber-400 via-amber-500 to-amber-600 border-2 border-amber-200 text-[#172554] flex items-center justify-center shadow-lg shadow-amber-500/35 ring-4 ring-[#172554] active:scale-95 transition-transform shrink-0"
+          title="كلية الذكاء الاصطناعي"
+        >
+          <GraduationCap className="w-6 h-6 stroke-[2.4]" />
+        </Link>
+
+        {/* 4. Key Icon (المفتاح / الصلاحيات) */}
+        <button
+          type="button"
+          onClick={(e) => e.preventDefault()}
+          className="flex flex-col items-center justify-center py-1.5 px-2.5 text-slate-400 hover:text-white transition-colors cursor-pointer group"
+          title="المفتاح (قريباً)"
+        >
+          <KeyRound className="w-5 h-5 group-hover:scale-105 transition-transform" />
+          <span className="text-[10px] font-medium mt-0.5 text-slate-300">المفتاح</span>
+        </button>
+
+        {/* 5. More Icon (المزيد) */}
+        <button
+          type="button"
+          onClick={(e) => e.preventDefault()}
+          className="flex flex-col items-center justify-center py-1.5 px-2.5 text-slate-400 hover:text-white transition-colors cursor-pointer group"
+          title="المزيد (قريباً)"
+        >
+          <MoreHorizontal className="w-5 h-5 group-hover:scale-105 transition-transform" />
+          <span className="text-[10px] font-medium mt-0.5 text-slate-300">المزيد</span>
+        </button>
+
       </div>
     </nav>
   );

@@ -8,7 +8,10 @@ import {
   LogOut,
   ChevronRight,
   Sparkles,
-  HelpCircle
+  HelpCircle,
+  ClipboardCheck,
+  KeyRound,
+  MoreHorizontal
 } from 'lucide-react';
 
 export const NAVIGATION_LINKS = [
@@ -71,15 +74,16 @@ export function Sidebar({ currentPath = '/courses' }: { currentPath?: string }) 
           </div>
         </div>
 
-        {/* Middle Section: ONLY the original content (مكتبة المقررات) */}
-        <div className="flex-1 my-6 flex flex-col justify-start w-full">
+        {/* Middle Section: Navigation Items */}
+        <div className="flex-1 my-4 flex flex-col justify-start gap-2.5 w-full">
           {/* Header Title when expanded */}
           {isExpanded && (
-            <p className="text-[10px] font-bold text-blue-300/80 uppercase px-2 mb-3 tracking-wider animate-fadeIn">
+            <p className="text-[10px] font-bold text-blue-300/80 uppercase px-2 mb-1 tracking-wider animate-fadeIn">
               القائمة الأكاديمية
             </p>
           )}
 
+          {/* 1. مكتبة المقررات */}
           <div className="relative group w-full">
             <Link
               href="/courses"
@@ -104,20 +108,91 @@ export function Sidebar({ currentPath = '/courses' }: { currentPath?: string }) 
               )}
             </Link>
 
-            {/* Micro label underneath when collapsed */}
-            {!isExpanded && (
-              <span className={`text-[10px] font-bold mt-1.5 block text-center transition-colors ${
-                isCoursesActive ? 'text-blue-300' : 'text-slate-400'
-              }`}>
-                المقررات
-              </span>
-            )}
-
-            {/* Full Tooltip on hover when collapsed */}
             {!isExpanded && (
               <div className="absolute right-16 top-1/2 -translate-y-1/2 hidden group-hover:flex items-center z-50 pointer-events-none">
                 <div className="bg-[#172554] text-white text-xs font-bold px-3 py-1.5 rounded-xl border border-blue-700 shadow-xl whitespace-nowrap">
                   مكتبة المقررات الأكاديمية
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* 2. الاختبارات (Exams) */}
+          <div className="relative group w-full">
+            <button
+              type="button"
+              onClick={(e) => e.preventDefault()}
+              className={`flex items-center gap-3.5 rounded-2xl text-slate-400 hover:text-white hover:bg-blue-900/40 transition-all duration-200 cursor-pointer ${
+                isExpanded 
+                  ? 'px-4 py-2.5 w-full text-right' 
+                  : 'w-12 h-12 justify-center mx-auto'
+              }`}
+              title="الاختبارات"
+            >
+              <ClipboardCheck className="w-5 h-5 shrink-0 group-hover:scale-105 transition-transform" />
+              {isExpanded && (
+                <span className="text-sm font-medium animate-fadeIn">الاختبارات</span>
+              )}
+            </button>
+
+            {!isExpanded && (
+              <div className="absolute right-16 top-1/2 -translate-y-1/2 hidden group-hover:flex items-center z-50 pointer-events-none">
+                <div className="bg-[#172554] text-white text-xs font-semibold px-3 py-1.5 rounded-xl border border-blue-700 shadow-xl whitespace-nowrap">
+                  الاختبارات والتقييمات
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* 3. المفتاح (Key) */}
+          <div className="relative group w-full">
+            <button
+              type="button"
+              onClick={(e) => e.preventDefault()}
+              className={`flex items-center gap-3.5 rounded-2xl text-slate-400 hover:text-white hover:bg-blue-900/40 transition-all duration-200 cursor-pointer ${
+                isExpanded 
+                  ? 'px-4 py-2.5 w-full text-right' 
+                  : 'w-12 h-12 justify-center mx-auto'
+              }`}
+              title="المفتاح"
+            >
+              <KeyRound className="w-5 h-5 shrink-0 group-hover:scale-105 transition-transform" />
+              {isExpanded && (
+                <span className="text-sm font-medium animate-fadeIn">المفتاح</span>
+              )}
+            </button>
+
+            {!isExpanded && (
+              <div className="absolute right-16 top-1/2 -translate-y-1/2 hidden group-hover:flex items-center z-50 pointer-events-none">
+                <div className="bg-[#172554] text-white text-xs font-semibold px-3 py-1.5 rounded-xl border border-blue-700 shadow-xl whitespace-nowrap">
+                  المفتاح والصلاحيات
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* 4. المزيد (More) */}
+          <div className="relative group w-full">
+            <button
+              type="button"
+              onClick={(e) => e.preventDefault()}
+              className={`flex items-center gap-3.5 rounded-2xl text-slate-400 hover:text-white hover:bg-blue-900/40 transition-all duration-200 cursor-pointer ${
+                isExpanded 
+                  ? 'px-4 py-2.5 w-full text-right' 
+                  : 'w-12 h-12 justify-center mx-auto'
+              }`}
+              title="المزيد"
+            >
+              <MoreHorizontal className="w-5 h-5 shrink-0 group-hover:scale-105 transition-transform" />
+              {isExpanded && (
+                <span className="text-sm font-medium animate-fadeIn">المزيد</span>
+              )}
+            </button>
+
+            {!isExpanded && (
+              <div className="absolute right-16 top-1/2 -translate-y-1/2 hidden group-hover:flex items-center z-50 pointer-events-none">
+                <div className="bg-[#172554] text-white text-xs font-semibold px-3 py-1.5 rounded-xl border border-blue-700 shadow-xl whitespace-nowrap">
+                  المزيد من الخيارات
                 </div>
               </div>
             )}

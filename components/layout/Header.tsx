@@ -18,12 +18,11 @@ export function Header() {
               <span className="text-xs text-slate-500 hidden md:inline font-medium">• الفصل الدراسي الأول</span>
             </div>
             
-            <div className="flex items-center gap-1.5">
+            <div className="flex items-center gap-2">
               <h1 className="text-sm sm:text-base md:text-lg font-extrabold text-[#172554] tracking-tight truncate">
-                كلية الذكاء الاصطناعي
+                بوابة كلية الذكاء الاصطناعي الأكاديمية
               </h1>
-              <span className="text-xs text-slate-500 hidden sm:inline font-semibold">| بوابة المقررات</span>
-              <Sparkles className="w-3.5 h-3.5 text-blue-600 hidden lg:block shrink-0" />
+              <Sparkles className="w-3.5 h-3.5 text-blue-600 hidden sm:block shrink-0" />
             </div>
           </div>
         </div>

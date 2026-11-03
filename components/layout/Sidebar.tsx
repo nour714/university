@@ -1,10 +1,53 @@
 import Link from 'next/link';
 import { 
+  ArrowRight,
+  Plus, 
+  LayoutGrid, 
   BookOpen, 
-  GraduationCap, 
-  HelpCircle,
-  Sparkles
+  Calendar, 
+  Clock, 
+  UserCheck, 
+  Building2, 
+  Users, 
+  CreditCard, 
+  RotateCw, 
+  BarChart2, 
+  LogOut,
+  Sparkles,
+  ChevronDown
 } from 'lucide-react';
+
+interface SidebarItemProps {
+  href: string;
+  label: string;
+  icon: React.ReactNode;
+  isActive?: boolean;
+}
+
+function SidebarItem({ href, label, icon, isActive = false }: SidebarItemProps) {
+  return (
+    <div className="relative group flex items-center justify-center">
+      <Link
+        href={href}
+        className={`w-11 h-11 rounded-2xl flex items-center justify-center transition-all duration-200 ${
+          isActive
+            ? 'bg-blue-600/20 text-blue-400 border border-blue-500 shadow-md shadow-blue-600/30 scale-105'
+            : 'text-slate-400 hover:text-white hover:bg-blue-900/40'
+        }`}
+        aria-label={label}
+      >
+        {icon}
+      </Link>
+
+      {/* Modern Tooltip in RTL (appears to the left) */}
+      <div className="absolute right-14 top-1/2 -translate-y-1/2 hidden group-hover:flex items-center z-50 pointer-events-none">
+        <div className="bg-[#172554] text-white text-xs font-semibold px-3 py-1.5 rounded-xl border border-blue-800 shadow-xl whitespace-nowrap">
+          {label}
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export const NAVIGATION_LINKS = [
   { name: 'مكتبة المقررات', href: '/courses', icon: 'BookOpen', active: true },
@@ -12,70 +55,115 @@ export const NAVIGATION_LINKS = [
 
 export function Sidebar({ currentPath = '/courses' }: { currentPath?: string }) {
   return (
-    <aside className="hidden lg:flex flex-col justify-between w-64 bg-[#172554] text-white shrink-0 border-l border-blue-950/40 min-h-screen sticky top-0 h-screen overflow-y-auto">
-      {/* Faculty Branding */}
-      <div>
-        <div className="p-6 border-b border-blue-900/50">
-          <Link href="/courses" className="flex items-center gap-3 group">
-            <div className="w-11 h-11 rounded-xl bg-blue-600 flex items-center justify-center text-white shadow-lg shadow-blue-600/30 group-hover:scale-105 transition-transform">
-              <GraduationCap className="w-6 h-6" />
-            </div>
-            <div>
-              <div className="flex items-center gap-1.5">
-                <span className="font-bold text-base tracking-tight text-white">كلية الذكاء الاصطناعي</span>
-                <Sparkles className="w-3.5 h-3.5 text-blue-400" />
-              </div>
-              <p className="text-xs text-blue-200">المنصة الأكاديمية الذكية</p>
-            </div>
+    <aside className="hidden lg:flex flex-col items-center justify-between p-3 shrink-0 sticky top-0 h-screen select-none z-40">
+      {/* Pill Capsule Container */}
+      <div className="w-[74px] h-full bg-[#172554] rounded-[36px] flex flex-col items-center justify-between py-4 px-2 shadow-2xl border border-blue-900/50 relative overflow-hidden">
+        
+        {/* Top Section: Back/Collapse & Quick Action Button */}
+        <div className="flex flex-col items-center gap-3 w-full shrink-0">
+          {/* Top Arrow / Faculty Emblem */}
+          <Link
+            href="/courses"
+            className="w-11 h-11 rounded-2xl bg-blue-950/90 border border-blue-800/60 text-slate-300 hover:text-white hover:border-blue-500 hover:bg-blue-900/60 flex items-center justify-center transition-all shadow-sm"
+            title="كلية الذكاء الاصطناعي"
+          >
+            <ArrowRight className="w-5 h-5" />
           </Link>
+
+          {/* Glowing Primary Action Button (Blue pill action like the red one in reference) */}
+          <button
+            type="button"
+            className="w-12 h-12 rounded-full bg-blue-600 hover:bg-blue-500 text-white flex items-center justify-center shadow-lg shadow-blue-600/50 transition-all hover:scale-105 active:scale-95"
+            title="إضافة أو استكشاف سريع"
+          >
+            <Plus className="w-6 h-6 stroke-[2.5]" />
+          </button>
         </div>
 
-        {/* Navigation */}
-        <div className="p-4">
-          <p className="text-[11px] font-semibold text-blue-300 uppercase px-3 mb-2 tracking-wider">
-            القائمة الرئيسية
-          </p>
-          <nav className="space-y-1.5">
-            {NAVIGATION_LINKS.map((item) => {
-              const isActive = currentPath.startsWith(item.href) && item.href !== '#';
-              return (
-                <Link
-                  key={item.name}
-                  href={item.href}
-                  className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all ${
-                    isActive
-                      ? 'bg-blue-600 text-white font-semibold shadow-md shadow-blue-600/30'
-                      : 'text-slate-300 hover:bg-blue-900/40 hover:text-white'
-                  }`}
-                >
-                  <BookOpen className="w-5 h-5" />
-                  <span>{item.name}</span>
-                  {isActive && (
-                    <span className="mr-auto w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
-                  )}
-                </Link>
-              );
-            })}
-          </nav>
-        </div>
-      </div>
+        {/* Middle Navigation Icons (with subtle custom scroll track) */}
+        <div className="flex-1 my-3 flex flex-col items-center justify-start gap-2.5 overflow-y-auto overflow-x-hidden no-scrollbar w-full py-1">
+          {/* Main Course Library (Active Grid / Book) */}
+          <SidebarItem
+            href="/courses"
+            label="مكتبة المقررات"
+            icon={<LayoutGrid className="w-5 h-5 stroke-[2.2]" />}
+            isActive={currentPath.startsWith('/courses')}
+          />
 
-      {/* Footer Info Box */}
-      <div className="p-4 border-t border-blue-900/50">
-        <div className="bg-blue-900/30 rounded-xl p-3.5 text-xs text-blue-200 border border-blue-800/40">
-          <div className="flex items-center gap-2 mb-1.5 text-white font-medium">
-            <HelpCircle className="w-4 h-4 text-blue-400" />
-            <span>الدعم الأكاديمي</span>
+          <SidebarItem
+            href="#schedule"
+            label="الجدول الأكاديمي"
+            icon={<Calendar className="w-5 h-5" />}
+          />
+
+          <SidebarItem
+            href="#timetable"
+            label="مواعيد المحاضرات"
+            icon={<Clock className="w-5 h-5" />}
+          />
+
+          <SidebarItem
+            href="#profile"
+            label="الملف الأكاديمي"
+            icon={<UserCheck className="w-5 h-5" />}
+          />
+
+          <SidebarItem
+            href="#departments"
+            label="الأقسام العلمية"
+            icon={<Building2 className="w-5 h-5" />}
+          />
+
+          <SidebarItem
+            href="#teams"
+            label="مجموعات العمل الطلابية"
+            icon={<Users className="w-5 h-5" />}
+          />
+
+          <SidebarItem
+            href="#card"
+            label="البطاقة الجامعية الإلكترونية"
+            icon={<CreditCard className="w-5 h-5" />}
+          />
+
+          <SidebarItem
+            href="#sync"
+            label="المزامنة والتحديث"
+            icon={<RotateCw className="w-5 h-5" />}
+          />
+
+          <SidebarItem
+            href="#analytics"
+            label="المعدل التراكمي والإحصائيات"
+            icon={<BarChart2 className="w-5 h-5" />}
+          />
+        </div>
+
+        {/* Bottom Section: Avatar & Logout */}
+        <div className="flex flex-col items-center gap-3 w-full shrink-0 pt-2 border-t border-blue-900/60">
+          <ChevronDown className="w-4 h-4 text-blue-400/50" />
+
+          {/* User Avatar Circle (MR in Blue just like reference) */}
+          <div 
+            className="w-11 h-11 rounded-full bg-blue-600 text-white font-extrabold text-sm flex items-center justify-center shadow-lg shadow-blue-600/40 cursor-pointer hover:scale-105 transition-transform border-2 border-blue-400/40"
+            title="عبد الرحمن خالد (MR)"
+          >
+            MR
           </div>
-          <p className="text-[11px] text-blue-300 leading-relaxed">
-            للاستفسارات الخاصة بالمواد، تواصل مع منسق القسم الأكاديمي.
-          </p>
+
+          {/* Logout / Exit Action */}
+          <button
+            type="button"
+            className="w-10 h-10 rounded-xl flex items-center justify-center text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 transition-colors"
+            title="تسجيل الخروج"
+          >
+            <LogOut className="w-5 h-5 -scale-x-100" />
+          </button>
         </div>
-        <div className="mt-3 text-[11px] text-blue-300/80 text-center">
-          جامعة المستقبل الذكية © 2026
-        </div>
+
+        {/* Ambient background glow inside capsule */}
+        <div className="absolute -top-12 -left-12 w-28 h-28 bg-blue-500/15 rounded-full blur-2xl pointer-events-none" />
       </div>
     </aside>
   );
 }
-

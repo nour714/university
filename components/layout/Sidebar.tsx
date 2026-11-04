@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { 
   BookOpen, 
@@ -46,9 +47,16 @@ export function Sidebar({ currentPath }: { currentPath?: string }) {
               }`}
               title={isExpanded ? 'طي القائمة الجانبية' : 'اضغط لفتح القائمة الجانبية'}
             >
-              {/* Distinctive University Crest (Gold/Amber Emblem with Royal Navy Trim) */}
-              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-amber-400 via-amber-500 to-amber-600 border-2 border-amber-200 text-[#172554] flex items-center justify-center shrink-0 shadow-lg shadow-amber-500/35 ring-2 ring-amber-400/40 ring-offset-2 ring-offset-[#172554] group-hover:scale-110 group-hover:shadow-amber-400/60 transition-all duration-300 cursor-pointer">
-                <GraduationCap className="w-6 h-6 stroke-[2.4] drop-shadow-2xs" />
+              {/* Distinctive University Crest (Gold/Amber Emblem with Official Logo) */}
+              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-amber-400 via-amber-500 to-amber-600 border-2 border-amber-200 flex items-center justify-center p-1 shrink-0 shadow-lg shadow-amber-500/35 ring-2 ring-amber-400/40 ring-offset-2 ring-offset-[#172554] group-hover:scale-110 group-hover:shadow-amber-400/60 transition-all duration-300 cursor-pointer overflow-hidden">
+                <Image
+                  src="/logo.png"
+                  alt="شعار كلية الذكاء الاصطناعي"
+                  width={40}
+                  height={40}
+                  className="w-full h-full object-contain filter drop-shadow-sm select-none"
+                  priority
+                />
               </div>
 
               {/* Text shown ONLY when expanded */}

@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { useNotifications } from '@/context/NotificationContext';
 import { AcademicNotification, NotificationType } from '@/types/notification';
+import { safeInternalPath } from '@/lib/safeUrl';
 
 export function NotificationBell() {
   const router = useRouter();
@@ -108,7 +109,7 @@ export function NotificationBell() {
     markAsRead(notif.id);
     setIsOpen(false);
     if (notif.actionUrl) {
-      router.push(notif.actionUrl);
+      router.push(safeInternalPath(notif.actionUrl));
     }
   };
 

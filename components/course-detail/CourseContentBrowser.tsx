@@ -3,6 +3,7 @@
 import { useState, useMemo } from 'react';
 import { CourseContentItem, ContentType } from '@/types/course';
 import { matchesSearch } from '@/lib/normalizeArabic';
+import { isSafeExternalUrl } from '@/lib/safeUrl';
 import { 
   FileText, 
   Video, 
@@ -12,8 +13,7 @@ import {
   ExternalLink, 
   Download, 
   Clock, 
-  FolderSearch,
-  Calendar
+  FolderSearch
 } from 'lucide-react';
 
 interface CourseContentBrowserProps {
@@ -61,7 +61,7 @@ export function CourseContentBrowser({ items, courseCode }: CourseContentBrowser
   }, [items, activeTab, searchQuery]);
 
   // Helper for item type icon & badge
-  const getItemIcon = (type: ContentType, format: string) => {
+  const getItemIcon = (type: ContentType) => {
     switch (type) {
       case 'file':
         return (
@@ -227,7 +227,7 @@ export function CourseContentBrowser({ items, courseCode }: CourseContentBrowser
                 className="bg-white rounded-2xl p-4 border border-slate-200/90 shadow-2xs space-y-3"
               >
                 <div className="flex items-start gap-3">
-                  {getItemIcon(item.type, item.format)}
+                  {getItemIcon(item.type)}
                   <div className="min-w-0 flex-1">
                     <p className="font-bold text-slate-900 text-sm leading-snug">
                       {item.title}
@@ -250,37 +250,73 @@ export function CourseContentBrowser({ items, courseCode }: CourseContentBrowser
 
                 {/* Mobile Action Buttons (44px touch targets) */}
                 <div className="grid grid-cols-2 gap-2 pt-1">
-                  <a
-                    href={item.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-blue-50 hover:bg-blue-600 text-blue-700 hover:text-white border border-blue-200/80 font-bold text-xs transition-all active:scale-95"
-                  >
-                    <ExternalLink className="w-3.5 h-3.5" />
-                    <span>عرض مباشر</span>
-                  </a>
-
-                  {item.type !== 'link' ? (
-                    <a
-                      href={item.downloadUrl || item.url}
-                      download
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-slate-100 hover:bg-slate-800 text-slate-700 hover:text-white border border-slate-200 font-bold text-xs transition-all active:scale-95"
-                    >
-                      <Download className="w-3.5 h-3.5" />
-                      <span>تنزيل الملف</span>
-                    </a>
-                  ) : (
+                  {isSafeExternalUrl(item.url) ? (
                     <a
                       href={item.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-200 font-bold text-xs transition-all"
+                      className="flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-blue-50 hover:bg-blue-600 text-blue-700 hover:text-white border border-blue-200/80 font-bold text-xs transition-all active:scale-95"
                     >
-                      <Link2 className="w-3.5 h-3.5" />
-                      <span>فتح الرابط</span>
+                      <ExternalLink className="w-3.5 h-3.5" />
+                      <span>عرض مباشر</span>
                     </a>
+                  ) : (
+                    <button
+                      type="button"
+                      disabled
+                      aria-disabled="true"
+                      className="flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-blue-50 text-blue-700 border border-blue-200/80 font-bold text-xs opacity-50 cursor-not-allowed"
+                    >
+                      <ExternalLink className="w-3.5 h-3.5" />
+                      <span>عرض مباشر</span>
+                    </button>
+                  )}
+
+                  {item.type !== 'link' ? (
+                    isSafeExternalUrl(item.downloadUrl || item.url) ? (
+                      <a
+                        href={item.downloadUrl || item.url}
+                        download
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-slate-100 hover:bg-slate-800 text-slate-700 hover:text-white border border-slate-200 font-bold text-xs transition-all active:scale-95"
+                      >
+                        <Download className="w-3.5 h-3.5" />
+                        <span>تنزيل الملف</span>
+                      </a>
+                    ) : (
+                      <button
+                        type="button"
+                        disabled
+                        aria-disabled="true"
+                        className="flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-slate-100 text-slate-700 border border-slate-200 font-bold text-xs opacity-50 cursor-not-allowed"
+                      >
+                        <Download className="w-3.5 h-3.5" />
+                        <span>تنزيل الملف</span>
+                      </button>
+                    )
+                  ) : (
+                    isSafeExternalUrl(item.url) ? (
+                      <a
+                        href={item.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-200 font-bold text-xs transition-all"
+                      >
+                        <Link2 className="w-3.5 h-3.5" />
+                        <span>فتح الرابط</span>
+                      </a>
+                    ) : (
+                      <button
+                        type="button"
+                        disabled
+                        aria-disabled="true"
+                        className="flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-200 font-bold text-xs opacity-50 cursor-not-allowed"
+                      >
+                        <Link2 className="w-3.5 h-3.5" />
+                        <span>فتح الرابط</span>
+                      </button>
+                    )
                   )}
                 </div>
               </div>
@@ -309,7 +345,7 @@ export function CourseContentBrowser({ items, courseCode }: CourseContentBrowser
                       {/* Item Title & Icon */}
                       <td className="py-3.5 px-4 sm:px-6">
                         <div className="flex items-start gap-3">
-                          {getItemIcon(item.type, item.format)}
+                          {getItemIcon(item.type)}
                           <div className="min-w-0">
                             <p className="font-bold text-slate-900 group-hover:text-blue-600 transition-colors line-clamp-1">
                               {item.title}
@@ -349,30 +385,56 @@ export function CourseContentBrowser({ items, courseCode }: CourseContentBrowser
                       <td className="py-3.5 px-4 text-center">
                         <div className="flex items-center justify-center gap-1.5">
                           {/* View in New Tab Button */}
-                          <a
-                            href={item.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-50 hover:bg-blue-600 text-blue-700 hover:text-white border border-blue-200/80 hover:border-blue-600 text-xs font-semibold transition-all shadow-2xs"
-                            title="عرض في علامة تبويب جديدة"
-                          >
-                            <ExternalLink className="w-3.5 h-3.5" />
-                            <span>عرض</span>
-                          </a>
+                          {isSafeExternalUrl(item.url) ? (
+                            <a
+                              href={item.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-50 hover:bg-blue-600 text-blue-700 hover:text-white border border-blue-200/80 hover:border-blue-600 text-xs font-semibold transition-all shadow-2xs"
+                              title="عرض في علامة تبويب جديدة"
+                            >
+                              <ExternalLink className="w-3.5 h-3.5" />
+                              <span>عرض</span>
+                            </a>
+                          ) : (
+                            <button
+                              type="button"
+                              disabled
+                              aria-disabled="true"
+                              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-50 text-blue-700 border border-blue-200/80 text-xs font-semibold shadow-2xs opacity-50 cursor-not-allowed"
+                              title="الرابط غير متاح"
+                            >
+                              <ExternalLink className="w-3.5 h-3.5" />
+                              <span>عرض</span>
+                            </button>
+                          )}
 
                           {/* Download Button (for files, videos, images) */}
                           {item.type !== 'link' && (
-                            <a
-                              href={item.downloadUrl || item.url}
-                              download
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-800 text-slate-700 hover:text-white border border-slate-200 hover:border-slate-800 text-xs font-semibold transition-all shadow-2xs"
-                              title="تنزيل الملف مباشرة"
-                            >
-                              <Download className="w-3.5 h-3.5" />
-                              <span>تنزيل</span>
-                            </a>
+                            isSafeExternalUrl(item.downloadUrl || item.url) ? (
+                              <a
+                                href={item.downloadUrl || item.url}
+                                download
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-800 text-slate-700 hover:text-white border border-slate-200 hover:border-slate-800 text-xs font-semibold transition-all shadow-2xs"
+                                title="تنزيل الملف مباشرة"
+                              >
+                                <Download className="w-3.5 h-3.5" />
+                                <span>تنزيل</span>
+                              </a>
+                            ) : (
+                              <button
+                                type="button"
+                                disabled
+                                aria-disabled="true"
+                                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-100 text-slate-700 border border-slate-200 text-xs font-semibold shadow-2xs opacity-50 cursor-not-allowed"
+                                title="رابط التنزيل غير متاح"
+                              >
+                                <Download className="w-3.5 h-3.5" />
+                                <span>تنزيل</span>
+                              </button>
+                            )
                           )}
                         </div>
                       </td>

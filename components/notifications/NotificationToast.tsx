@@ -2,7 +2,6 @@
 
 import { useNotifications } from '@/context/NotificationContext';
 import { 
-  Bell, 
   BookOpen, 
   ClipboardCheck, 
   Sparkles, 
@@ -11,6 +10,7 @@ import {
   ArrowLeft 
 } from 'lucide-react';
 import Link from 'next/link';
+import { safeInternalPath } from '@/lib/safeUrl';
 
 export function NotificationToast() {
   const { toast, dismissToast, markAsRead } = useNotifications();
@@ -83,7 +83,7 @@ export function NotificationToast() {
           <div className="flex items-center justify-between pt-1 border-t border-slate-100">
             {toast.actionUrl ? (
               <Link
-                href={toast.actionUrl}
+                href={safeInternalPath(toast.actionUrl)}
                 onClick={() => {
                   markAsRead(toast.id);
                   dismissToast();

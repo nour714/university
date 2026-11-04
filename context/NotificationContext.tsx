@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { AcademicNotification } from '@/types/notification';
 import { INITIAL_NOTIFICATIONS } from '@/data/notifications';
+import { safeInternalPath } from '@/lib/safeUrl';
 
 interface NotificationContextType {
   notifications: AcademicNotification[];
@@ -70,7 +71,16 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) {
-        setNotifications(JSON.parse(saved));
+        const raw = JSON.parse(saved);
+        if (Array.isArray(raw)) {
+          const sanitized = raw.map((item: AcademicNotification) => ({
+            ...item,
+            actionUrl: item.actionUrl ? safeInternalPath(item.actionUrl) : undefined,
+          }));
+          setNotifications(sanitized);
+        } else {
+          setNotifications(INITIAL_NOTIFICATIONS);
+        }
       } else {
         setNotifications(INITIAL_NOTIFICATIONS);
       }
@@ -134,7 +144,7 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
         createdAt: new Date().toISOString(),
         isRead: false,
         priority: notif.priority || 'urgent',
-        actionUrl: notif.actionUrl || '/courses',
+        actionUrl: safeInternalPath(notif.actionUrl || '/courses'),
       };
 
       setNotifications((prev) => [newNotif, ...prev]);

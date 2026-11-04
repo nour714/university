@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { 
-  LogIn, 
+  LogOut, 
   KeyRound, 
   X, 
   ChevronLeft, 
@@ -24,13 +24,8 @@ interface MoreMenuSheetProps {
 
 export function MoreMenuSheet({ isOpen, onClose }: MoreMenuSheetProps) {
   const [mounted, setMounted] = useState(false);
-  const [activeView, setActiveView] = useState<'menu' | 'login' | 'changePassword'>('menu');
-  
-  // Login form state
-  const [loginId, setLoginId] = useState('');
-  const [loginPassword, setLoginPassword] = useState('');
-  const [showLoginPassword, setShowLoginPassword] = useState(false);
-  const [loginLoading, setLoginLoading] = useState(false);
+  const [activeView, setActiveView] = useState<'menu' | 'changePassword'>('menu');
+  const [logoutLoading, setLogoutLoading] = useState(false);
 
   // Change password form state
   const [currentPassword, setCurrentPassword] = useState('');
@@ -54,6 +49,7 @@ export function MoreMenuSheet({ isOpen, onClose }: MoreMenuSheetProps) {
       setActiveView('menu');
       setPasswordError('');
       setPasswordSuccess(false);
+      setLogoutLoading(false);
     } else {
       document.body.style.overflow = '';
     }
@@ -73,20 +69,17 @@ export function MoreMenuSheet({ isOpen, onClose }: MoreMenuSheetProps) {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isOpen, onClose]);
 
-  const handleLoginSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!loginId.trim() || !loginPassword.trim()) return;
-
-    setLoginLoading(true);
+  const handleLogout = () => {
+    setLogoutLoading(true);
     setTimeout(() => {
-      setLoginLoading(false);
+      setLogoutLoading(false);
       addNotification({
-        title: 'تم تسجيل الدخول بنجاح',
-        message: `مرحباً بك مجدداً في بوابة كلية الذكاء الاصطناعي الأكاديمية!`,
+        title: 'تم تسجيل الخروج بنجاح',
+        message: 'تم إنهاء الجلسة الأكاديمية بنجاح. يمكنك تسجيل الدخول مجدداً في أي وقت.',
         type: 'announcement',
       });
       onClose();
-    }, 600);
+    }, 500);
   };
 
   const handleChangePasswordSubmit = (e: React.FormEvent) => {
@@ -160,10 +153,8 @@ export function MoreMenuSheet({ isOpen, onClose }: MoreMenuSheetProps) {
             )}
 
             <div className="w-9 h-9 rounded-xl bg-blue-500/20 text-blue-300 flex items-center justify-center border border-blue-400/30 shrink-0">
-              {activeView === 'login' ? (
-                <LogIn className="w-4.5 h-4.5" />
-              ) : activeView === 'changePassword' ? (
-                <KeyRound className="w-4.5 h-4.5" />
+              {activeView === 'changePassword' ? (
+                <KeyRound className="w-4.5 h-4.5 text-amber-400" />
               ) : (
                 <Sparkles className="w-4.5 h-4.5 text-amber-400" />
               )}
@@ -171,16 +162,12 @@ export function MoreMenuSheet({ isOpen, onClose }: MoreMenuSheetProps) {
 
             <div>
               <h2 className="text-sm font-extrabold text-white tracking-tight">
-                {activeView === 'login' 
-                  ? 'تسجيل الدخول الأكاديمي' 
-                  : activeView === 'changePassword' 
+                {activeView === 'changePassword' 
                   ? 'تغيير كلمة السر' 
                   : 'المزيد من الخيارات'}
               </h2>
               <p className="text-[11px] text-blue-200/90 font-medium">
-                {activeView === 'login' 
-                  ? 'الدخول إلى حساب الطالب والخدمات' 
-                  : activeView === 'changePassword' 
+                {activeView === 'changePassword' 
                   ? 'تأمين وتحديث كلمة مرور الحساب' 
                   : 'إدارة وتأمين حسابك الجامعي'}
               </p>
@@ -200,29 +187,34 @@ export function MoreMenuSheet({ isOpen, onClose }: MoreMenuSheetProps) {
 
         {/* Body Content */}
         <div className="p-5 overflow-y-auto max-h-[70vh]">
-          {/* VIEW 1: Main Menu with Login and Change Password Buttons */}
+          {/* VIEW 1: Main Menu with LogOut and Change Password Buttons */}
           {activeView === 'menu' && (
             <div className="space-y-3.5">
-              {/* Button 1: تسجيل الدخول */}
+              {/* Button 1: تسجيل الخروج */}
               <button
                 type="button"
-                onClick={() => setActiveView('login')}
-                className="w-full text-right p-4 rounded-2xl bg-gradient-to-r from-blue-50 to-indigo-50/60 hover:from-blue-100/70 hover:to-indigo-100/70 border border-blue-200/80 transition-all flex items-center justify-between group cursor-pointer shadow-xs active:scale-[0.99]"
+                onClick={handleLogout}
+                disabled={logoutLoading}
+                className="w-full text-right p-4 rounded-2xl bg-gradient-to-r from-rose-50 to-red-50/60 hover:from-rose-100/70 hover:to-red-100/70 border border-rose-200/80 transition-all flex items-center justify-between group cursor-pointer shadow-xs active:scale-[0.99] disabled:opacity-60"
               >
                 <div className="flex items-center gap-3.5">
-                  <div className="w-11 h-11 rounded-2xl bg-blue-600 text-white flex items-center justify-center shadow-md shadow-blue-600/30 group-hover:scale-105 transition-transform shrink-0">
-                    <LogIn className="w-5 h-5 -scale-x-100" />
+                  <div className="w-11 h-11 rounded-2xl bg-rose-600 text-white flex items-center justify-center shadow-md shadow-rose-600/30 group-hover:scale-105 transition-transform shrink-0">
+                    {logoutLoading ? (
+                      <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    ) : (
+                      <LogOut className="w-5 h-5 -scale-x-100" />
+                    )}
                   </div>
                   <div>
-                    <h3 className="text-sm font-extrabold text-slate-900 group-hover:text-blue-700 transition-colors">
-                      تسجيل الدخول
+                    <h3 className="text-sm font-extrabold text-slate-900 group-hover:text-rose-700 transition-colors">
+                      تسجيل الخروج
                     </h3>
                     <p className="text-xs text-slate-500 font-medium mt-0.5">
-                      الدخول إلى حسابك الأكاديمي والوصول لكافة الخدمات
+                      إنهاء الجلسة الحالية وتسجيل الخروج من الحساب
                     </p>
                   </div>
                 </div>
-                <div className="w-8 h-8 rounded-full bg-white border border-blue-200/60 flex items-center justify-center text-blue-600 shadow-2xs group-hover:bg-blue-600 group-hover:text-white transition-all shrink-0">
+                <div className="w-8 h-8 rounded-full bg-white border border-rose-200/60 flex items-center justify-center text-rose-600 shadow-2xs group-hover:bg-rose-600 group-hover:text-white transition-all shrink-0">
                   <ChevronLeft className="w-4 h-4" />
                 </div>
               </button>
@@ -231,7 +223,7 @@ export function MoreMenuSheet({ isOpen, onClose }: MoreMenuSheetProps) {
               <button
                 type="button"
                 onClick={() => setActiveView('changePassword')}
-                className="w-full text-right p-4 rounded-2xl bg-slate-50 hover:bg-slate-100/80 border border-slate-200/80 transition-all flex items-center justify-between group cursor-pointer shadow-xs active:scale-[0.99]"
+                className="w-full text-right p-4 rounded-2xl bg-gradient-to-r from-amber-50 to-orange-50/60 hover:from-amber-100/70 hover:to-orange-100/70 border border-amber-200/80 transition-all flex items-center justify-between group cursor-pointer shadow-xs active:scale-[0.99]"
               >
                 <div className="flex items-center gap-3.5">
                   <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-amber-500 to-amber-600 text-white flex items-center justify-center shadow-md shadow-amber-500/30 group-hover:scale-105 transition-transform shrink-0">
@@ -246,7 +238,7 @@ export function MoreMenuSheet({ isOpen, onClose }: MoreMenuSheetProps) {
                     </p>
                   </div>
                 </div>
-                <div className="w-8 h-8 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-600 shadow-2xs group-hover:bg-amber-500 group-hover:text-white transition-all shrink-0">
+                <div className="w-8 h-8 rounded-full bg-white border border-amber-200/60 flex items-center justify-center text-amber-600 shadow-2xs group-hover:bg-amber-500 group-hover:text-white transition-all shrink-0">
                   <ChevronLeft className="w-4 h-4" />
                 </div>
               </button>
@@ -271,69 +263,7 @@ export function MoreMenuSheet({ isOpen, onClose }: MoreMenuSheetProps) {
             </div>
           )}
 
-          {/* VIEW 2: Login Form */}
-          {activeView === 'login' && (
-            <form onSubmit={handleLoginSubmit} className="space-y-4">
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1.5 text-right">
-                  الرقم الأكاديمي أو البريد الجامعي
-                </label>
-                <div className="relative">
-                  <input
-                    type="text"
-                    required
-                    value={loginId}
-                    onChange={(e) => setLoginId(e.target.value)}
-                    placeholder="مثال: 20240189 أو student@uni.edu.eg"
-                    className="w-full px-3.5 py-2.5 pr-10 text-xs sm:text-sm bg-slate-50 border border-slate-300 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all text-slate-800"
-                  />
-                  <User className="w-4 h-4 text-slate-400 absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1.5 text-right">
-                  كلمة المرور
-                </label>
-                <div className="relative">
-                  <input
-                    type={showLoginPassword ? 'text' : 'password'}
-                    required
-                    value={loginPassword}
-                    onChange={(e) => setLoginPassword(e.target.value)}
-                    placeholder="أدخل كلمة المرور الخاصة بك"
-                    className="w-full px-3.5 py-2.5 pr-10 pl-10 text-xs sm:text-sm bg-slate-50 border border-slate-300 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all text-slate-800"
-                  />
-                  <Lock className="w-4 h-4 text-slate-400 absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-                  <button
-                    type="button"
-                    onClick={() => setShowLoginPassword(!showLoginPassword)}
-                    className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-1"
-                    title={showLoginPassword ? 'إخفاء' : 'إظهار'}
-                  >
-                    {showLoginPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                  </button>
-                </div>
-              </div>
-
-              <button
-                type="submit"
-                disabled={loginLoading}
-                className="w-full py-3 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-sm shadow-md shadow-blue-600/30 flex items-center justify-center gap-2 transition-all cursor-pointer disabled:opacity-60 active:scale-[0.99]"
-              >
-                {loginLoading ? (
-                  <span className="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                ) : (
-                  <>
-                    <LogIn className="w-4 h-4 -scale-x-100" />
-                    <span>تسجيل الدخول الآن</span>
-                  </>
-                )}
-              </button>
-            </form>
-          )}
-
-          {/* VIEW 3: Change Password Form */}
+          {/* VIEW 2: Change Password Form */}
           {activeView === 'changePassword' && (
             <form onSubmit={handleChangePasswordSubmit} className="space-y-3.5">
               {passwordError && (

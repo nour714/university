@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { GraduationCap, Sparkles, Calendar, ShieldCheck } from 'lucide-react';
 import { StudentProfile } from '@/data/student';
 
@@ -39,6 +40,17 @@ export function StudentHero({ student }: StudentHeroProps) {
         className="absolute -bottom-24 -right-24 w-80 h-80 rounded-full bg-amber-500/15 blur-3xl pointer-events-none" 
         aria-hidden="true"
       />
+
+      {/* Decorative Official College Logo Watermark */}
+      <div className="absolute left-6 bottom-4 sm:bottom-6 w-36 h-36 sm:w-48 sm:h-48 opacity-20 pointer-events-none hidden md:block">
+        <Image
+          src="/logo.png"
+          alt="شعار كلية الذكاء الاصطناعي"
+          width={192}
+          height={192}
+          className="w-full h-full object-contain filter drop-shadow-[0_0_25px_rgba(59,130,246,0.5)]"
+        />
+      </div>
 
       <div className="relative z-10 space-y-3 sm:space-y-4">
         {/* Top Badges Row */}

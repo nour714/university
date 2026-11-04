@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { GraduationCap, User, Sparkles } from 'lucide-react';
 import { CURRENT_STUDENT } from '@/data/student';
 import { NotificationBell } from '@/components/notifications/NotificationBell';
@@ -8,8 +9,23 @@ export function Header() {
     <header className="sticky top-1.5 sm:top-2.5 z-30 mx-2 sm:mx-6 lg:mx-8 mb-1.5 sm:mb-2 transition-all">
       {/* Floating Pill Container with Curved Sides */}
       <div className="bg-white/95 backdrop-blur-md rounded-[20px] sm:rounded-[24px] border border-slate-200/90 shadow-md shadow-slate-200/40 px-3 sm:px-5 py-1.5 sm:py-2 flex items-center justify-between gap-2.5 sm:gap-4">
-        {/* Right side: Academic Title */}
-        <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
+        {/* Right side: Academic Title with Official Logo */}
+        <div className="flex items-center gap-2.5 sm:gap-3 min-w-0 flex-1">
+          <Link 
+            href="/" 
+            className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-blue-50/80 hover:bg-blue-100/80 border border-blue-200/80 p-0.5 flex items-center justify-center shrink-0 transition-transform active:scale-95"
+            title="الرئيسية"
+          >
+            <Image
+              src="/logo.png"
+              alt="شعار كلية الذكاء الاصطناعي"
+              width={36}
+              height={36}
+              className="w-full h-full object-contain"
+              priority
+            />
+          </Link>
+
           <div className="truncate">
             <div className="flex items-center gap-1.5 sm:gap-2 mb-0.5">
               <span className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-blue-50 text-blue-700 border border-blue-200/70">

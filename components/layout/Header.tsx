@@ -6,29 +6,31 @@ import { NotificationBell } from '@/components/notifications/NotificationBell';
 
 export function Header() {
   return (
-    <header className="sticky top-1.5 sm:top-2.5 z-30 mx-2 sm:mx-6 lg:mx-8 mb-1.5 sm:mb-2 transition-all">
+    <header className="sticky top-2 sm:top-2.5 z-30 mx-2 sm:mx-6 lg:mx-8 mb-2 sm:mb-2.5 transition-all">
       {/* Floating Pill Container with Curved Sides */}
-      <div className="bg-white/95 backdrop-blur-md rounded-[20px] sm:rounded-[24px] border border-slate-200/90 shadow-md shadow-slate-200/40 px-3 sm:px-5 py-1.5 sm:py-2 flex items-center justify-between gap-2.5 sm:gap-4">
+      <div className="bg-white/95 backdrop-blur-md rounded-[22px] sm:rounded-[26px] border border-slate-200/90 shadow-md shadow-slate-200/40 px-3.5 sm:px-6 py-2 sm:py-2.5 min-h-[52px] sm:min-h-[58px] flex items-center justify-between gap-3 sm:gap-4">
         {/* Right side: Academic Title with Official Logo */}
         <div className="flex items-center gap-2.5 sm:gap-3 min-w-0 flex-1">
+          {/* Mobile Logo: Clean & Transparent with No Background Box */}
           <Link 
             href="/" 
-            className="lg:hidden w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-blue-50/80 hover:bg-blue-100/80 border border-blue-200/80 p-0.5 flex items-center justify-center shrink-0 transition-transform active:scale-95"
+            className="lg:hidden flex items-center justify-center shrink-0 transition-transform active:scale-95"
             title="الرئيسية"
           >
             <Image
               src="/logo.png"
               alt="شعار كلية الذكاء الاصطناعي"
-              width={36}
-              height={36}
-              className="w-full h-full object-contain"
+              width={46}
+              height={32}
+              className="h-8.5 w-auto object-contain filter drop-shadow-xs"
               priority
             />
           </Link>
 
-          <div className="truncate">
+          {/* Academic Portal Title - Hidden on Mobile to keep header clean and spacious, Shown on Tablet/Desktop */}
+          <div className="hidden sm:block truncate">
             <div className="flex items-center gap-1.5 sm:gap-2 mb-0.5">
-              <span className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-blue-50 text-blue-700 border border-blue-200/70">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-blue-50 text-blue-700 border border-blue-200/70">
                 <GraduationCap className="w-3.5 h-3.5 text-blue-600" />
                 العام الأكاديمي 2026/2027
               </span>

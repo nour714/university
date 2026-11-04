@@ -25,9 +25,7 @@ export function NotificationBell() {
     unreadCount, 
     markAsRead, 
     markAllAsRead, 
-    removeNotification,
-    simulateLectureNotification,
-    simulateExamNotification
+    removeNotification
   } = useNotifications();
 
   const [isOpen, setIsOpen] = useState(false);
@@ -291,31 +289,12 @@ export function NotificationBell() {
         )}
       </div>
 
-      {/* Footer with Instant Testing Buttons & Course Link */}
-      <div className="p-3 bg-slate-50 border-t border-slate-200/80 flex flex-col sm:flex-row items-center justify-between gap-2 shrink-0">
-        <div className="flex items-center gap-1.5 w-full sm:w-auto justify-center">
-          <button
-            type="button"
-            onClick={simulateLectureNotification}
-            className="flex-1 sm:flex-none px-2.5 py-1.5 rounded-xl text-[11px] font-bold bg-blue-100 hover:bg-blue-200 text-blue-800 active:scale-95 transition-all cursor-pointer text-center"
-            title="محاكاة نزول محاضرة جديدة"
-          >
-            + تجربة محاضرة
-          </button>
-          <button
-            type="button"
-            onClick={simulateExamNotification}
-            className="flex-1 sm:flex-none px-2.5 py-1.5 rounded-xl text-[11px] font-bold bg-rose-100 hover:bg-rose-200 text-rose-800 active:scale-95 transition-all cursor-pointer text-center"
-            title="محاكاة إشعار اختبار"
-          >
-            + تجربة اختبار
-          </button>
-        </div>
-
+      {/* Footer */}
+      <div className="p-3 bg-slate-50 border-t border-slate-200/80 text-center shrink-0">
         <Link
           href="/courses"
           onClick={() => setIsOpen(false)}
-          className="text-xs font-bold text-blue-600 hover:text-blue-800 transition-colors py-1"
+          className="text-xs font-bold text-blue-600 hover:text-blue-800 transition-colors py-1 inline-block"
         >
           تصفح كافة المقررات الدراسية ←
         </Link>

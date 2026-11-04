@@ -2,9 +2,8 @@
 
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { AcademicNotification } from '@/types/notification';
-import { INITIAL_NOTIFICATIONS } from '@/data/notifications';
 import { safeInternalPath } from '@/lib/safeUrl';
-import { AcademicNotificationListSchema } from '@/lib/schemas';
+import { listNotifications, saveNotifications } from '@/lib/repos/notificationsRepo';
 
 interface NotificationContextType {
   notifications: AcademicNotification[];
@@ -60,47 +59,29 @@ function playNotificationSound() {
   }
 }
 
-const STORAGE_KEY = 'academic_notifications_v1';
-
 export function NotificationProvider({ children }: { children: React.ReactNode }) {
   const [notifications, setNotifications] = useState<AcademicNotification[]>([]);
   const [toast, setToast] = useState<AcademicNotification | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
 
-  // Load from localStorage or initialize
+  // Load from repo
   useEffect(() => {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) {
-        const parsed = AcademicNotificationListSchema.safeParse(JSON.parse(saved));
-        if (parsed.success) {
-          setNotifications(parsed.data);
-        } else {
-          localStorage.removeItem(STORAGE_KEY);
-          setNotifications(INITIAL_NOTIFICATIONS);
-        }
-      } else {
-        setNotifications(INITIAL_NOTIFICATIONS);
+    let mounted = true;
+    listNotifications().then((loaded) => {
+      if (mounted) {
+        setNotifications(loaded);
+        setIsLoaded(true);
       }
-    } catch {
-      try {
-        localStorage.removeItem(STORAGE_KEY);
-      } catch {
-        // Ignore storage errors
-      }
-      setNotifications(INITIAL_NOTIFICATIONS);
-    }
-    setIsLoaded(true);
+    });
+    return () => {
+      mounted = false;
+    };
   }, []);
 
-  // Save to localStorage when changed
+  // Save via repo when changed
   useEffect(() => {
     if (!isLoaded) return;
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(notifications));
-    } catch {
-      // Ignore storage errors
-    }
+    saveNotifications(notifications);
   }, [notifications, isLoaded]);
 
   // Unread count

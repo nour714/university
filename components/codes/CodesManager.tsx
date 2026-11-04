@@ -14,16 +14,12 @@ import {
   BookOpen, 
   ShieldCheck, 
   Receipt,
-  Calendar,
   User
 } from 'lucide-react';
 import { StudentCode } from '@/types/code';
-import { INITIAL_STUDENT_CODES, DEMO_REDEEMABLE_CODES } from '@/data/codes';
 import { useNotifications } from '@/context/NotificationContext';
 import { CodesSkeleton } from '@/components/skeletons/CodesSkeleton';
-import { StudentCodeListSchema } from '@/lib/schemas';
-
-const STORAGE_KEY = 'academic_student_codes_v1';
+import { listCodes, saveCodes, redeemCode } from '@/lib/repos/codesRepo';
 
 export function CodesManager() {
   const [codes, setCodes] = useState<StudentCode[]>([]);
@@ -36,40 +32,24 @@ export function CodesManager() {
 
   const { addNotification } = useNotifications();
 
-  // Load from localStorage
+  // Load from repo
   useEffect(() => {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) {
-        const parsed = StudentCodeListSchema.safeParse(JSON.parse(saved));
-        if (parsed.success) {
-          setCodes(parsed.data);
-        } else {
-          localStorage.removeItem(STORAGE_KEY);
-          setCodes(INITIAL_STUDENT_CODES);
-        }
-      } else {
-        setCodes(INITIAL_STUDENT_CODES);
+    let mounted = true;
+    listCodes().then((data) => {
+      if (mounted) {
+        setCodes(data);
+        setIsLoaded(true);
       }
-    } catch {
-      try {
-        localStorage.removeItem(STORAGE_KEY);
-      } catch {
-        // Ignore storage errors
-      }
-      setCodes(INITIAL_STUDENT_CODES);
-    }
-    setIsLoaded(true);
+    });
+    return () => {
+      mounted = false;
+    };
   }, []);
 
-  // Save to localStorage
+  // Save via repo
   useEffect(() => {
     if (!isLoaded) return;
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(codes));
-    } catch {
-      // Ignore storage errors
-    }
+    saveCodes(codes);
   }, [codes, isLoaded]);
 
   // Clean and format code input with dashes (XXXX - XXXX - XXXX)
@@ -89,7 +69,7 @@ export function CodesManager() {
     setInputCode(formatted);
   };
 
-  const handleRedeem = (e: React.FormEvent) => {
+  const handleRedeem = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMessage('');
     setSuccessMessage(null);
@@ -107,38 +87,23 @@ export function CodesManager() {
 
     setIsLoading(true);
 
-    // Simulate validation
-    setTimeout(() => {
-      setIsLoading(false);
+    try {
+      // Simulate validation delay
+      await new Promise((resolve) => setTimeout(resolve, 450));
+      const res = await redeemCode(inputCode);
 
-      // Check if already redeemed
-      const alreadyRedeemed = codes.some(
-        (c) => c.code.replace(/[^a-zA-Z0-9]/g, '').toUpperCase() === raw
-      );
-
-      if (alreadyRedeemed) {
-        setErrorMessage('هذا الكود تم تفعيله مسبقاً في حسابك، المقرر متاح بالفعل في مكتبتك.');
+      if (!res.ok) {
+        if (res.reason === 'already_redeemed') {
+          setErrorMessage('هذا الكود تم تفعيله مسبقاً في حسابك، المقرر متاح بالفعل في مكتبتك.');
+        } else if (res.reason === 'incomplete') {
+          setErrorMessage('كود الوصول غير مكتمل، تأكد من إدخال كافة حروف وأرقام الكود.');
+        } else {
+          setErrorMessage('كود الوصول غير صحيح، تأكد من صحة الرمز المدخل.');
+        }
         return;
       }
 
-      // Check if matches one of demo redeemable codes or create a valid activation
-      const matchDemo = DEMO_REDEEMABLE_CODES.find(
-        (d) => d.code.replace(/[^a-zA-Z0-9]/g, '').toUpperCase() === raw
-      );
-
-      const newCode: StudentCode = {
-        id: `code-${Date.now()}`,
-        code: inputCode,
-        courseCode: matchDemo ? matchDemo.courseCode : `AI${Math.floor(Math.random() * 300 + 100)}`,
-        courseName: matchDemo ? matchDemo.courseName : 'مقرر دراسي معتمد - كلية الذكاء الاصطناعي',
-        courseId: matchDemo ? matchDemo.courseId : 'ai-301',
-        doctorName: matchDemo ? matchDemo.doctorName : 'أستاذ المادة المعتمد',
-        receiptNumber: `REC-2026-${Math.floor(Math.random() * 9000 + 1000)}`,
-        activatedAt: new Date().toLocaleDateString('ar-EG', { year: 'numeric', month: '2-digit', day: '2-digit' }),
-        semester: 'الفصل الدراسي الأول 2026/2027',
-        status: 'active',
-      };
-
+      const newCode = res.code;
       setCodes((prev) => [newCode, ...prev]);
       setSuccessMessage(newCode);
       setInputCode('');
@@ -154,7 +119,9 @@ export function CodesManager() {
         actionUrl: `/courses/${newCode.courseId}`,
         priority: 'urgent',
       });
-    }, 450);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleCopyCode = (id: string, text: string) => {

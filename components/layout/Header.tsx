@@ -3,6 +3,7 @@ import Image from 'next/image';
 import { GraduationCap, User, Sparkles } from 'lucide-react';
 import { CURRENT_STUDENT } from '@/data/student';
 import { NotificationBell } from '@/components/notifications/NotificationBell';
+import { SettingsMenu } from '@/components/settings/SettingsMenu';
 
 export function Header() {
   return (
@@ -47,8 +48,11 @@ export function Header() {
           </div>
         </div>
 
-        {/* Left side: Notifications Bell + Student Profile */}
+        {/* Left side: Settings + Notifications Bell + Student Profile */}
         <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+          {/* Settings Menu (Password & Support) */}
+          <SettingsMenu />
+
           {/* Academic Notifications Bell */}
           <NotificationBell />
 

@@ -112,14 +112,6 @@ export function Sidebar({ currentPath }: { currentPath?: string }) {
                 </div>
               )}
             </Link>
-
-            {!isExpanded && (
-              <div className="absolute right-16 top-1/2 -translate-y-1/2 hidden group-hover:flex items-center z-50 pointer-events-none">
-                <div className="bg-[#172554] text-white text-xs font-bold px-3 py-1.5 rounded-xl border border-blue-700 shadow-xl whitespace-nowrap">
-                  الصفحة الرئيسية
-                </div>
-              </div>
-            )}
           </div>
 
           {/* 2. مكتبة المقررات */}
@@ -136,6 +128,7 @@ export function Sidebar({ currentPath }: { currentPath?: string }) {
                   : 'text-slate-300 hover:text-white hover:bg-blue-900/40'
               }`}
               aria-label="مكتبة المقررات"
+              title="مكتبة المقررات"
             >
               <BookOpen className="w-5 h-5 shrink-0 stroke-[2.2]" />
 
@@ -146,14 +139,6 @@ export function Sidebar({ currentPath }: { currentPath?: string }) {
                 </div>
               )}
             </Link>
-
-            {!isExpanded && (
-              <div className="absolute right-16 top-1/2 -translate-y-1/2 hidden group-hover:flex items-center z-50 pointer-events-none">
-                <div className="bg-[#172554] text-white text-xs font-bold px-3 py-1.5 rounded-xl border border-blue-700 shadow-xl whitespace-nowrap">
-                  مكتبة المقررات الأكاديمية
-                </div>
-              </div>
-            )}
           </div>
 
           {/* 3. الاختبارات (Exams) */}
@@ -173,14 +158,6 @@ export function Sidebar({ currentPath }: { currentPath?: string }) {
                 <span className="text-sm font-medium animate-fadeIn">الاختبارات</span>
               )}
             </button>
-
-            {!isExpanded && (
-              <div className="absolute right-16 top-1/2 -translate-y-1/2 hidden group-hover:flex items-center z-50 pointer-events-none">
-                <div className="bg-[#172554] text-white text-xs font-semibold px-3 py-1.5 rounded-xl border border-blue-700 shadow-xl whitespace-nowrap">
-                  الاختبارات والتقييمات
-                </div>
-              </div>
-            )}
           </div>
 
           {/* 4. أكوادي (My Codes) */}
@@ -206,14 +183,6 @@ export function Sidebar({ currentPath }: { currentPath?: string }) {
                 </div>
               )}
             </Link>
-
-            {!isExpanded && (
-              <div className="absolute right-16 top-1/2 -translate-y-1/2 hidden group-hover:flex items-center z-50 pointer-events-none">
-                <div className="bg-[#172554] text-white text-xs font-semibold px-3 py-1.5 rounded-xl border border-blue-700 shadow-xl whitespace-nowrap">
-                  أكوادي الأكاديمية
-                </div>
-              </div>
-            )}
           </div>
 
           {/* Academic Help Info Box when expanded */}
@@ -252,15 +221,10 @@ export function Sidebar({ currentPath }: { currentPath?: string }) {
           ) : (
             <button
               type="button"
-              className="w-10 h-10 rounded-xl flex items-center justify-center text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 transition-colors group relative"
+              className="w-10 h-10 rounded-xl flex items-center justify-center text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 transition-colors"
               title="تسجيل الخروج"
             >
               <LogOut className="w-5 h-5 -scale-x-100" />
-              <div className="absolute right-16 top-1/2 -translate-y-1/2 hidden group-hover:flex items-center z-50 pointer-events-none">
-                <div className="bg-[#172554] text-rose-300 text-xs font-semibold px-3 py-1.5 rounded-xl border border-rose-900 shadow-xl whitespace-nowrap">
-                  تسجيل الخروج
-                </div>
-              </div>
             </button>
           )}
         </div>

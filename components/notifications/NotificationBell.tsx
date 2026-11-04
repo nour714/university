@@ -297,11 +297,11 @@ export function NotificationBell() {
         ref={buttonRef}
         type="button"
         onClick={() => setIsOpen((prev) => !prev)}
-        className="relative w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-slate-50 hover:bg-slate-100 text-slate-700 hover:text-blue-600 flex items-center justify-center border border-slate-200/90 shadow-2xs transition-all duration-200 active:scale-95 cursor-pointer group"
+        className="relative w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-slate-50 hover:bg-slate-100 text-slate-700 hover:text-blue-600 flex items-center justify-center border border-slate-200/90 shadow-2xs transition-all duration-200 active:scale-95 cursor-pointer group"
         aria-label="الإشعارات الأكاديمية"
         title="الإشعارات الأكاديمية"
       >
-        <Bell className="w-4 h-4 sm:w-4.5 sm:h-4.5 group-hover:rotate-12 transition-transform duration-200" />
+        <Bell className="w-4.5 h-4.5 sm:w-5 sm:h-5 group-hover:rotate-12 transition-transform duration-200" />
         
         {/* Unread Badge with Pulse Ring */}
         {unreadCount > 0 && (

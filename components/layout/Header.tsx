@@ -6,23 +6,23 @@ import { NotificationBell } from '@/components/notifications/NotificationBell';
 
 export function Header() {
   return (
-    <header className="sticky top-2 sm:top-2.5 z-30 mx-2 sm:mx-6 lg:mx-8 mb-2 sm:mb-2.5 transition-all">
+    <header className="sticky top-2 sm:top-3 z-30 mx-2.5 sm:mx-6 lg:mx-8 mb-2.5 sm:mb-3 transition-all">
       {/* Floating Pill Container with Curved Sides */}
-      <div className="bg-white/95 backdrop-blur-md rounded-[22px] sm:rounded-[26px] border border-slate-200/90 shadow-md shadow-slate-200/40 px-3.5 sm:px-6 py-2 sm:py-2.5 min-h-[52px] sm:min-h-[58px] flex items-center justify-between gap-3 sm:gap-4">
+      <div className="bg-white/95 backdrop-blur-md rounded-[26px] sm:rounded-[30px] border border-slate-200/90 shadow-md shadow-slate-200/50 px-4 sm:px-6 py-2.5 sm:py-3.5 min-h-[60px] sm:min-h-[66px] flex items-center justify-between gap-3 sm:gap-4">
         {/* Right side: Academic Title with Official Logo */}
-        <div className="flex items-center gap-2.5 sm:gap-3 min-w-0 flex-1">
+        <div className="flex items-center gap-3 sm:gap-3.5 min-w-0 flex-1">
           {/* Mobile Logo: Clean & Transparent with No Background Box */}
           <Link 
             href="/" 
-            className="lg:hidden flex items-center justify-center shrink-0 transition-transform active:scale-95"
+            className="lg:hidden flex items-center justify-center shrink-0 transition-transform active:scale-95 py-0.5"
             title="الرئيسية"
           >
             <Image
               src="/logo.png"
               alt="شعار كلية الذكاء الاصطناعي"
-              width={46}
-              height={32}
-              className="h-8.5 w-auto object-contain filter drop-shadow-xs"
+              width={54}
+              height={38}
+              className="h-10 sm:h-11 w-auto object-contain filter drop-shadow-xs"
               priority
             />
           </Link>
@@ -47,7 +47,7 @@ export function Header() {
         </div>
 
         {/* Left side: Notifications Bell + Student Profile */}
-        <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
+        <div className="flex items-center gap-2 sm:gap-3 shrink-0">
           {/* Academic Notifications Bell */}
           <NotificationBell />
 
@@ -58,8 +58,8 @@ export function Header() {
             title="الرئيسية - الملف الشخصي للطالب"
           >
             {/* Circular Avatar */}
-            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-gradient-to-br from-blue-600 to-indigo-700 text-white flex items-center justify-center font-bold text-xs shadow-sm shadow-blue-600/20 group-hover:scale-105 group-hover:shadow-md group-hover:shadow-blue-600/30 transition-all duration-700 ease-out shrink-0">
-              <User className="w-4 h-4 stroke-[2.5]" />
+            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br from-blue-600 to-indigo-700 text-white flex items-center justify-center font-bold text-xs shadow-sm shadow-blue-600/20 group-hover:scale-105 group-hover:shadow-md group-hover:shadow-blue-600/30 transition-all duration-700 ease-out shrink-0">
+              <User className="w-4.5 h-4.5 stroke-[2.5]" />
             </div>
 
             {/* Student Name and Academic Level - Appears in Slow Motion when hovering over the icon */}

@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useRouter, useSearchParams, usePathname } from 'next/navigation';
+import { useState } from 'react';
+import { useSearchParams, usePathname } from 'next/navigation';
 import { Search, X } from 'lucide-react';
 
 interface CourseFiltersProps {
@@ -10,18 +10,17 @@ interface CourseFiltersProps {
 }
 
 export function CourseFilters({ value, onChange }: CourseFiltersProps) {
-  const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
   const urlSearch = searchParams?.get('q') || '';
   const [internalQuery, setInternalQuery] = useState(value !== undefined ? value : urlSearch);
+  const [prevValue, setPrevValue] = useState(value);
 
-  useEffect(() => {
-    if (value !== undefined) {
-      setInternalQuery(value);
-    }
-  }, [value]);
+  if (value !== undefined && value !== prevValue) {
+    setPrevValue(value);
+    setInternalQuery(value);
+  }
 
   const handleChange = (newVal: string) => {
     setInternalQuery(newVal);

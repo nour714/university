@@ -6,15 +6,13 @@ import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { 
   BookOpen, 
-  GraduationCap,
-  LogOut,
-  ChevronRight,
-  Sparkles,
-  HelpCircle,
-  ClipboardCheck,
-  KeyRound,
-  LayoutDashboard,
-  Home
+  LogOut, 
+  ChevronRight, 
+  Sparkles, 
+  HelpCircle, 
+  ClipboardCheck, 
+  KeyRound, 
+  Home 
 } from 'lucide-react';
 
 export const NAVIGATION_LINKS = [

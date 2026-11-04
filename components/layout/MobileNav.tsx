@@ -9,8 +9,7 @@ import {
   BookOpen, 
   GraduationCap,
   Sparkles,
-  User,
-  ExternalLink
+  User
 } from 'lucide-react';
 
 interface MobileNavProps {

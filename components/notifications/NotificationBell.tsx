@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useSyncExternalStore } from 'react';
 import { createPortal } from 'react-dom';
 import { useRouter } from 'next/navigation';
 import { 
@@ -18,6 +18,8 @@ import { useNotifications } from '@/context/NotificationContext';
 import { AcademicNotification, NotificationType } from '@/types/notification';
 import { safeInternalPath } from '@/lib/safeUrl';
 
+const emptySubscribe = () => () => {};
+
 export function NotificationBell() {
   const router = useRouter();
   const { 
@@ -29,15 +31,11 @@ export function NotificationBell() {
   } = useNotifications();
 
   const [isOpen, setIsOpen] = useState(false);
-  const [mounted, setMounted] = useState(false);
+  const mounted = useSyncExternalStore(emptySubscribe, () => true, () => false);
   const [activeTab, setActiveTab] = useState<'all' | NotificationType>('all');
   
   const desktopPanelRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   // Close when clicking outside on desktop
   useEffect(() => {

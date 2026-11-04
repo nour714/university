@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useSyncExternalStore } from 'react';
 import { createPortal } from 'react-dom';
 import { 
   LogOut, 
@@ -22,8 +22,10 @@ interface MoreMenuSheetProps {
   onClose: () => void;
 }
 
+const emptySubscribe = () => () => {};
+
 export function MoreMenuSheet({ isOpen, onClose }: MoreMenuSheetProps) {
-  const [mounted, setMounted] = useState(false);
+  const mounted = useSyncExternalStore(emptySubscribe, () => true, () => false);
   const [activeView, setActiveView] = useState<'menu' | 'changePassword'>('menu');
   const [logoutLoading, setLogoutLoading] = useState(false);
 
@@ -38,18 +40,21 @@ export function MoreMenuSheet({ isOpen, onClose }: MoreMenuSheetProps) {
 
   const { addNotification } = useNotifications();
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  // Lock body scroll and reset view when opened/closed
-  useEffect(() => {
+  const [prevIsOpen, setPrevIsOpen] = useState(isOpen);
+  if (isOpen !== prevIsOpen) {
+    setPrevIsOpen(isOpen);
     if (isOpen) {
-      document.body.style.overflow = 'hidden';
       setActiveView('menu');
       setPasswordError('');
       setPasswordSuccess(false);
       setLogoutLoading(false);
+    }
+  }
+
+  // Lock body scroll when opened/closed
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
     } else {
       document.body.style.overflow = '';
     }

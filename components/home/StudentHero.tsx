@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useSyncExternalStore } from 'react';
 import Image from 'next/image';
 import { GraduationCap, Sparkles, Calendar, ShieldCheck } from 'lucide-react';
 import { StudentProfile } from '@/data/student';
@@ -9,22 +9,28 @@ interface StudentHeroProps {
   student: StudentProfile;
 }
 
-export function StudentHero({ student }: StudentHeroProps) {
-  const [formattedDate, setFormattedDate] = useState<string>('الفصل الدراسي الأول');
+const emptySubscribe = () => () => {};
 
-  useEffect(() => {
+export function StudentHero({ student }: StudentHeroProps) {
+  const isClient = useSyncExternalStore(
+    emptySubscribe,
+    () => true,
+    () => false
+  );
+
+  let formattedDate = 'الفصل الدراسي الأول';
+  if (isClient) {
     try {
-      const today = new Intl.DateTimeFormat('ar-EG', {
+      formattedDate = new Intl.DateTimeFormat('ar-EG', {
         weekday: 'long',
         day: 'numeric',
         month: 'long',
         year: 'numeric',
       }).format(new Date());
-      setFormattedDate(today);
     } catch {
-      setFormattedDate('الفصل الدراسي الأول');
+      formattedDate = 'الفصل الدراسي الأول';
     }
-  }, []);
+  }
 
   return (
     <section 

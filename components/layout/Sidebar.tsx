@@ -62,6 +62,7 @@ export function Sidebar({ currentPath }: { currentPath?: string }) {
                     height={40}
                     className="w-full h-full object-contain filter drop-shadow-xs select-none"
                     priority
+                    unoptimized
                   />
                 </div>
               </div>

@@ -24,6 +24,7 @@ export function Header() {
               height={38}
               className="h-10 sm:h-11 w-auto object-contain filter drop-shadow-xs"
               priority
+              unoptimized
             />
           </Link>
 

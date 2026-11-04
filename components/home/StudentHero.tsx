@@ -49,6 +49,7 @@ export function StudentHero({ student }: StudentHeroProps) {
           width={192}
           height={192}
           className="w-full h-full object-contain filter drop-shadow-[0_0_25px_rgba(59,130,246,0.5)]"
+          unoptimized
         />
       </div>
 

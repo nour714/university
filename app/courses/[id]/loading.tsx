@@ -3,3 +3,4 @@ import { CourseDetailSkeleton } from '@/components/skeletons/CourseDetailSkeleto
 export default function CourseDetailLoading() {
   return <CourseDetailSkeleton />;
 }
+

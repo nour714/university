@@ -19,3 +19,4 @@ export function Skeleton({ className = '', variant = 'light', ...props }: Skelet
     />
   );
 }
+

@@ -1,3 +1,5 @@
+// DEMO DATA ONLY — do not commit real student data or real access codes to this repository.
+
 export interface StudentProfile {
   id: string;
   fullName: string;

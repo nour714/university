@@ -1,3 +1,5 @@
+// DEMO DATA ONLY — do not commit real student data or real access codes to this repository.
+
 import { StudentCode } from '@/types/code';
 
 export const INITIAL_STUDENT_CODES: StudentCode[] = [

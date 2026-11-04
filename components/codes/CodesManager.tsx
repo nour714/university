@@ -124,10 +124,14 @@ export function CodesManager() {
     }
   };
 
-  const handleCopyCode = (id: string, text: string) => {
-    navigator.clipboard.writeText(text);
-    setCopiedId(id);
-    setTimeout(() => setCopiedId(null), 2000);
+  const handleCopyCode = async (id: string, text: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopiedId(id);
+      setTimeout(() => setCopiedId(null), 2000);
+    } catch {
+      // Do not setCopiedId if writeText fails
+    }
   };
 
   if (!isLoaded) {

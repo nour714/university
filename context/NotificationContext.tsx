@@ -59,6 +59,13 @@ function playNotificationSound() {
   }
 }
 
+function generateNotificationId(): string {
+  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+    return crypto.randomUUID();
+  }
+  return `notif-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
+}
+
 export function NotificationProvider({ children }: { children: React.ReactNode }) {
   const [notifications, setNotifications] = useState<AcademicNotification[]>([]);
   const [toast, setToast] = useState<AcademicNotification | null>(null);
@@ -117,7 +124,7 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
   const addNotification = useCallback(
     (notif: Partial<AcademicNotification> & { title: string; message: string; type: AcademicNotification['type'] }) => {
       const newNotif: AcademicNotification = {
-        id: `notif-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+        id: generateNotificationId(),
         type: notif.type,
         title: notif.title,
         message: notif.message,

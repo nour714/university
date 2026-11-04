@@ -4,6 +4,7 @@ import React, { createContext, useContext, useState, useEffect, useCallback } fr
 import { AcademicNotification } from '@/types/notification';
 import { INITIAL_NOTIFICATIONS } from '@/data/notifications';
 import { safeInternalPath } from '@/lib/safeUrl';
+import { AcademicNotificationListSchema } from '@/lib/schemas';
 
 interface NotificationContextType {
   notifications: AcademicNotification[];
@@ -71,20 +72,22 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) {
-        const raw = JSON.parse(saved);
-        if (Array.isArray(raw)) {
-          const sanitized = raw.map((item: AcademicNotification) => ({
-            ...item,
-            actionUrl: item.actionUrl ? safeInternalPath(item.actionUrl) : undefined,
-          }));
-          setNotifications(sanitized);
+        const parsed = AcademicNotificationListSchema.safeParse(JSON.parse(saved));
+        if (parsed.success) {
+          setNotifications(parsed.data);
         } else {
+          localStorage.removeItem(STORAGE_KEY);
           setNotifications(INITIAL_NOTIFICATIONS);
         }
       } else {
         setNotifications(INITIAL_NOTIFICATIONS);
       }
     } catch {
+      try {
+        localStorage.removeItem(STORAGE_KEY);
+      } catch {
+        // Ignore storage errors
+      }
       setNotifications(INITIAL_NOTIFICATIONS);
     }
     setIsLoaded(true);

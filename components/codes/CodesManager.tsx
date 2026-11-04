@@ -21,6 +21,7 @@ import { StudentCode } from '@/types/code';
 import { INITIAL_STUDENT_CODES, DEMO_REDEEMABLE_CODES } from '@/data/codes';
 import { useNotifications } from '@/context/NotificationContext';
 import { CodesSkeleton } from '@/components/skeletons/CodesSkeleton';
+import { StudentCodeListSchema } from '@/lib/schemas';
 
 const STORAGE_KEY = 'academic_student_codes_v1';
 
@@ -40,11 +41,22 @@ export function CodesManager() {
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) {
-        setCodes(JSON.parse(saved));
+        const parsed = StudentCodeListSchema.safeParse(JSON.parse(saved));
+        if (parsed.success) {
+          setCodes(parsed.data);
+        } else {
+          localStorage.removeItem(STORAGE_KEY);
+          setCodes(INITIAL_STUDENT_CODES);
+        }
       } else {
         setCodes(INITIAL_STUDENT_CODES);
       }
     } catch {
+      try {
+        localStorage.removeItem(STORAGE_KEY);
+      } catch {
+        // Ignore storage errors
+      }
       setCodes(INITIAL_STUDENT_CODES);
     }
     setIsLoaded(true);

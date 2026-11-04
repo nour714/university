@@ -2,7 +2,6 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { 
   Bell, 
@@ -287,17 +286,6 @@ export function NotificationBell() {
             </p>
           </div>
         )}
-      </div>
-
-      {/* Footer */}
-      <div className="p-3 bg-slate-50 border-t border-slate-200/80 text-center shrink-0">
-        <Link
-          href="/courses"
-          onClick={() => setIsOpen(false)}
-          className="text-xs font-bold text-blue-600 hover:text-blue-800 transition-colors py-1 inline-block"
-        >
-          تصفح كافة المقررات الدراسية ←
-        </Link>
       </div>
     </>
   );

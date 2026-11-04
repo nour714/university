@@ -48,19 +48,19 @@ export function Sidebar({ currentPath }: { currentPath?: string }) {
               }`}
               title={isExpanded ? 'طي القائمة الجانبية' : 'اضغط لفتح القائمة الجانبية'}
             >
-              {/* Distinctive University Crest (Gold/Amber Emblem with Official Logo) */}
+              {/* Distinctive University Crest (Pure White Emblem with Official Logo on Desktop) */}
               <div className="relative shrink-0 flex items-center justify-center">
                 <span
-                  className="absolute inset-0 rounded-full bg-amber-400/35 animate-gold-wave pointer-events-none"
+                  className="absolute inset-0 rounded-full bg-white/20 animate-white-wave pointer-events-none"
                   aria-hidden="true"
                 />
-                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-amber-400 via-amber-500 to-amber-600 border-2 border-amber-200 flex items-center justify-center p-1 shrink-0 shadow-lg shadow-amber-500/35 ring-2 ring-amber-400/40 ring-offset-2 ring-offset-[#172554] group-hover:scale-110 group-hover:shadow-amber-400/60 transition-all duration-300 cursor-pointer overflow-hidden animate-gold-pulse">
+                <div className="w-12 h-12 rounded-full bg-white border-2 border-white flex items-center justify-center p-1.5 shrink-0 shadow-lg shadow-blue-950/40 ring-2 ring-blue-400/40 ring-offset-2 ring-offset-[#172554] group-hover:scale-110 group-hover:shadow-blue-400/60 transition-all duration-300 cursor-pointer overflow-hidden animate-white-pulse">
                   <Image
                     src="/logo.png"
                     alt="شعار كلية الذكاء الاصطناعي"
                     width={40}
                     height={40}
-                    className="w-full h-full object-contain filter drop-shadow-sm select-none"
+                    className="w-full h-full object-contain filter drop-shadow-xs select-none"
                     priority
                   />
                 </div>

@@ -1,7 +1,6 @@
 'use client';
 
 import Link from 'next/link';
-import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { 
   BookOpen, 
@@ -52,21 +51,14 @@ export function BottomNav() {
         {/* 3. Center College Emblem Logo - Navigates to Home (الرئيسية) */}
         <Link
           href="/"
-          className={`w-12 h-12 -mt-4 rounded-full bg-white border-2 border-blue-400 p-1 flex items-center justify-center shadow-xl transition-all shrink-0 overflow-hidden ${
+          className={`w-11 h-11 -mt-3 rounded-full bg-gradient-to-br from-amber-400 via-amber-500 to-amber-600 border-2 border-amber-200 text-[#172554] flex items-center justify-center shadow-lg transition-all shrink-0 ${
             isHomeActive
-              ? 'ring-4 ring-blue-400 shadow-blue-500/50 scale-105'
-              : 'ring-4 ring-[#172554] shadow-blue-900/40 active:scale-95'
+              ? 'ring-4 ring-amber-300 shadow-amber-400/70 scale-105'
+              : 'ring-4 ring-[#172554] shadow-amber-500/35 active:scale-95'
           }`}
           title="الرئيسية (لوحة التحكم)"
         >
-          <Image
-            src="/logo.png"
-            alt="شعار كلية الذكاء الاصطناعي"
-            width={44}
-            height={44}
-            className="w-full h-full object-contain"
-            priority
-          />
+          <GraduationCap className="w-6 h-6 stroke-[2.4]" />
         </Link>
 
         {/* 4. Key Icon (أكوادي) */}

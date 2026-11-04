@@ -130,12 +130,12 @@ export function MoreMenuSheet({ isOpen, onClose }: MoreMenuSheetProps) {
         className="fixed inset-x-0 bottom-0 z-[1000] w-full max-h-[90vh] bg-white rounded-t-[32px] border-t border-slate-200/90 shadow-2xl flex flex-col overflow-hidden animate-slideUp"
       >
         {/* Drag Handle Top Bar */}
-        <div className="w-full pt-3 pb-1.5 flex justify-center bg-slate-50/80 border-b border-slate-100 shrink-0">
-          <div className="w-12 h-1.5 rounded-full bg-slate-300" />
+        <div className="w-full pt-3.5 pb-1.5 flex justify-center shrink-0">
+          <div className="w-12 h-1.5 rounded-full bg-slate-300/80" />
         </div>
 
-        {/* Dynamic Sheet Header */}
-        <div className="px-5 py-3.5 bg-gradient-to-l from-slate-900 to-[#172554] text-white flex items-center justify-between shrink-0">
+        {/* Dynamic Sheet Header - Clean, unified white header */}
+        <div className="px-5 pb-3.5 pt-1 border-b border-slate-100 flex items-center justify-between shrink-0">
           <div className="flex items-center gap-2.5">
             {activeView !== 'menu' && (
               <button
@@ -144,7 +144,7 @@ export function MoreMenuSheet({ isOpen, onClose }: MoreMenuSheetProps) {
                   setActiveView('menu');
                   setPasswordError('');
                 }}
-                className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors cursor-pointer -ms-1"
+                className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 flex items-center justify-center transition-colors cursor-pointer -ms-1"
                 title="رجوع"
                 aria-label="رجوع"
               >
@@ -152,21 +152,13 @@ export function MoreMenuSheet({ isOpen, onClose }: MoreMenuSheetProps) {
               </button>
             )}
 
-            <div className="w-9 h-9 rounded-xl bg-blue-500/20 text-blue-300 flex items-center justify-center border border-blue-400/30 shrink-0">
-              {activeView === 'changePassword' ? (
-                <KeyRound className="w-4.5 h-4.5 text-amber-400" />
-              ) : (
-                <Sparkles className="w-4.5 h-4.5 text-amber-400" />
-              )}
-            </div>
-
             <div>
-              <h2 className="text-sm font-extrabold text-white tracking-tight">
+              <h2 className="text-base font-extrabold text-[#172554] tracking-tight">
                 {activeView === 'changePassword' 
                   ? 'تغيير كلمة السر' 
                   : 'المزيد من الخيارات'}
               </h2>
-              <p className="text-[11px] text-blue-200/90 font-medium">
+              <p className="text-[11px] text-slate-500 font-medium">
                 {activeView === 'changePassword' 
                   ? 'تأمين وتحديث كلمة مرور الحساب' 
                   : 'إدارة وتأمين حسابك الجامعي'}
@@ -177,7 +169,7 @@ export function MoreMenuSheet({ isOpen, onClose }: MoreMenuSheetProps) {
           <button
             type="button"
             onClick={onClose}
-            className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors cursor-pointer"
+            className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-800 flex items-center justify-center transition-colors cursor-pointer"
             title="إغلاق"
             aria-label="إغلاق النافذة"
           >

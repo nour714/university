@@ -13,7 +13,7 @@ export function Header() {
         <div className="flex items-center gap-2.5 sm:gap-3 min-w-0 flex-1">
           <Link 
             href="/" 
-            className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-blue-50/80 hover:bg-blue-100/80 border border-blue-200/80 p-0.5 flex items-center justify-center shrink-0 transition-transform active:scale-95"
+            className="lg:hidden w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-blue-50/80 hover:bg-blue-100/80 border border-blue-200/80 p-0.5 flex items-center justify-center shrink-0 transition-transform active:scale-95"
             title="الرئيسية"
           >
             <Image

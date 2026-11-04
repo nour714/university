@@ -7,11 +7,10 @@ const cspHeader = `default-src 'self'; img-src 'self' data: https://images.unspl
 
 const nextConfig: NextConfig = {
   /* config options here */
-  devIndicators: false,
   images: {
     unoptimized: true,
   },
-  allowedDevOrigins: ['192.168.1.4', 'localhost:5500'],
+  allowedDevOrigins: ['192.168.1.4', 'localhost:5500', '192.168.4.5'],
   cacheComponents: true,
   partialPrefetching: true,
   turbopack: {

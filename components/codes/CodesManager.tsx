@@ -20,6 +20,7 @@ import {
 import { StudentCode } from '@/types/code';
 import { INITIAL_STUDENT_CODES, DEMO_REDEEMABLE_CODES } from '@/data/codes';
 import { useNotifications } from '@/context/NotificationContext';
+import { CodesSkeleton } from '@/components/skeletons/CodesSkeleton';
 
 const STORAGE_KEY = 'academic_student_codes_v1';
 
@@ -149,6 +150,10 @@ export function CodesManager() {
     setCopiedId(id);
     setTimeout(() => setCopiedId(null), 2000);
   };
+
+  if (!isLoaded) {
+    return <CodesSkeleton />;
+  }
 
   return (
     <div className="space-y-4 sm:space-y-6">

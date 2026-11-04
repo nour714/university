@@ -13,11 +13,12 @@ import {
   HelpCircle,
   ClipboardCheck,
   KeyRound,
-  LayoutDashboard
+  LayoutDashboard,
+  Home
 } from 'lucide-react';
 
 export const NAVIGATION_LINKS = [
-  { name: 'الرئيسية', href: '/', icon: 'LayoutDashboard', active: true },
+  { name: 'الرئيسية', href: '/', icon: 'Home', active: true },
   { name: 'مكتبة المقررات', href: '/courses', icon: 'BookOpen', active: false },
 ];
 
@@ -117,7 +118,7 @@ export function Sidebar({ currentPath }: { currentPath?: string }) {
               }`}
               aria-label="الرئيسية"
             >
-              <LayoutDashboard className="w-5 h-5 shrink-0 stroke-[2.2]" />
+              <Home className="w-5 h-5 shrink-0 stroke-[2.2]" />
 
               {isExpanded && (
                 <div className="flex-1 flex items-center justify-between animate-fadeIn">

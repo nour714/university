@@ -1,11 +1,10 @@
 'use client';
 
 import Link from 'next/link';
-import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { 
   BookOpen, 
-  GraduationCap, 
+  Home, 
   ClipboardCheck, 
   KeyRound, 
   MoreHorizontal 
@@ -49,7 +48,7 @@ export function BottomNav() {
           <span className="text-[10px] font-medium mt-0.5 text-slate-300">الاختبارات</span>
         </button>
 
-        {/* 3. Center College Emblem Logo - Navigates to Home (الرئيسية) */}
+        {/* 3. Center Navigation Button - Home (الرئيسية) */}
         <Link
           href="/"
           className="relative -mt-3.5 shrink-0 flex items-center justify-center group"
@@ -61,22 +60,15 @@ export function BottomNav() {
             aria-hidden="true"
           />
 
-          {/* Golden Emblem Body with Rhythmic Pulse */}
+          {/* Golden Button with Rhythmic Pulse and Home Icon */}
           <div
-            className={`w-12 h-12 rounded-full bg-gradient-to-br from-amber-400 via-amber-500 to-amber-600 border-2 border-amber-200 flex items-center justify-center p-1 shadow-lg transition-all shrink-0 cursor-pointer overflow-hidden animate-gold-pulse ${
+            className={`w-12 h-12 rounded-full bg-gradient-to-br from-amber-400 via-amber-500 to-amber-600 border-2 border-amber-200 text-[#172554] flex items-center justify-center shadow-lg transition-all shrink-0 cursor-pointer animate-gold-pulse ${
               isHomeActive
-                ? 'ring-4 ring-amber-300 shadow-amber-400/70'
+                ? 'ring-4 ring-amber-300 shadow-amber-400/70 scale-105'
                 : 'ring-4 ring-[#172554] shadow-amber-500/35 active:scale-95'
             }`}
           >
-            <Image
-              src="/logo.png"
-              alt="الرئيسية - شعار كلية الذكاء الاصطناعي"
-              width={40}
-              height={40}
-              className="w-full h-full object-contain filter drop-shadow-sm select-none"
-              priority
-            />
+            <Home className="w-6 h-6 stroke-[2.3] drop-shadow-2xs" />
           </div>
         </Link>
 

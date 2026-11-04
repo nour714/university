@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { 
@@ -9,9 +10,11 @@ import {
   KeyRound, 
   MoreHorizontal 
 } from 'lucide-react';
+import { MoreMenuSheet } from '@/components/layout/MoreMenuSheet';
 
 export function BottomNav() {
   const pathname = usePathname();
+  const [isMoreOpen, setIsMoreOpen] = useState(false);
   const isCoursesActive = pathname.startsWith('/courses');
   const isCodesActive = pathname.startsWith('/codes');
   const isHomeActive = pathname === '/';
@@ -86,18 +89,27 @@ export function BottomNav() {
           <span className="text-[10px] font-bold mt-0.5">أكوادي</span>
         </Link>
 
-        {/* 5. More Icon (المزيد) */}
+        {/* 5. More Button (المزيد) */}
         <button
           type="button"
-          onClick={(e) => e.preventDefault()}
-          className="flex flex-col items-center justify-center py-1.5 px-2.5 text-slate-400 hover:text-white transition-colors cursor-pointer group"
-          title="المزيد (قريباً)"
+          onClick={() => setIsMoreOpen(true)}
+          className={`flex flex-col items-center justify-center py-1.5 px-2.5 transition-colors cursor-pointer group ${
+            isMoreOpen ? 'text-white' : 'text-slate-400 hover:text-white'
+          }`}
+          title="المزيد من الخيارات"
+          aria-expanded={isMoreOpen}
         >
           <MoreHorizontal className="w-5 h-5 group-hover:scale-105 transition-transform" />
           <span className="text-[10px] font-medium mt-0.5 text-slate-300">المزيد</span>
         </button>
 
       </div>
+
+      {/* Mobile More Options Sheet (Login & Change Password) */}
+      <MoreMenuSheet 
+        isOpen={isMoreOpen} 
+        onClose={() => setIsMoreOpen(false)} 
+      />
     </nav>
   );
 }

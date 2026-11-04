@@ -147,7 +147,8 @@ export function NotificationBell() {
           <button
             type="button"
             onClick={() => setIsOpen(false)}
-            className="w-8 h-8 rounded-xl text-slate-300 hover:text-white flex items-center justify-center hover:bg-white/10 active:scale-95 transition-colors cursor-pointer"
+            className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors cursor-pointer"
+            title="إغلاق"
             aria-label="إغلاق الإشعارات"
           >
             <X className="w-4 h-4" />

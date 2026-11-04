@@ -52,21 +52,32 @@ export function BottomNav() {
         {/* 3. Center College Emblem Logo - Navigates to Home (الرئيسية) */}
         <Link
           href="/"
-          className={`w-12 h-12 -mt-3.5 rounded-full bg-gradient-to-br from-amber-400 via-amber-500 to-amber-600 border-2 border-amber-200 flex items-center justify-center p-1 shadow-lg transition-all shrink-0 cursor-pointer overflow-hidden ${
-            isHomeActive
-              ? 'ring-4 ring-amber-300 shadow-amber-400/70 scale-105'
-              : 'ring-4 ring-[#172554] shadow-amber-500/35 active:scale-95'
-          }`}
+          className="relative -mt-3.5 shrink-0 flex items-center justify-center group"
           title="الرئيسية (لوحة التحكم)"
         >
-          <Image
-            src="/logo.png"
-            alt="الرئيسية - شعار كلية الذكاء الاصطناعي"
-            width={40}
-            height={40}
-            className="w-full h-full object-contain filter drop-shadow-sm select-none"
-            priority
+          {/* Ambient Pulsing Radar Halo */}
+          <span
+            className="absolute inset-0 rounded-full bg-amber-400/40 animate-gold-wave pointer-events-none"
+            aria-hidden="true"
           />
+
+          {/* Golden Emblem Body with Rhythmic Pulse */}
+          <div
+            className={`w-12 h-12 rounded-full bg-gradient-to-br from-amber-400 via-amber-500 to-amber-600 border-2 border-amber-200 flex items-center justify-center p-1 shadow-lg transition-all shrink-0 cursor-pointer overflow-hidden animate-gold-pulse ${
+              isHomeActive
+                ? 'ring-4 ring-amber-300 shadow-amber-400/70'
+                : 'ring-4 ring-[#172554] shadow-amber-500/35 active:scale-95'
+            }`}
+          >
+            <Image
+              src="/logo.png"
+              alt="الرئيسية - شعار كلية الذكاء الاصطناعي"
+              width={40}
+              height={40}
+              className="w-full h-full object-contain filter drop-shadow-sm select-none"
+              priority
+            />
+          </div>
         </Link>
 
         {/* 4. Key Icon (أكوادي) */}

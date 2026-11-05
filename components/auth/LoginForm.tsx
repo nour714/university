@@ -149,29 +149,35 @@ export function LoginForm() {
 
         {/* 2. Floating Luminous AI Ambient Plasma Orbs */}
         <div 
-          className="absolute -top-16 -right-16 w-72 sm:w-[450px] h-72 sm:h-[450px] bg-blue-600/30 rounded-full blur-[80px] sm:blur-[110px] animate-float-orb-1" 
+          className="absolute -top-10 -right-10 w-96 sm:w-[550px] h-96 sm:h-[550px] bg-blue-600/40 rounded-full blur-[70px] sm:blur-[100px] animate-aurora-1" 
         />
         <div 
-          className="absolute -bottom-16 -left-16 w-72 sm:w-[480px] h-72 sm:h-[480px] bg-indigo-600/30 rounded-full blur-[80px] sm:blur-[110px] animate-float-orb-2" 
+          className="absolute -bottom-10 -left-10 w-96 sm:w-[580px] h-96 sm:h-[580px] bg-indigo-600/40 rounded-full blur-[70px] sm:blur-[100px] animate-aurora-2" 
         />
         <div 
-          className="absolute top-1/2 left-1/2 w-80 sm:w-[550px] h-80 sm:h-[550px] bg-cyan-500/15 rounded-full blur-[90px] sm:blur-[130px] animate-float-orb-3" 
+          className="absolute top-1/3 left-1/4 w-80 sm:w-[480px] h-80 sm:h-[480px] bg-cyan-400/20 rounded-full blur-[80px] sm:blur-[110px] animate-float-orb-3" 
         />
 
         {/* 3. Floating Neural Sparks / Data Nodes */}
-        <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute top-[20%] right-[22%] w-2 h-2 rounded-full bg-blue-400 shadow-[0_0_10px_#60a5fa] animate-particle-float" style={{ animationDelay: '0s' }} />
-          <div className="absolute top-[35%] left-[16%] w-1.5 h-1.5 rounded-full bg-cyan-300 shadow-[0_0_8px_#67e8f9] animate-particle-float" style={{ animationDelay: '1.2s' }} />
-          <div className="absolute bottom-[25%] right-[24%] w-2 h-2 rounded-full bg-indigo-400 shadow-[0_0_10px_#818cf8] animate-particle-float" style={{ animationDelay: '2.5s' }} />
-          <div className="absolute bottom-[35%] left-[20%] w-1.5 h-1.5 rounded-full bg-blue-300 shadow-[0_0_8px_#93c5fd] animate-particle-float" style={{ animationDelay: '1.8s' }} />
-          <div className="absolute top-[50%] right-[10%] w-1.5 h-1.5 rounded-full bg-sky-300 shadow-[0_0_8px_#38bdf8] animate-particle-float" style={{ animationDelay: '3.2s' }} />
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-[18%] right-[20%] w-2.5 h-2.5 rounded-full bg-blue-400 shadow-[0_0_12px_#60a5fa] animate-neural-drift" style={{ animationDelay: '0s' }} />
+          <div className="absolute top-[32%] left-[15%] w-2 h-2 rounded-full bg-cyan-300 shadow-[0_0_10px_#67e8f9] animate-neural-drift" style={{ animationDelay: '1.2s' }} />
+          <div className="absolute bottom-[22%] right-[22%] w-2.5 h-2.5 rounded-full bg-indigo-400 shadow-[0_0_12px_#818cf8] animate-neural-drift" style={{ animationDelay: '2.5s' }} />
+          <div className="absolute bottom-[30%] left-[18%] w-2 h-2 rounded-full bg-blue-300 shadow-[0_0_10px_#93c5fd] animate-neural-drift" style={{ animationDelay: '1.8s' }} />
+          <div className="absolute top-[48%] right-[8%] w-2 h-2 rounded-full bg-sky-300 shadow-[0_0_10px_#38bdf8] animate-neural-drift" style={{ animationDelay: '3.2s' }} />
+          <div className="absolute top-[65%] left-[10%] w-2.5 h-2.5 rounded-full bg-cyan-400 shadow-[0_0_12px_#22d3ee] animate-neural-drift" style={{ animationDelay: '0.7s' }} />
+          <div className="absolute top-[12%] left-[30%] w-2 h-2 rounded-full bg-blue-500 shadow-[0_0_10px_#3b82f6] animate-neural-drift" style={{ animationDelay: '2.1s' }} />
+          <div className="absolute bottom-[15%] left-[40%] w-1.5 h-1.5 rounded-full bg-indigo-300 shadow-[0_0_8px_#a5b4fc] animate-neural-drift" style={{ animationDelay: '3.8s' }} />
         </div>
 
-        {/* 4. Ambient Institutional Watermark Logo (Positioned cleanly in upper background) */}
+        {/* 4. Ambient Institutional Watermark Logo & Dynamic Energy Halo */}
         <div 
-          className="absolute top-0 sm:top-2 lg:top-5 left-1/2 -translate-x-1/2 w-48 h-48 sm:w-60 sm:h-60 lg:w-[500px] lg:h-[500px] flex items-center justify-center pointer-events-none"
+          className="absolute top-1 sm:-top-4 lg:-top-24 left-1/2 -translate-x-1/2 w-56 h-56 sm:w-72 sm:h-72 lg:w-[680px] lg:h-[680px] flex items-center justify-center pointer-events-none"
         >
-          <div className="relative w-full h-full animate-logo-breathe filter drop-shadow-[0_0_90px_rgba(59,130,246,0.75)] brightness-125 contrast-110">
+          {/* Animated Energy Halo Ring behind Logo */}
+          <div className="absolute inset-4 rounded-full bg-gradient-to-tr from-blue-600/30 via-cyan-400/25 to-indigo-600/30 blur-2xl animate-aura-spin opacity-70" />
+
+          <div className="relative w-full h-full animate-logo-breathe brightness-125 contrast-110">
             <Image
               src="/logo.png"
               alt="شعار الكلية بالخلفية"
@@ -185,23 +191,23 @@ export function LoginForm() {
       </div>
 
       {/* 5. Top Institutional Brand Header (Desktop Only) */}
-      <div className="hidden lg:flex absolute top-6 right-8 z-20 items-center gap-3 select-none pointer-events-none">
-        <div className="w-12 h-12 flex items-center justify-center shrink-0">
+      <div className="hidden lg:flex absolute top-6 right-8 z-20 items-center gap-3.5 select-none pointer-events-none">
+        <div className="w-16 h-16 flex items-center justify-center shrink-0">
           <Image
             src="/logo.png"
             alt="شعار كلية الذكاء الاصطناعي"
-            width={48}
-            height={48}
-            className="w-full h-full object-contain select-none drop-shadow-[0_2px_14px_rgba(59,130,246,0.65)]"
+            width={64}
+            height={64}
+            className="w-full h-full object-contain select-none drop-shadow-[0_2px_16px_rgba(59,130,246,0.85)]"
             priority
             unoptimized
           />
         </div>
         <div className="flex flex-col text-right">
-          <span className="text-base font-black text-white tracking-tight drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]">
+          <span className="text-lg font-black text-white tracking-tight drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]">
             كلية الذكاء الاصطناعي
           </span>
-          <span className="text-xs font-bold text-blue-400 drop-shadow-[0_1px_4px_rgba(0,0,0,0.8)]">
+          <span className="text-xs sm:text-sm font-bold text-blue-400 drop-shadow-[0_1px_4px_rgba(0,0,0,0.8)]">
             جامعة المستقبل • البوابة الأكاديمية
           </span>
         </div>

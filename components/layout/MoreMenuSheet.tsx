@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useSyncExternalStore } from 'react';
 import { createPortal } from 'react-dom';
+import Link from 'next/link';
 import { 
   LogOut, 
   KeyRound, 
@@ -13,7 +14,9 @@ import {
   ShieldCheck, 
   Check,
   User,
-  Sparkles
+  Sparkles,
+  Settings,
+  Headphones
 } from 'lucide-react';
 import { useNotifications } from '@/context/NotificationContext';
 
@@ -195,7 +198,55 @@ export function MoreMenuSheet({ isOpen, onClose }: MoreMenuSheetProps) {
           {/* VIEW 1: Main Menu with LogOut and Change Password Buttons */}
           {activeView === 'menu' && (
             <div className="space-y-3.5">
-              {/* Button 1: تسجيل الخروج */}
+              {/* Button 1: الإعدادات والدعم الفني */}
+              <Link
+                href="/settings"
+                onClick={onClose}
+                className="w-full text-right p-4 rounded-2xl bg-gradient-to-r from-blue-50 to-indigo-50/70 hover:from-blue-100/80 hover:to-indigo-100/80 border border-blue-200/90 transition-all flex items-center justify-between group cursor-pointer shadow-xs active:scale-[0.99]"
+              >
+                <div className="flex items-center gap-3.5">
+                  <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-700 text-white flex items-center justify-center shadow-md shadow-blue-600/30 group-hover:scale-105 transition-transform shrink-0">
+                    <Settings className="w-5 h-5 group-hover:rotate-90 transition-transform duration-500" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-extrabold text-slate-900 group-hover:text-blue-700 transition-colors">
+                      الإعدادات والدعم الفني
+                    </h3>
+                    <p className="text-xs text-slate-500 font-medium mt-0.5">
+                      تغيير كلمة السر، التواصل مع الدعم، والأسئلة الشائعة
+                    </p>
+                  </div>
+                </div>
+                <div className="w-8 h-8 rounded-full bg-white border border-blue-200/80 flex items-center justify-center text-blue-600 shadow-2xs group-hover:bg-blue-600 group-hover:text-white transition-all shrink-0">
+                  <ChevronLeft className="w-4 h-4" />
+                </div>
+              </Link>
+
+              {/* Button 2: تغيير كلمة السر */}
+              <button
+                type="button"
+                onClick={() => setActiveView('changePassword')}
+                className="w-full text-right p-4 rounded-2xl bg-gradient-to-r from-amber-50 to-orange-50/60 hover:from-amber-100/70 hover:to-orange-100/70 border border-amber-200/80 transition-all flex items-center justify-between group cursor-pointer shadow-xs active:scale-[0.99]"
+              >
+                <div className="flex items-center gap-3.5">
+                  <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-amber-500 to-amber-600 text-white flex items-center justify-center shadow-md shadow-amber-500/30 group-hover:scale-105 transition-transform shrink-0">
+                    <KeyRound className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-extrabold text-slate-900 group-hover:text-amber-700 transition-colors">
+                      تغيير كلمة السر
+                    </h3>
+                    <p className="text-xs text-slate-500 font-medium mt-0.5">
+                      تحديث كلمة المرور لحماية وتأمين حساب الطالب
+                    </p>
+                  </div>
+                </div>
+                <div className="w-8 h-8 rounded-full bg-white border border-amber-200/60 flex items-center justify-center text-amber-600 shadow-2xs group-hover:bg-amber-500 group-hover:text-white transition-all shrink-0">
+                  <ChevronLeft className="w-4 h-4" />
+                </div>
+              </button>
+
+              {/* Button 3: تسجيل الخروج */}
               <button
                 type="button"
                 onClick={handleLogout}
@@ -220,30 +271,6 @@ export function MoreMenuSheet({ isOpen, onClose }: MoreMenuSheetProps) {
                   </div>
                 </div>
                 <div className="w-8 h-8 rounded-full bg-white border border-rose-200/60 flex items-center justify-center text-rose-600 shadow-2xs group-hover:bg-rose-600 group-hover:text-white transition-all shrink-0">
-                  <ChevronLeft className="w-4 h-4" />
-                </div>
-              </button>
-
-              {/* Button 2: تغيير كلمة السر */}
-              <button
-                type="button"
-                onClick={() => setActiveView('changePassword')}
-                className="w-full text-right p-4 rounded-2xl bg-gradient-to-r from-amber-50 to-orange-50/60 hover:from-amber-100/70 hover:to-orange-100/70 border border-amber-200/80 transition-all flex items-center justify-between group cursor-pointer shadow-xs active:scale-[0.99]"
-              >
-                <div className="flex items-center gap-3.5">
-                  <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-amber-500 to-amber-600 text-white flex items-center justify-center shadow-md shadow-amber-500/30 group-hover:scale-105 transition-transform shrink-0">
-                    <KeyRound className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <h3 className="text-sm font-extrabold text-slate-900 group-hover:text-amber-700 transition-colors">
-                      تغيير كلمة السر
-                    </h3>
-                    <p className="text-xs text-slate-500 font-medium mt-0.5">
-                      تحديث كلمة المرور لحماية وتأمين حساب الطالب
-                    </p>
-                  </div>
-                </div>
-                <div className="w-8 h-8 rounded-full bg-white border border-amber-200/60 flex items-center justify-center text-amber-600 shadow-2xs group-hover:bg-amber-500 group-hover:text-white transition-all shrink-0">
                   <ChevronLeft className="w-4 h-4" />
                 </div>
               </button>

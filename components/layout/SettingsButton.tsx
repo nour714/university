@@ -11,7 +11,7 @@ export function SettingsButton() {
   return (
     <Link
       href="/settings"
-      className={`group relative w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center border transition-all duration-200 active:scale-95 cursor-pointer shrink-0 ${
+      className={`hidden sm:flex group relative w-9 h-9 sm:w-10 sm:h-10 rounded-full items-center justify-center border transition-all duration-200 active:scale-95 cursor-pointer shrink-0 ${
         isActive
           ? 'bg-blue-600 text-white border-blue-600 shadow-sm shadow-blue-600/30'
           : 'bg-slate-50 hover:bg-blue-50/80 text-slate-700 hover:text-blue-600 border-slate-200/90 shadow-2xs'

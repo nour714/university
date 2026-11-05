@@ -151,12 +151,12 @@ export function SettingsView() {
   ];
 
   return (
-    <div className="space-y-4 sm:space-y-6 pb-16 lg:pb-8">
+    <div className="space-y-3.5 sm:space-y-6 pb-28 sm:pb-24 lg:pb-12 max-w-7xl mx-auto">
       {/* 1. Header Banner */}
       <div className="bg-gradient-to-l from-[#172554] via-blue-900 to-indigo-900 rounded-2xl sm:rounded-3xl p-4 sm:py-6 sm:px-8 text-white shadow-lg relative overflow-hidden">
         <div className="relative z-10 max-w-3xl">
           {/* Breadcrumb link back */}
-          <div className="flex items-center gap-2 mb-2 text-xs text-blue-200/90">
+          <div className="flex items-center gap-1.5 mb-2 text-[11px] sm:text-xs text-blue-200/90">
             <Link href="/" className="hover:text-white transition-colors flex items-center gap-1 font-semibold">
               الرئيسية
             </Link>
@@ -164,12 +164,12 @@ export function SettingsView() {
             <span className="text-white font-bold">الإعدادات والدعم الفني</span>
           </div>
 
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-500/20 text-blue-200 text-[11px] sm:text-xs font-bold mb-2 border border-blue-400/30">
-            <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full bg-blue-500/20 text-blue-200 text-[10px] sm:text-xs font-bold mb-2 border border-blue-400/30">
+            <Sparkles className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-amber-300" />
             <span>لوحة التحكم في الحساب والمساعدة</span>
           </div>
 
-          <h1 className="text-xl sm:text-2xl md:text-3xl font-extrabold tracking-tight mb-2">
+          <h1 className="text-lg sm:text-2xl md:text-3xl font-extrabold tracking-tight mb-1.5 sm:mb-2">
             الإعدادات والدعم الفني
           </h1>
           <p className="text-xs sm:text-sm text-blue-100/90 leading-relaxed max-w-2xl">
@@ -178,23 +178,23 @@ export function SettingsView() {
         </div>
 
         {/* Ambient Decorative Blur */}
-        <div className="absolute -left-12 -bottom-12 w-56 h-56 rounded-full bg-blue-500/15 blur-3xl pointer-events-none" />
-        <div className="absolute -right-8 -top-8 w-48 h-48 rounded-full bg-indigo-500/20 blur-2xl pointer-events-none" />
+        <div className="absolute -left-12 -bottom-12 w-48 sm:w-56 h-48 sm:h-56 rounded-full bg-blue-500/15 blur-3xl pointer-events-none" />
+        <div className="absolute -right-8 -top-8 w-40 sm:w-48 h-40 sm:h-48 rounded-full bg-indigo-500/20 blur-2xl pointer-events-none" />
       </div>
 
-      {/* 2. Top Summary Quick Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
-        {/* Student info */}
-        <div className="bg-white rounded-2xl p-4 border border-slate-200/90 shadow-2xs flex items-center gap-3">
-          <div className="w-11 h-11 rounded-2xl bg-blue-50 text-blue-600 border border-blue-100 flex items-center justify-center shrink-0">
+      {/* 2. Top Summary Quick Stats (Optimized 2-Col on mobile, 3-Col on tablet/desktop) */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 sm:gap-4">
+        {/* Student info - Full width on mobile */}
+        <div className="col-span-2 sm:col-span-1 bg-white rounded-2xl p-3 sm:p-4 border border-slate-200/90 shadow-2xs flex items-center gap-3">
+          <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-blue-50 text-blue-600 border border-blue-100 flex items-center justify-center shrink-0">
             <ShieldCheck className="w-5 h-5" />
           </div>
-          <div className="min-w-0">
-            <p className="text-[11px] text-slate-500 font-medium">حالة الحساب الأكاديمي</p>
-            <p className="text-sm sm:text-base font-extrabold text-slate-800 truncate">
+          <div className="min-w-0 flex-1">
+            <p className="text-[10px] sm:text-[11px] text-slate-500 font-medium">حالة الحساب الأكاديمي</p>
+            <p className="text-xs sm:text-base font-extrabold text-slate-800 truncate">
               {CURRENT_STUDENT.fullName}
             </p>
-            <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded-md mt-0.5">
+            <span className="inline-flex items-center gap-1 text-[9px] sm:text-[10px] font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded-md mt-0.5">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
               حساب نشط وموثق
             </span>
@@ -202,60 +202,62 @@ export function SettingsView() {
         </div>
 
         {/* Password Security Status */}
-        <div className="bg-white rounded-2xl p-4 border border-slate-200/90 shadow-2xs flex items-center gap-3">
-          <div className="w-11 h-11 rounded-2xl bg-amber-50 text-amber-600 border border-amber-100 flex items-center justify-center shrink-0">
-            <KeyRound className="w-5 h-5" />
+        <div className="col-span-1 bg-white rounded-2xl p-3 sm:p-4 border border-slate-200/90 shadow-2xs flex items-center gap-2.5 sm:gap-3">
+          <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-2xl bg-amber-50 text-amber-600 border border-amber-100 flex items-center justify-center shrink-0">
+            <KeyRound className="w-4.5 h-4.5 sm:w-5 sm:h-5" />
           </div>
-          <div>
-            <p className="text-[11px] text-slate-500 font-medium">مستوى أمان كلمة السر</p>
-            <p className="text-sm sm:text-base font-extrabold text-slate-800">
-              كلمة مرور مشفرة
+          <div className="min-w-0">
+            <p className="text-[10px] sm:text-[11px] text-slate-500 font-medium">أمان كلمة السر</p>
+            <p className="text-xs sm:text-base font-extrabold text-slate-800 truncate">
+              مشفرة وآمنة
             </p>
-            <p className="text-[11px] text-slate-400 font-medium mt-0.5">آخر تغيير: الفصل الحالي</p>
+            <p className="text-[9px] sm:text-[11px] text-slate-400 font-medium mt-0.5 hidden sm:block">آخر تغيير: الفصل الحالي</p>
           </div>
         </div>
 
         {/* Technical Support Availability */}
-        <div className="bg-white rounded-2xl p-4 border border-slate-200/90 shadow-2xs flex items-center gap-3">
-          <div className="w-11 h-11 rounded-2xl bg-emerald-50 text-emerald-600 border border-emerald-100 flex items-center justify-center shrink-0">
-            <Headphones className="w-5 h-5" />
+        <div className="col-span-1 bg-white rounded-2xl p-3 sm:p-4 border border-slate-200/90 shadow-2xs flex items-center gap-2.5 sm:gap-3">
+          <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-2xl bg-emerald-50 text-emerald-600 border border-emerald-100 flex items-center justify-center shrink-0">
+            <Headphones className="w-4.5 h-4.5 sm:w-5 sm:h-5" />
           </div>
-          <div>
-            <p className="text-[11px] text-slate-500 font-medium">حالة الدعم الفني</p>
-            <p className="text-sm sm:text-base font-extrabold text-emerald-700">
-              متاح الآن للمساعدة
+          <div className="min-w-0">
+            <p className="text-[10px] sm:text-[11px] text-slate-500 font-medium">الدعم الفني</p>
+            <p className="text-xs sm:text-base font-extrabold text-emerald-700 truncate">
+              متاح الآن
             </p>
-            <p className="text-[11px] text-slate-400 font-medium mt-0.5">رد فوري عبر واتساب</p>
+            <p className="text-[9px] sm:text-[11px] text-slate-400 font-medium mt-0.5 hidden sm:block">رد فوري عبر واتساب</p>
           </div>
         </div>
       </div>
 
-      {/* 3. Navigation Tabs */}
+      {/* 3. Navigation Tabs - Perfectly fitted on mobile */}
       <div className="bg-white rounded-2xl p-1.5 border border-slate-200/90 shadow-2xs flex items-center gap-1.5">
         <button
           type="button"
           onClick={() => setActiveTab('password')}
-          className={`flex-1 flex items-center justify-center gap-2 py-2.5 sm:py-3 px-4 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
+          className={`flex-1 flex items-center justify-center gap-1.5 sm:gap-2 py-2.5 sm:py-3 px-2 sm:px-4 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
             activeTab === 'password'
               ? 'bg-blue-600 text-white shadow-md shadow-blue-600/30'
               : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
           }`}
         >
-          <Lock className="w-4 h-4" />
-          <span>تغيير كلمة السر والأمان</span>
+          <Lock className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
+          <span>تغيير كلمة السر</span>
+          <span className="hidden sm:inline"> والأمان</span>
         </button>
 
         <button
           type="button"
           onClick={() => setActiveTab('support')}
-          className={`flex-1 flex items-center justify-center gap-2 py-2.5 sm:py-3 px-4 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
+          className={`flex-1 flex items-center justify-center gap-1.5 sm:gap-2 py-2.5 sm:py-3 px-2 sm:px-4 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
             activeTab === 'support'
               ? 'bg-blue-600 text-white shadow-md shadow-blue-600/30'
               : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
           }`}
         >
-          <Headphones className="w-4 h-4" />
-          <span>الدعم الفني والمساعدة</span>
+          <Headphones className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
+          <span>الدعم الفني</span>
+          <span className="hidden sm:inline"> والمساعدة</span>
         </button>
       </div>
 
@@ -263,7 +265,7 @@ export function SettingsView() {
       {activeTab === 'password' && (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6">
           {/* Main Form */}
-          <div className="lg:col-span-7 bg-white rounded-2xl sm:rounded-3xl p-5 sm:p-7 border border-slate-200/90 shadow-2xs">
+          <div className="lg:col-span-7 bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-7 border border-slate-200/90 shadow-2xs">
             <div className="flex items-center gap-3 pb-4 mb-5 border-b border-slate-100">
               <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
                 <KeyRound className="w-5 h-5" />
@@ -312,7 +314,7 @@ export function SettingsView() {
                     value={currentPassword}
                     onChange={(e) => setCurrentPassword(e.target.value)}
                     placeholder="أدخل كلمة المرور الحالية"
-                    className="w-full h-11 px-3.5 pe-11 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 text-xs sm:text-sm text-slate-900 transition-all outline-hidden"
+                    className="w-full h-11 px-3.5 pe-11 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 text-base sm:text-sm text-slate-900 transition-all outline-hidden"
                     required
                   />
                   <button
@@ -337,7 +339,7 @@ export function SettingsView() {
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
                     placeholder="أدخل كلمة المرور الجديدة (8 خانات على الأقل)"
-                    className="w-full h-11 px-3.5 pe-11 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 text-xs sm:text-sm text-slate-900 transition-all outline-hidden"
+                    className="w-full h-11 px-3.5 pe-11 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 text-base sm:text-sm text-slate-900 transition-all outline-hidden"
                     required
                   />
                   <button
@@ -362,7 +364,7 @@ export function SettingsView() {
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     placeholder="أعد كتابة كلمة المرور الجديدة"
-                    className="w-full h-11 px-3.5 pe-11 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 text-xs sm:text-sm text-slate-900 transition-all outline-hidden"
+                    className="w-full h-11 px-3.5 pe-11 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 text-base sm:text-sm text-slate-900 transition-all outline-hidden"
                     required
                   />
                   <button
@@ -569,7 +571,7 @@ export function SettingsView() {
           {/* Ticket Form + FAQ Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6">
             {/* Ticket Submission Form */}
-            <div className="lg:col-span-7 bg-white rounded-2xl sm:rounded-3xl p-5 sm:p-7 border border-slate-200/90 shadow-2xs">
+            <div className="lg:col-span-7 bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-7 border border-slate-200/90 shadow-2xs">
               <div className="flex items-center gap-3 pb-4 mb-5 border-b border-slate-100">
                 <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
                   <Send className="w-5 h-5" />
@@ -606,7 +608,7 @@ export function SettingsView() {
                     <select
                       value={supportCategory}
                       onChange={(e) => setSupportCategory(e.target.value)}
-                      className="w-full h-11 px-3 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 text-xs sm:text-sm text-slate-900 transition-all outline-hidden cursor-pointer"
+                      className="w-full h-11 px-3 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 text-base sm:text-sm text-slate-900 transition-all outline-hidden cursor-pointer"
                     >
                       <option value="technical">عطل تقني في المنصة</option>
                       <option value="code">مشكلة في كود تفعيل المقرر</option>
@@ -624,7 +626,7 @@ export function SettingsView() {
                     <select
                       value={supportPriority}
                       onChange={(e) => setSupportPriority(e.target.value)}
-                      className="w-full h-11 px-3 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 text-xs sm:text-sm text-slate-900 transition-all outline-hidden cursor-pointer"
+                      className="w-full h-11 px-3 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 text-base sm:text-sm text-slate-900 transition-all outline-hidden cursor-pointer"
                     >
                       <option value="normal">عادية (خلال 24 ساعة)</option>
                       <option value="urgent">عاجلة (خلال ساعتين)</option>
@@ -642,7 +644,7 @@ export function SettingsView() {
                     value={supportSubject}
                     onChange={(e) => setSupportSubject(e.target.value)}
                     placeholder="مثال: لم أتمكن من تحميل سلايدات مقرر الذكاء الاصطناعي"
-                    className="w-full h-11 px-3.5 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 text-xs sm:text-sm text-slate-900 transition-all outline-hidden"
+                    className="w-full h-11 px-3.5 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 text-base sm:text-sm text-slate-900 transition-all outline-hidden"
                   />
                 </div>
 
@@ -656,7 +658,7 @@ export function SettingsView() {
                     value={supportMessage}
                     onChange={(e) => setSupportMessage(e.target.value)}
                     placeholder="اشرح المشكلة بالتفصيل، ورقم المقرر أو رسالة الخطأ إن وجدت..."
-                    className="w-full p-3.5 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 text-xs sm:text-sm text-slate-900 transition-all outline-hidden resize-none"
+                    className="w-full p-3.5 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 text-base sm:text-sm text-slate-900 transition-all outline-hidden resize-none"
                     required
                   />
                 </div>
@@ -683,7 +685,7 @@ export function SettingsView() {
             </div>
 
             {/* FAQs Accordion */}
-            <div className="lg:col-span-5 bg-white rounded-2xl sm:rounded-3xl p-5 sm:p-7 border border-slate-200/90 shadow-2xs flex flex-col">
+            <div className="lg:col-span-5 bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-7 border border-slate-200/90 shadow-2xs flex flex-col">
               <div className="flex items-center gap-2.5 pb-3 mb-4 border-b border-slate-100">
                 <HelpCircle className="w-5 h-5 text-blue-600" />
                 <h3 className="text-base font-bold text-slate-900">

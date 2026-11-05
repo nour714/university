@@ -105,7 +105,7 @@ export function LoginForm() {
   };
 
   return (
-    <div className="h-screen h-[100dvh] w-full flex items-center justify-center bg-gradient-to-br from-[#020617] via-[#091533] to-[#04091a] p-3 sm:p-5 relative overflow-hidden select-none">
+    <div className="h-screen h-[100dvh] w-full flex flex-col items-center justify-center bg-gradient-to-br from-[#020617] via-[#091533] to-[#04091a] p-3 sm:p-5 relative overflow-hidden select-none">
       
       {/* Background Decorative Layer (Bounded strictly to prevent layout jitter or mobile overflow) */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none select-none z-0" aria-hidden="true">
@@ -134,11 +134,11 @@ export function LoginForm() {
           <div className="absolute top-[50%] right-[10%] w-1.5 h-1.5 rounded-full bg-sky-300 shadow-[0_0_8px_#38bdf8] animate-particle-float" style={{ animationDelay: '3.2s' }} />
         </div>
 
-        {/* 4. Ambient Institutional Watermark Logo in Background */}
+        {/* 4. Ambient Institutional Watermark Logo (Positioned in upper open background, NOT hidden under the form) */}
         <div 
-          className="absolute top-1/2 left-1/2 w-[420px] h-[420px] sm:w-[680px] sm:h-[680px] flex items-center justify-center animate-logo-breathe"
+          className="absolute top-1 sm:top-3 lg:top-5 left-1/2 -translate-x-1/2 w-60 h-60 sm:w-76 sm:h-76 lg:w-[460px] lg:h-[460px] flex items-center justify-center pointer-events-none"
         >
-          <div className="relative w-full h-full filter drop-shadow-[0_0_90px_rgba(59,130,246,0.55)] brightness-125 contrast-110">
+          <div className="relative w-full h-full animate-logo-breathe filter drop-shadow-[0_0_90px_rgba(59,130,246,0.7)] brightness-125 contrast-110">
             <Image
               src="/logo.png"
               alt="شعار الكلية بالخلفية"

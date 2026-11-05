@@ -9,7 +9,6 @@ import {
   User, 
   Eye, 
   EyeOff, 
-  ShieldCheck, 
   Sparkles, 
   ArrowLeft, 
   CheckCircle2, 
@@ -144,8 +143,8 @@ export function LoginForm() {
               </div>
             </div>
 
-            {/* Form Title & Intro */}
-            <div className="mb-3">
+            {/* Form Title */}
+            <div className="mb-3.5">
               <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 text-[10px] font-bold mb-1.5 border border-blue-200/60">
                 <GraduationCap className="w-3 h-3 text-blue-600" />
                 <span>العام الأكاديمي 2026/2027</span>
@@ -153,9 +152,6 @@ export function LoginForm() {
               <h2 className="text-lg sm:text-xl font-extrabold text-slate-900 tracking-tight">
                 تسجيل الدخول إلى حسابك
               </h2>
-              <p className="text-[11px] text-slate-500 mt-0.5 leading-relaxed">
-                أدخل الرقم الأكاديمي أو الرقم القومي للمتابعة.
-              </p>
             </div>
 
             {/* Error Message */}
@@ -168,17 +164,17 @@ export function LoginForm() {
 
             {/* Login Form */}
             <form onSubmit={handleSubmit} className="space-y-3">
-              {/* Field 1: Academic ID / National ID */}
+              {/* Field 1: National ID */}
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1">
-                  الرقم الأكاديمي أو الرقم القومي <span className="text-rose-500">*</span>
+                  الرقم القومي <span className="text-rose-500">*</span>
                 </label>
                 <div className="relative">
                   <input
                     type="text"
                     value={identifier}
                     onChange={(e) => setIdentifier(e.target.value)}
-                    placeholder="مثال: 20230814 أو الرقم القومي 14 رقم"
+                    placeholder="مثال: الرقم القومي 14 رقم"
                     className="w-full h-10 sm:h-11 px-3.5 ps-9 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 text-xs sm:text-sm text-slate-900 transition-all outline-hidden font-medium"
                     required
                   />
@@ -271,18 +267,13 @@ export function LoginForm() {
           </div>
 
           {/* Footer Assistance */}
-          <div className="mt-3 pt-2 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-1 text-[10px] text-slate-500 font-medium">
-            <div className="flex items-center gap-1">
-              <HelpCircle className="w-3 h-3 text-slate-400" />
-              <span>تواجه صعوبة؟</span>
+          <div className="mt-3.5 pt-2.5 border-t border-slate-100 flex items-center justify-center text-[11px] text-slate-500 font-medium">
+            <div className="flex items-center gap-1.5">
+              <HelpCircle className="w-3.5 h-3.5 text-slate-400" />
+              <span>تواجه صعوبة في الدخول؟</span>
               <Link href="/settings" className="font-bold text-blue-600 hover:text-blue-800 transition-colors">
                 مركز المساعدة
               </Link>
-            </div>
-
-            <div className="flex items-center gap-1 text-[9px] text-slate-400">
-              <ShieldCheck className="w-2.5 h-2.5 text-emerald-500" />
-              <span>نظام موثق ومحمي SSL</span>
             </div>
           </div>
         </div>

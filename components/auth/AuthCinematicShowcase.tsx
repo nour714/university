@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { ChevronRight, ChevronLeft } from 'lucide-react';
 
@@ -28,10 +28,24 @@ const SLIDES: Slide[] = [
   },
 ];
 
+const AUTO_PLAY_INTERVAL = 4000; // 4 seconds auto-switch between slides
+
 export function AuthCinematicShowcase() {
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
 
-  // Manual navigation only - no automatic auto-play or auto-sliding
+  // Automatic slide switching (التبديل التلقائي للصور)
+  useEffect(() => {
+    if (isPaused) return;
+
+    const timer = setInterval(() => {
+      setCurrentSlideIndex((prev) => (prev + 1) % SLIDES.length);
+    }, AUTO_PLAY_INTERVAL);
+
+    return () => clearInterval(timer);
+  }, [isPaused]);
+
+  // Manual navigation handlers
   const goToSlide = (idx: number) => {
     setCurrentSlideIndex(idx);
   };
@@ -49,9 +63,11 @@ export function AuthCinematicShowcase() {
       className="hidden lg:flex flex-1 relative overflow-hidden select-none group min-h-[460px] bg-slate-950 rounded-l-2xl sm:rounded-l-3xl"
       role="region"
       aria-label="عرض الصور الأكاديمي"
+      onMouseEnter={() => setIsPaused(true)}
+      onMouseLeave={() => setIsPaused(false)}
     >
       {/* ============================================================== */}
-      {/* 1. CRYSTAL-CLEAR STATIC SLIDE IMAGES (100% CLEAR - NO MOTION)  */}
+      {/* 1. CRYSTAL-CLEAR SLIDE IMAGES (SMOOTH CROSSFADE TRANSITION)   */}
       {/* ============================================================== */}
       <div className="absolute inset-0 overflow-hidden">
         {SLIDES.map((slide, idx) => {
@@ -59,7 +75,7 @@ export function AuthCinematicShowcase() {
           return (
             <div
               key={slide.id}
-              className={`absolute inset-0 transition-opacity duration-300 ease-in-out ${
+              className={`absolute inset-0 transition-opacity duration-700 ease-in-out ${
                 isActive ? 'opacity-100 z-10' : 'opacity-0 z-0 pointer-events-none'
               }`}
             >

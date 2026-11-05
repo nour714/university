@@ -262,19 +262,25 @@ export function LoginForm() {
 
         {/* ========================================================= */}
         {/* VERTICAL DIVIDER TRACK WITH CENTRAL ACADEMIC BADGE NODE   */}
-        {/* Placed in flex flow between columns to lock to the seam   */}
+        {/* High-visibility architectural timeline divider on the seam */}
         {/* ========================================================= */}
         <div 
           className="hidden lg:block relative w-0 shrink-0 z-30 self-stretch pointer-events-none"
           aria-hidden="true"
         >
-          {/* Continuous vertical line running full height along the seam */}
-          <div className="absolute inset-y-0 -left-[1.5px] w-[3px] bg-gradient-to-b from-[#172554] via-blue-600 to-[#172554] shadow-sm" />
+          {/* Top Decorative Node Cap */}
+          <div className="absolute top-1 left-0 -translate-x-1/2 w-2 h-2 rounded-full bg-blue-600 ring-2 ring-white shadow-xs" />
+
+          {/* Continuous Bold Vertical Track with Luminous Blue Accent */}
+          <div className="absolute inset-y-0 -left-[2px] w-[4px] bg-gradient-to-b from-[#0f172a] via-blue-600 to-[#0f172a] shadow-[0_0_12px_rgba(37,99,235,0.4)] ring-1 ring-white/60" />
           
-          {/* Central Circular Node Badge (Centered on the line at 50% height) */}
-          <div className="absolute top-1/2 left-0 -translate-x-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-gradient-to-br from-blue-600 via-indigo-600 to-blue-700 border-2 border-white shadow-xl shadow-blue-950/40 flex items-center justify-center text-white">
-            <GraduationCap className="w-4.5 h-4.5 drop-shadow-xs" />
+          {/* Central Prominent Academic Circular Badge */}
+          <div className="absolute top-1/2 left-0 -translate-x-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-gradient-to-br from-blue-600 via-indigo-600 to-blue-800 border-[3.5px] border-white shadow-2xl shadow-blue-950/60 ring-2 ring-blue-500/25 flex items-center justify-center text-white">
+            <GraduationCap className="w-5 h-5 drop-shadow-xs" />
           </div>
+
+          {/* Bottom Decorative Node Cap */}
+          <div className="absolute bottom-1 left-0 -translate-x-1/2 w-2 h-2 rounded-full bg-blue-600 ring-2 ring-white shadow-xs" />
         </div>
 
         {/* ========================================================= */}

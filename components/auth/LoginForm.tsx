@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { 
@@ -104,8 +104,41 @@ export function LoginForm() {
     }, 700);
   };
 
+  // Support seamless pull-to-refresh on mobile browsers & webviews
+  useEffect(() => {
+    let startY = 0;
+    let isTop = false;
+
+    const handleTouchStart = (e: TouchEvent) => {
+      if (window.scrollY <= 10) {
+        startY = e.touches[0].clientY;
+        isTop = true;
+      } else {
+        isTop = false;
+      }
+    };
+
+    const handleTouchEnd = (e: TouchEvent) => {
+      if (!isTop) return;
+      const endY = e.changedTouches[0].clientY;
+      const diffY = endY - startY;
+      if (diffY > 95) {
+        window.location.reload();
+      }
+      isTop = false;
+    };
+
+    window.addEventListener('touchstart', handleTouchStart, { passive: true });
+    window.addEventListener('touchend', handleTouchEnd, { passive: true });
+
+    return () => {
+      window.removeEventListener('touchstart', handleTouchStart);
+      window.removeEventListener('touchend', handleTouchEnd);
+    };
+  }, []);
+
   return (
-    <div data-auth-page className="fixed inset-0 w-full h-[100dvh] flex flex-col items-center justify-center bg-gradient-to-br from-[#020617] via-[#091533] to-[#04091a] p-3 sm:p-5 overflow-hidden select-none overscroll-none">
+    <div className="w-full min-h-[100dvh] flex flex-col items-center justify-center bg-gradient-to-br from-[#020617] via-[#091533] to-[#04091a] p-3 sm:p-5 relative select-none">
       
       {/* Background Decorative Layer (Bounded strictly to prevent layout jitter or mobile overflow) */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none select-none z-0" aria-hidden="true">
@@ -136,9 +169,9 @@ export function LoginForm() {
 
         {/* 4. Ambient Institutional Watermark Logo (Positioned cleanly in upper background) */}
         <div 
-          className="absolute top-1 sm:top-2 lg:top-5 left-1/2 -translate-x-1/2 w-40 h-40 sm:w-48 sm:h-48 lg:w-[460px] lg:h-[460px] flex items-center justify-center pointer-events-none"
+          className="absolute top-0 sm:top-2 lg:top-5 left-1/2 -translate-x-1/2 w-48 h-48 sm:w-60 sm:h-60 lg:w-[500px] lg:h-[500px] flex items-center justify-center pointer-events-none"
         >
-          <div className="relative w-full h-full animate-logo-breathe filter drop-shadow-[0_0_80px_rgba(59,130,246,0.7)] brightness-125 contrast-110">
+          <div className="relative w-full h-full animate-logo-breathe filter drop-shadow-[0_0_90px_rgba(59,130,246,0.75)] brightness-125 contrast-110">
             <Image
               src="/logo.png"
               alt="شعار الكلية بالخلفية"

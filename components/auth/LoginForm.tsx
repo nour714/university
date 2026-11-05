@@ -222,13 +222,13 @@ export function LoginForm() {
         {/* ========================================================= */}
         <div className="w-full lg:w-[46%] p-3.5 sm:p-5 lg:p-6 flex flex-col justify-between bg-white shrink-0">
           <div>
-            {/* Form Title */}
-            <div className="mb-2 sm:mb-3">
-              <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 text-[10px] font-bold mb-1 border border-blue-200/60">
+            {/* Form Title (Centered) */}
+            <div className="mb-2 sm:mb-3 text-center flex flex-col items-center">
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-700 text-[10px] sm:text-xs font-bold mb-1 border border-blue-200/60">
                 <GraduationCap className="w-3 h-3 text-blue-600" />
                 <span>العام الأكاديمي 2026/2027</span>
               </div>
-              <h2 className="text-base sm:text-xl font-extrabold text-slate-900 tracking-tight">
+              <h2 className="text-base sm:text-xl font-extrabold text-slate-900 tracking-tight text-center">
                 تسجيل الدخول إلى حسابك
               </h2>
             </div>

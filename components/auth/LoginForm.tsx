@@ -134,11 +134,11 @@ export function LoginForm() {
           <div className="absolute top-[50%] right-[10%] w-1.5 h-1.5 rounded-full bg-sky-300 shadow-[0_0_8px_#38bdf8] animate-particle-float" style={{ animationDelay: '3.2s' }} />
         </div>
 
-        {/* 4. Ambient Institutional Watermark Logo (Positioned in upper open background, NOT hidden under the form) */}
+        {/* 4. Ambient Institutional Watermark Logo (Positioned cleanly in upper background) */}
         <div 
-          className="absolute top-1 sm:top-3 lg:top-5 left-1/2 -translate-x-1/2 w-60 h-60 sm:w-76 sm:h-76 lg:w-[460px] lg:h-[460px] flex items-center justify-center pointer-events-none"
+          className="absolute top-1 sm:top-2 lg:top-5 left-1/2 -translate-x-1/2 w-40 h-40 sm:w-48 sm:h-48 lg:w-[460px] lg:h-[460px] flex items-center justify-center pointer-events-none"
         >
-          <div className="relative w-full h-full animate-logo-breathe filter drop-shadow-[0_0_90px_rgba(59,130,246,0.7)] brightness-125 contrast-110">
+          <div className="relative w-full h-full animate-logo-breathe filter drop-shadow-[0_0_80px_rgba(59,130,246,0.7)] brightness-125 contrast-110">
             <Image
               src="/logo.png"
               alt="شعار الكلية بالخلفية"
@@ -174,27 +174,11 @@ export function LoginForm() {
         </div>
       </div>
 
-      {/* Mobile Floating Brand Crest Capsule (Directly above the card in a distinctive style) */}
-      <div className="lg:hidden flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-slate-900/85 backdrop-blur-md border border-white/20 shadow-xl shadow-blue-950/60 mb-2.5 z-20 select-none">
-        <div className="w-7 h-7 rounded-full bg-white p-1 shadow-md flex items-center justify-center shrink-0 border border-white/80">
-          <Image
-            src="/logo.png"
-            alt="شعار كلية الذكاء الاصطناعي"
-            width={20}
-            height={20}
-            className="w-full h-full object-contain select-none"
-            priority
-            unoptimized
-          />
-        </div>
-        <div className="flex flex-col text-right">
-          <span className="text-xs font-black text-white tracking-wide drop-shadow-xs">
-            كلية الذكاء الاصطناعي
-          </span>
-          <span className="text-[9px] font-semibold text-blue-300 drop-shadow-xs">
-            جامعة المستقبل • البوابة الأكاديمية
-          </span>
-        </div>
+      {/* Mobile Floating Brand Badge (Cleanly positioned directly under the logo, above the card) */}
+      <div className="lg:hidden flex items-center justify-center px-4 py-1.5 rounded-full bg-slate-900/85 backdrop-blur-md border border-white/20 shadow-xl shadow-blue-950/60 mb-2.5 z-20 select-none">
+        <span className="text-xs sm:text-sm font-black text-white tracking-wide drop-shadow-xs">
+          كلية الذكاء الاصطناعي
+        </span>
       </div>
 
       {/* Main Container Card (Compact Form 46% & Expanded Showcase 54% with Timeline Divider) */}

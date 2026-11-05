@@ -262,21 +262,19 @@ export function LoginForm() {
 
         {/* ========================================================= */}
         {/* VERTICAL DIVIDER TRACK WITH CENTRAL ACADEMIC BADGE NODE   */}
+        {/* Placed in flex flow between columns to lock to the seam   */}
         {/* ========================================================= */}
         <div 
-          className="hidden lg:flex absolute top-0 bottom-0 start-[46%] -translate-x-1/2 z-30 flex-col items-center pointer-events-none"
+          className="hidden lg:block relative w-0 shrink-0 z-30 self-stretch pointer-events-none"
           aria-hidden="true"
         >
-          {/* Top Half of the Vertical Line */}
-          <div className="w-[3px] flex-1 bg-gradient-to-b from-[#172554] via-blue-600 to-blue-500 shadow-sm" />
+          {/* Continuous vertical line running full height along the seam */}
+          <div className="absolute inset-y-0 -left-[1.5px] w-[3px] bg-gradient-to-b from-[#172554] via-blue-600 to-[#172554] shadow-sm" />
           
-          {/* Central Circular Node Badge (Floating directly on the line) */}
-          <div className="w-9 h-9 rounded-full bg-gradient-to-br from-blue-600 via-indigo-600 to-blue-700 border-2 border-white shadow-xl shadow-blue-950/40 flex items-center justify-center text-white my-1 shrink-0 animate-pulse">
+          {/* Central Circular Node Badge (Centered on the line at 50% height) */}
+          <div className="absolute top-1/2 left-0 -translate-x-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-gradient-to-br from-blue-600 via-indigo-600 to-blue-700 border-2 border-white shadow-xl shadow-blue-950/40 flex items-center justify-center text-white">
             <GraduationCap className="w-4.5 h-4.5 drop-shadow-xs" />
           </div>
-          
-          {/* Bottom Half of the Vertical Line */}
-          <div className="w-[3px] flex-1 bg-gradient-to-b from-blue-500 via-blue-600 to-[#172554] shadow-sm" />
         </div>
 
         {/* ========================================================= */}

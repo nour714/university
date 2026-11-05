@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState } from 'react';
 import Image from 'next/image';
 import { ChevronRight, ChevronLeft } from 'lucide-react';
 
@@ -28,29 +28,10 @@ const SLIDES: Slide[] = [
   },
 ];
 
-const AUTO_PLAY_INTERVAL = 5000; // 5 seconds per slide
-
 export function AuthCinematicShowcase() {
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
-  const [isPaused, setIsPaused] = useState(false);
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Auto-play interval with pause on hover
-  useEffect(() => {
-    if (isPaused) {
-      if (timerRef.current) clearInterval(timerRef.current);
-      return;
-    }
-
-    timerRef.current = setInterval(() => {
-      setCurrentSlideIndex((prev) => (prev + 1) % SLIDES.length);
-    }, AUTO_PLAY_INTERVAL);
-
-    return () => {
-      if (timerRef.current) clearInterval(timerRef.current);
-    };
-  }, [currentSlideIndex, isPaused]);
-
+  // Manual navigation only - no automatic auto-play or auto-sliding
   const goToSlide = (idx: number) => {
     setCurrentSlideIndex(idx);
   };
@@ -66,13 +47,11 @@ export function AuthCinematicShowcase() {
   return (
     <div 
       className="hidden lg:flex flex-1 relative overflow-hidden select-none group min-h-[460px] bg-slate-950 rounded-l-2xl sm:rounded-l-3xl"
-      onMouseEnter={() => setIsPaused(true)}
-      onMouseLeave={() => setIsPaused(false)}
       role="region"
       aria-label="عرض الصور الأكاديمي"
     >
       {/* ============================================================== */}
-      {/* 1. CRYSTAL-CLEAR CINEMATIC SLIDE IMAGES (100% VISIBLE)         */}
+      {/* 1. CRYSTAL-CLEAR STATIC SLIDE IMAGES (100% CLEAR - NO MOTION)  */}
       {/* ============================================================== */}
       <div className="absolute inset-0 overflow-hidden">
         {SLIDES.map((slide, idx) => {
@@ -80,7 +59,7 @@ export function AuthCinematicShowcase() {
           return (
             <div
               key={slide.id}
-              className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
+              className={`absolute inset-0 transition-opacity duration-300 ease-in-out ${
                 isActive ? 'opacity-100 z-10' : 'opacity-0 z-0 pointer-events-none'
               }`}
             >
@@ -89,9 +68,7 @@ export function AuthCinematicShowcase() {
                 alt={slide.altText}
                 fill
                 sizes="(max-width: 1024px) 100vw, 50vw"
-                className={`object-cover object-center transition-transform duration-7000 ease-out ${
-                  isActive ? 'scale-100' : 'scale-105'
-                }`}
+                className="object-cover object-center scale-100"
                 priority={idx === 0}
               />
             </div>
@@ -103,7 +80,7 @@ export function AuthCinematicShowcase() {
       {/* 2. TOP FLOATING NAVIGATION ARROWS: ONE RIGHT, ONE LEFT         */}
       {/* ============================================================== */}
       {/* Right Navigation Arrow (أعلى اليمين) */}
-      <div className="absolute top-4 right-4 z-20">
+      <div className="absolute top-4 right-5 z-20">
         <button
           type="button"
           onClick={prevSlide}

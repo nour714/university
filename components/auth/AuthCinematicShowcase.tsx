@@ -2,259 +2,137 @@
 
 import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
-import { 
-  KeyRound, 
-  CheckCircle2, 
-  BookOpen, 
-  ChevronRight, 
-  ChevronLeft, 
-  GraduationCap,
-  FileText
-} from 'lucide-react';
+import { ChevronRight, ChevronLeft } from 'lucide-react';
 
 interface Slide {
   id: number;
-  stepBadge: string;
-  badgeIcon: React.ReactNode;
-  title: string;
-  description: string;
   imageSrc: string;
-  gradientTheme: string;
-  glowColor: string;
-  // Interactive mini preview mockup inside the slide
-  mockup: React.ReactNode;
+  altText: string;
 }
 
 const SLIDES: Slide[] = [
   {
     id: 1,
-    stepBadge: 'الخطوة الأولى: تسجيل الدخول السلس',
-    badgeIcon: <GraduationCap className="w-3.5 h-3.5 text-blue-300" />,
-    title: 'ادخل بوابتك الأكاديمية بنقرة واحدة',
-    description: 'أدخل رقمك الأكاديمي أو القومي للوصول الفوري إلى لوحة تحكمك الشخصية ومتابعة خطتك الدراسية.',
     imageSrc: '/onboarding/slide-1.jpg',
-    gradientTheme: 'from-[#0b132b] via-[#1c2541] to-[#1e3a8a]',
-    glowColor: 'rgba(59, 130, 246, 0.35)',
-    mockup: (
-      <div className="bg-white/10 backdrop-blur-md rounded-2xl p-3 sm:p-3.5 border border-white/15 shadow-xl space-y-2">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-500 to-indigo-500 flex items-center justify-center text-xs font-bold text-white shadow-sm">
-              أ.خ
-            </div>
-            <div>
-              <p className="text-xs font-bold text-white">عبد الرحمن خالد</p>
-              <p className="text-[10px] text-blue-200">المستوى 3 • ذكاء اصطناعي</p>
-            </div>
-          </div>
-          <span className="px-2 py-0.5 rounded-full text-[9px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-400/30">
-            جلسة مؤمنة
-          </span>
-        </div>
-        <div className="h-1.5 w-full bg-white/10 rounded-full overflow-hidden">
-          <div className="h-full bg-blue-400 rounded-full w-3/4 animate-pulse" />
-        </div>
-      </div>
-    ),
+    altText: 'بوابة كلية الذكاء الاصطناعي الأكاديمية - تسجيل الدخول',
   },
   {
     id: 2,
-    stepBadge: 'الخطوة الثانية: تفعيل كود المقرر',
-    badgeIcon: <KeyRound className="w-3.5 h-3.5 text-amber-300" />,
-    title: 'أضف كود المادة وفك قفل المحاضرات',
-    description: 'توجه إلى قسم "أكوادي" وأدخل كود تفعيل المادة المسلم لك من الكلية، وسيتم تفعيل المحاضرات والسلايدات تلقائياً.',
     imageSrc: '/onboarding/slide-2.jpg',
-    gradientTheme: 'from-[#0d1b2a] via-[#1b263b] to-[#1d3557]',
-    glowColor: 'rgba(245, 158, 11, 0.35)',
-    mockup: (
-      <div className="bg-white/10 backdrop-blur-md rounded-2xl p-3 sm:p-3.5 border border-amber-400/20 shadow-xl space-y-2">
-        <div className="flex items-center justify-between text-xs">
-          <span className="text-amber-200 font-bold flex items-center gap-1.5 text-[11px]">
-            <KeyRound className="w-3.5 h-3.5 text-amber-400" />
-            كود تفعيل المقرر
-          </span>
-          <span className="text-[10px] text-emerald-300 font-extrabold bg-emerald-500/20 px-1.5 py-0.5 rounded-md">
-            تم التفعيل ✓
-          </span>
-        </div>
-        <div className="bg-black/30 rounded-xl px-2.5 py-1.5 border border-white/10 flex items-center justify-between">
-          <span className="font-mono text-xs font-bold text-amber-300 tracking-wider">
-            AI-301-EXAM-2026
-          </span>
-          <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-        </div>
-      </div>
-    ),
+    altText: 'تفعيل أكواد المقررات الأكاديمية',
   },
   {
     id: 3,
-    stepBadge: 'الخطوة الثالثة: تصفح الشروحات والاختبارات',
-    badgeIcon: <BookOpen className="w-3.5 h-3.5 text-emerald-300" />,
-    title: 'حمّل السلايدات وتابع نتائجك فوراً',
-    description: 'شاهد تسجيلات المحاضرات الأكاديمية بجودة عالية، وتدرب على نماذج الاختبارات مع تصحيح ذكي ومتابعة لمعدلك التراكمي.',
     imageSrc: '/onboarding/slide-3.jpg',
-    gradientTheme: 'from-[#0f172a] via-[#1e1b4b] to-[#172554]',
-    glowColor: 'rgba(16, 185, 129, 0.35)',
-    mockup: (
-      <div className="bg-white/10 backdrop-blur-md rounded-2xl p-3 sm:p-3.5 border border-white/15 shadow-xl space-y-2">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-300 flex items-center justify-center">
-              <FileText className="w-4 h-4" />
-            </div>
-            <div>
-              <p className="text-xs font-bold text-white">المحاضرة 04: الشبكات العصبية</p>
-              <p className="text-[10px] text-emerald-200">سلايدات PDF متوفرة للتحميل</p>
-            </div>
-          </div>
-          <span className="text-xs font-extrabold text-amber-300">96%</span>
-        </div>
-      </div>
-    ),
+    altText: 'المحاضرات التفاعلية والاختبارات الأكاديمية',
   },
 ];
 
-const AUTO_PLAY_INTERVAL = 5500; // 5.5 seconds per slide
+const AUTO_PLAY_INTERVAL = 5000; // 5 seconds per slide
 
 export function AuthCinematicShowcase() {
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
-  const [progress, setProgress] = useState(0);
-  const [imageErrorMap, setImageErrorMap] = useState<Record<number, boolean>>({});
-
-  const currentSlide = SLIDES[currentSlideIndex];
   const timerRef = useRef<NodeJS.Timeout | null>(null);
-  const progressIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Handle auto-advance and smooth progress bar
+  // Auto-play interval with pause on hover
   useEffect(() => {
     if (isPaused) {
       if (timerRef.current) clearInterval(timerRef.current);
-      if (progressIntervalRef.current) clearInterval(progressIntervalRef.current);
       return;
     }
 
-    setProgress(0);
-    const stepTime = 50; // update progress every 50ms
-    const totalSteps = AUTO_PLAY_INTERVAL / stepTime;
-    let stepCount = 0;
-
-    progressIntervalRef.current = setInterval(() => {
-      stepCount += 1;
-      setProgress(Math.min(100, (stepCount / totalSteps) * 100));
-    }, stepTime);
-
     timerRef.current = setInterval(() => {
       setCurrentSlideIndex((prev) => (prev + 1) % SLIDES.length);
-      stepCount = 0;
-      setProgress(0);
     }, AUTO_PLAY_INTERVAL);
 
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
-      if (progressIntervalRef.current) clearInterval(progressIntervalRef.current);
     };
   }, [currentSlideIndex, isPaused]);
 
   const goToSlide = (idx: number) => {
     setCurrentSlideIndex(idx);
-    setProgress(0);
   };
 
   const nextSlide = () => {
     setCurrentSlideIndex((prev) => (prev + 1) % SLIDES.length);
-    setProgress(0);
   };
 
   const prevSlide = () => {
     setCurrentSlideIndex((prev) => (prev - 1 + SLIDES.length) % SLIDES.length);
-    setProgress(0);
   };
 
   return (
     <div 
-      className="hidden lg:flex lg:col-span-6 flex-col justify-between p-5 sm:p-6 text-white relative overflow-hidden select-none group min-h-[460px]"
+      className="hidden lg:flex lg:col-span-6 relative overflow-hidden select-none group min-h-[460px] bg-slate-950 rounded-l-2xl sm:rounded-l-3xl"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
       role="region"
-      aria-label="عرض توضيحي لخطوات المنصة"
+      aria-label="عرض الصور الأكاديمي"
     >
-      {/* Dynamic Background Gradient with Smooth Cross-fade */}
-      <div 
-        className={`absolute inset-0 bg-gradient-to-br ${currentSlide.gradientTheme} transition-colors duration-1000 ease-in-out`}
-      />
-
-      {/* Cinematic Ambient Glow Lights */}
-      <div 
-        className="absolute -top-20 -right-20 w-64 h-64 rounded-full blur-3xl pointer-events-none transition-all duration-1000"
-        style={{ backgroundColor: currentSlide.glowColor }}
-      />
-      <div className="absolute -bottom-20 -left-20 w-64 h-64 bg-indigo-600/20 rounded-full blur-3xl pointer-events-none" />
-
-      {/* Subtle Mesh Grid Pattern for Academic High-Tech Feel */}
-      <div 
-        className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff08_1px,transparent_1px),linear-gradient(to_bottom,#ffffff08_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none"
-      />
-
-      {/* Cinematic Slide Images with Smooth Crossfade & Ken-Burns Zoom */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        {SLIDES.map((slide, idx) => (
-          <div
-            key={slide.id}
-            className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
-              idx === currentSlideIndex ? 'opacity-35 scale-100' : 'opacity-0 scale-105 pointer-events-none'
-            } transition-transform duration-7000`}
-          >
-            <Image
-              src={slide.imageSrc}
-              alt={slide.title}
-              fill
-              sizes="(max-width: 1024px) 100vw, 50vw"
-              className="object-cover object-center"
-              priority={idx === 0}
-            />
-            {/* Vignette gradients to keep text high contrast and readable */}
-            <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/70 to-slate-950/40" />
-            <div className="absolute inset-0 bg-gradient-to-r from-slate-950/80 via-transparent to-slate-950/40" />
-          </div>
-        ))}
+      {/* ============================================================== */}
+      {/* 1. CRYSTAL-CLEAR CINEMATIC SLIDE IMAGES (100% VISIBLE)         */}
+      {/* ============================================================== */}
+      <div className="absolute inset-0 overflow-hidden">
+        {SLIDES.map((slide, idx) => {
+          const isActive = idx === currentSlideIndex;
+          return (
+            <div
+              key={slide.id}
+              className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
+                isActive ? 'opacity-100 z-10' : 'opacity-0 z-0 pointer-events-none'
+              }`}
+            >
+              <Image
+                src={slide.imageSrc}
+                alt={slide.altText}
+                fill
+                sizes="(max-width: 1024px) 100vw, 50vw"
+                className={`object-cover object-center transition-transform duration-7000 ease-out ${
+                  isActive ? 'scale-100' : 'scale-105'
+                }`}
+                priority={idx === 0}
+              />
+            </div>
+          );
+        })}
       </div>
 
       {/* ============================================================== */}
-      {/* CENTER CONTENT: Dynamic Slide with Animated Reveal             */}
+      {/* 2. TOP FLOATING NAVIGATION ARROWS: ONE RIGHT, ONE LEFT         */}
       {/* ============================================================== */}
-      <div 
-        key={currentSlide.id} 
-        className="relative z-10 my-auto py-3 space-y-3 animate-fadeIn"
-      >
-        {/* Step Badge Pill */}
-        <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-white/10 text-blue-200 text-[10px] font-extrabold border border-white/15 backdrop-blur-md">
-          {currentSlide.badgeIcon}
-          <span>{currentSlide.stepBadge}</span>
-        </div>
+      {/* Right Navigation Arrow (أعلى اليمين) */}
+      <div className="absolute top-4 right-4 z-20">
+        <button
+          type="button"
+          onClick={prevSlide}
+          className="w-10 h-10 rounded-full bg-slate-900/60 hover:bg-slate-900/90 text-white backdrop-blur-md border border-white/25 flex items-center justify-center transition-all cursor-pointer shadow-xl active:scale-90 hover:scale-105"
+          title="الصورة السابقة"
+          aria-label="الصورة السابقة"
+        >
+          <ChevronRight className="w-5 h-5" />
+        </button>
+      </div>
 
-        {/* Slide Title */}
-        <h2 className="text-lg xl:text-xl font-extrabold tracking-tight text-white leading-snug">
-          {currentSlide.title}
-        </h2>
-
-        {/* Slide Description */}
-        <p className="text-xs text-blue-100/90 leading-relaxed max-w-sm">
-          {currentSlide.description}
-        </p>
-
-        {/* Interactive Interactive Preview Card */}
-        <div className="pt-1">
-          {currentSlide.mockup}
-        </div>
+      {/* Left Navigation Arrow (أعلى الشمال) */}
+      <div className="absolute top-4 left-4 z-20">
+        <button
+          type="button"
+          onClick={nextSlide}
+          className="w-10 h-10 rounded-full bg-slate-900/60 hover:bg-slate-900/90 text-white backdrop-blur-md border border-white/25 flex items-center justify-center transition-all cursor-pointer shadow-xl active:scale-90 hover:scale-105"
+          title="الصورة التالية"
+          aria-label="الصورة التالية"
+        >
+          <ChevronLeft className="w-5 h-5" />
+        </button>
       </div>
 
       {/* ============================================================== */}
-      {/* 3. BOTTOM CONTROLS: Dots Navigation & Next/Prev Arrows         */}
+      {/* 3. SUBTLE BOTTOM PILL INDICATORS                               */}
       {/* ============================================================== */}
-      <div className="relative z-10 pt-3 border-t border-white/10 flex items-center justify-between">
-        {/* Step Indicators / Dots */}
-        <div className="flex items-center gap-1.5">
+      <div className="absolute bottom-4 inset-x-0 z-20 flex items-center justify-center gap-2 pointer-events-auto">
+        <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-950/50 backdrop-blur-md border border-white/15 shadow-lg">
           {SLIDES.map((slide, idx) => {
             const isActive = idx === currentSlideIndex;
             return (
@@ -264,37 +142,15 @@ export function AuthCinematicShowcase() {
                 onClick={() => goToSlide(idx)}
                 className={`transition-all duration-300 rounded-full cursor-pointer ${
                   isActive 
-                    ? 'w-7 h-2 bg-gradient-to-r from-amber-400 to-blue-400' 
-                    : 'w-2 h-2 bg-white/30 hover:bg-white/60'
+                    ? 'w-6 h-2 bg-gradient-to-r from-amber-400 to-blue-400' 
+                    : 'w-2 h-2 bg-white/40 hover:bg-white/80'
                 }`}
-                title={`الانتقال إلى ${slide.stepBadge}`}
-                aria-label={`الشريحة ${idx + 1}`}
+                title={`الانتقال إلى صورة ${idx + 1}`}
+                aria-label={`الصورة ${idx + 1}`}
                 aria-current={isActive ? 'true' : 'false'}
               />
             );
           })}
-        </div>
-
-        {/* Arrows for Manual Navigation */}
-        <div className="flex items-center gap-1.5">
-          <button
-            type="button"
-            onClick={prevSlide}
-            className="w-7 h-7 rounded-lg bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors cursor-pointer"
-            title="السابق"
-            aria-label="الشريحة السابقة"
-          >
-            <ChevronRight className="w-4 h-4" />
-          </button>
-          <button
-            type="button"
-            onClick={nextSlide}
-            className="w-7 h-7 rounded-lg bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors cursor-pointer"
-            title="التالي"
-            aria-label="الشريحة التالية"
-          >
-            <ChevronLeft className="w-4 h-4" />
-          </button>
         </div>
       </div>
     </div>

@@ -27,6 +27,7 @@ import {
 } from 'lucide-react';
 import { useNotifications } from '@/context/NotificationContext';
 import { CURRENT_STUDENT } from '@/data/student';
+import { CustomSelect, SelectOption } from '@/components/ui/CustomSelect';
 
 export function SettingsView() {
   const [activeTab, setActiveTab] = useState<'password' | 'support'>('password');
@@ -165,6 +166,19 @@ export function SettingsView() {
       q: 'كيف أقدم استفساراً بخصوص درجات الاختبارات؟',
       a: 'من تبويب الدعم الفني هنا، اختر التصنيف "استفسار عن اختبار أو مقرر" واكتب تفاصيل المادة والسؤال وسيتم تحويلها لمشرف الكنترول.'
     }
+  ];
+
+  const categoryOptions: SelectOption[] = [
+    { value: 'technical', label: 'عطل تقني في المنصة', icon: <AlertCircle className="w-4 h-4 text-rose-500" /> },
+    { value: 'code', label: 'مشكلة في كود تفعيل المقرر', icon: <KeyRound className="w-4 h-4 text-amber-500" /> },
+    { value: 'exam', label: 'استفسار بخصوص اختبار أو نتيجة', icon: <HelpCircle className="w-4 h-4 text-blue-500" /> },
+    { value: 'account', label: 'مشكلة في الحساب الأكاديمي', icon: <User className="w-4 h-4 text-indigo-500" /> },
+    { value: 'other', label: 'استفسار عام', icon: <MessageSquare className="w-4 h-4 text-slate-400" /> },
+  ];
+
+  const priorityOptions: SelectOption[] = [
+    { value: 'normal', label: 'عادية (خلال 24 ساعة)', badge: 'عادي' },
+    { value: 'urgent', label: 'عاجلة (خلال ساعتين)', badge: 'عاجل' },
   ];
 
   return (
@@ -595,37 +609,30 @@ export function SettingsView() {
 
             <form onSubmit={handleSupportSubmit} className="space-y-3">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {/* Category */}
+                {/* Category Custom Select */}
                 <div>
                   <label className="block text-xs font-bold text-slate-700 mb-1">
                     نوع المشكلة
                   </label>
-                  <select
+                  <CustomSelect
                     value={supportCategory}
-                    onChange={(e) => setSupportCategory(e.target.value)}
-                    className="w-full h-11 px-3 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 text-base sm:text-sm text-slate-900 transition-all outline-hidden cursor-pointer"
-                  >
-                    <option value="technical">عطل تقني في المنصة</option>
-                    <option value="code">مشكلة في كود تفعيل المقرر</option>
-                    <option value="exam">استفسار بخصوص اختبار أو نتيجة</option>
-                    <option value="account">مشكلة في الحساب الأكاديمي</option>
-                    <option value="other">استفسار عام</option>
-                  </select>
+                    onChange={setSupportCategory}
+                    options={categoryOptions}
+                    placeholder="اختر نوع المشكلة..."
+                  />
                 </div>
 
-                {/* Priority */}
+                {/* Priority Custom Select */}
                 <div>
                   <label className="block text-xs font-bold text-slate-700 mb-1">
                     درجة الأهمية
                   </label>
-                  <select
+                  <CustomSelect
                     value={supportPriority}
-                    onChange={(e) => setSupportPriority(e.target.value)}
-                    className="w-full h-11 px-3 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 text-base sm:text-sm text-slate-900 transition-all outline-hidden cursor-pointer"
-                  >
-                    <option value="normal">عادية (خلال 24 ساعة)</option>
-                    <option value="urgent">عاجلة (خلال ساعتين)</option>
-                  </select>
+                    onChange={setSupportPriority}
+                    options={priorityOptions}
+                    placeholder="اختر درجة الأهمية..."
+                  />
                 </div>
               </div>
 

@@ -17,11 +17,21 @@ import {
   GraduationCap,
   MessageSquare,
   Send,
-  X
+  X,
+  ChevronDown,
+  Check
 } from 'lucide-react';
 import { useNotifications } from '@/context/NotificationContext';
 import { CURRENT_STUDENT } from '@/data/student';
 import { AuthCinematicShowcase } from '@/components/auth/AuthCinematicShowcase';
+
+const ISSUE_TYPES = [
+  { id: 'login_issue', label: 'صعوبة في تسجيل الدخول بالرقم القومي', icon: User },
+  { id: 'password_issue', label: 'نسيان أو فقدان كلمة المرور', icon: Lock },
+  { id: 'account_inactive', label: 'الحساب غير مفعل لدى شؤون الطلاب', icon: GraduationCap },
+  { id: 'technical_bug', label: 'عطل تقني أو خطأ في المنصة', icon: AlertCircle },
+  { id: 'other', label: 'استفسار أو مشكلة أخرى', icon: HelpCircle },
+];
 
 export function LoginForm() {
   const router = useRouter();
@@ -37,6 +47,8 @@ export function LoginForm() {
   const [isHelpModalOpen, setIsHelpModalOpen] = useState(false);
   const [helpIdentifier, setHelpIdentifier] = useState('');
   const [helpIssueType, setHelpIssueType] = useState('login_issue');
+  const [isIssueTypeDropdownOpen, setIsIssueTypeDropdownOpen] = useState(false);
+  const selectedIssue = ISSUE_TYPES.find(item => item.id === helpIssueType) || ISSUE_TYPES[0];
   const [helpMessage, setHelpMessage] = useState('');
   const [isHelpSubmitted, setIsHelpSubmitted] = useState(false);
   const [isSubmittingHelp, setIsSubmittingHelp] = useState(false);
@@ -492,22 +504,66 @@ export function LoginForm() {
                     />
                   </div>
 
-                  {/* Field: Issue Type */}
-                  <div>
+                  {/* Field: Issue Type (Custom Modern Dropdown) */}
+                  <div className="relative">
                     <label className="block text-xs font-bold text-slate-700 mb-1">
                       نوع المشكلة
                     </label>
-                    <select
-                      value={helpIssueType}
-                      onChange={(e) => setHelpIssueType(e.target.value)}
-                      className="w-full h-10 px-3.5 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 text-xs text-slate-900 transition-all outline-hidden font-medium cursor-pointer"
+
+                    <button
+                      type="button"
+                      onClick={() => setIsIssueTypeDropdownOpen(!isIssueTypeDropdownOpen)}
+                      className="w-full h-10 px-3.5 rounded-xl bg-slate-50 hover:bg-slate-100/70 border border-slate-200 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 text-xs text-slate-900 transition-all outline-hidden font-medium flex items-center justify-between cursor-pointer"
                     >
-                      <option value="login_issue">صعوبة في تسجيل الدخول بالرقم القومي</option>
-                      <option value="password_issue">نسيان أو فقدان كلمة المرور</option>
-                      <option value="account_inactive">الحساب غير مفعل لدى شؤون الطلاب</option>
-                      <option value="technical_bug">عطل تقني أو خطأ في المنصة</option>
-                      <option value="other">استفسار أو مشكلة أخرى</option>
-                    </select>
+                      <div className="flex items-center gap-2 truncate">
+                        <selectedIssue.icon className="w-3.5 h-3.5 text-blue-600 shrink-0" />
+                        <span className="truncate">{selectedIssue.label}</span>
+                      </div>
+                      <ChevronDown className={`w-3.5 h-3.5 text-slate-400 transition-transform duration-200 shrink-0 ${isIssueTypeDropdownOpen ? 'rotate-180 text-blue-600' : ''}`} />
+                    </button>
+
+                    {/* Custom Dropdown Menu */}
+                    {isIssueTypeDropdownOpen && (
+                      <>
+                        <div 
+                          className="fixed inset-0 z-30" 
+                          onClick={() => setIsIssueTypeDropdownOpen(false)} 
+                        />
+                        <div className="absolute top-[calc(100%+4px)] right-0 left-0 z-40 bg-white rounded-2xl shadow-xl border border-slate-200/90 py-1 overflow-hidden animate-fadeIn">
+                          {ISSUE_TYPES.map((type) => {
+                            const isSelected = type.id === helpIssueType;
+                            const TypeIcon = type.icon;
+                            return (
+                              <button
+                                key={type.id}
+                                type="button"
+                                onClick={() => {
+                                  setHelpIssueType(type.id);
+                                  setIsIssueTypeDropdownOpen(false);
+                                }}
+                                className={`w-full px-3 py-2 text-xs text-right flex items-center justify-between transition-colors cursor-pointer ${
+                                  isSelected 
+                                    ? 'bg-blue-50 text-blue-700 font-bold' 
+                                    : 'text-slate-700 hover:bg-slate-50 hover:text-slate-900 font-medium'
+                                }`}
+                              >
+                                <div className="flex items-center gap-2 truncate">
+                                  <div className={`w-5 h-5 rounded-md flex items-center justify-center shrink-0 ${
+                                    isSelected ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-500'
+                                  }`}>
+                                    <TypeIcon className="w-3 h-3" />
+                                  </div>
+                                  <span className="truncate">{type.label}</span>
+                                </div>
+                                {isSelected && (
+                                  <Check className="w-3.5 h-3.5 text-blue-600 shrink-0 mr-1.5" />
+                                )}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </>
+                    )}
                   </div>
 
                   {/* Field: Problem Details */}

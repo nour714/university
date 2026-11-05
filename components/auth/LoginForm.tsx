@@ -88,12 +88,6 @@ export function LoginForm() {
 
     setTimeout(() => {
       setIsLoading(false);
-      addNotification({
-        title: `مرحباً بك مجدداً، ${CURRENT_STUDENT.fullName.split(' ')[0]}!`,
-        message: 'تم تسجيل الدخول إلى البوابة الأكاديمية بنجاح.',
-        type: 'announcement',
-        priority: 'normal',
-      });
       router.push('/');
     }, 850);
   };
@@ -106,12 +100,6 @@ export function LoginForm() {
 
     setTimeout(() => {
       setIsLoading(false);
-      addNotification({
-        title: `مرحباً بك، ${CURRENT_STUDENT.fullName}!`,
-        message: 'تم تسجيل الدخول السريع بالحساب التجريبي بنجاح.',
-        type: 'announcement',
-        priority: 'normal',
-      });
       router.push('/');
     }, 700);
   };

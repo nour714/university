@@ -56,11 +56,6 @@ export function MoreMenuSheet({ isOpen, onClose }: MoreMenuSheetProps) {
     setLogoutLoading(true);
     setTimeout(() => {
       setLogoutLoading(false);
-      addNotification({
-        title: 'تم تسجيل الخروج بنجاح',
-        message: 'تم إنهاء الجلسة الأكاديمية بنجاح. يمكنك تسجيل الدخول مجدداً في أي وقت.',
-        type: 'announcement',
-      });
       onClose();
       router.push('/login');
     }, 500);

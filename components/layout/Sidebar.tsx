@@ -247,11 +247,6 @@ export function Sidebar({ currentPath }: { currentPath?: string }) {
           <button
             type="button"
             onClick={() => {
-              addNotification({
-                title: 'تم تسجيل الخروج بنجاح',
-                message: 'تم إنهاء الجلسة الأكاديمية بنجاح.',
-                type: 'announcement',
-              });
               router.push('/login');
             }}
             className={`h-11 rounded-xl flex items-center justify-center text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 transition-all cursor-pointer shrink-0 ${

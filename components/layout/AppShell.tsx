@@ -24,7 +24,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   // Standard Academic Platform Layout
   return (
-    <div className="min-h-full flex flex-row bg-[#f8fafc] text-slate-900 font-sans w-full">
+    <div className="min-h-full flex flex-row bg-[#f8fafc] text-slate-900 w-full">
       {/* Real-time Global Academic Toast Banner */}
       <NotificationToast />
 
@@ -43,3 +43,4 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     </div>
   );
 }
+

@@ -13,7 +13,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   // Standalone Full-Screen Auth Pages (no sidebar, no header, no bottom nav)
   if (isAuthPage) {
     return (
-      <div className="min-h-screen w-full flex flex-col bg-[#070b14]">
+      <div className="min-h-screen w-full flex flex-col bg-slate-900 text-slate-100">
         <NotificationToast />
         <main className="flex-1 w-full flex flex-col justify-center">
           {children}

@@ -155,24 +155,24 @@ export function LoginForm() {
         </div>
       </div>
 
-      {/* 5. Top Floating Institutional Brand Capsule in Background */}
-      <div className="absolute top-3 sm:top-5 right-4 sm:right-8 z-20 flex items-center gap-2.5 sm:gap-3 p-1.5 pe-4 rounded-2xl bg-slate-900/75 backdrop-blur-md border border-white/15 shadow-2xl shadow-blue-950/50 select-none">
-        <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-white shadow-md p-1.5 flex items-center justify-center shrink-0 border border-white/90">
+      {/* 5. Top Institutional Brand Header in Background */}
+      <div className="absolute top-4 sm:top-6 right-4 sm:right-8 z-20 flex items-center gap-3 select-none pointer-events-none">
+        <div className="w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center shrink-0">
           <Image
             src="/logo.png"
             alt="شعار كلية الذكاء الاصطناعي"
-            width={36}
-            height={36}
-            className="w-full h-full object-contain select-none"
+            width={48}
+            height={48}
+            className="w-full h-full object-contain select-none drop-shadow-[0_2px_14px_rgba(59,130,246,0.65)]"
             priority
             unoptimized
           />
         </div>
         <div className="flex flex-col text-right">
-          <span className="text-xs sm:text-sm font-black text-white tracking-tight drop-shadow-xs">
+          <span className="text-sm sm:text-base font-black text-white tracking-tight drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]">
             كلية الذكاء الاصطناعي
           </span>
-          <span className="text-[10px] sm:text-[11px] font-bold text-blue-400 drop-shadow-xs">
+          <span className="text-[11px] sm:text-xs font-bold text-blue-400 drop-shadow-[0_1px_4px_rgba(0,0,0,0.8)]">
             جامعة المستقبل • البوابة الأكاديمية
           </span>
         </div>

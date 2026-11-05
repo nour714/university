@@ -381,27 +381,15 @@ export function CourseContentBrowser({ items, courseCode }: CourseContentBrowser
 
                       {/* Left Side: Blue Outline Action Button */}
                       <div className="flex items-center gap-2 shrink-0">
-                        {item.type === 'link' ? (
-                          <button
-                            type="button"
-                            onClick={() => handleActionClick(item)}
-                            className="border border-blue-500 text-blue-600 hover:bg-blue-50 active:scale-95 px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl text-xs sm:text-sm font-bold flex items-center gap-1.5 transition-all shadow-2xs cursor-pointer"
-                            title="فتح الرابط"
-                          >
-                            <ExternalLink className="w-3.5 h-3.5 sm:w-4 sm:h-4 stroke-[2]" />
-                            <span>فتح</span>
-                          </button>
-                        ) : (
-                          <button
-                            type="button"
-                            onClick={() => handleActionClick(item)}
-                            className="border border-blue-500 text-blue-600 hover:bg-blue-50 active:scale-95 px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl text-xs sm:text-sm font-bold flex items-center gap-1.5 transition-all shadow-2xs cursor-pointer"
-                            title="عرض المحتوى"
-                          >
-                            <Eye className="w-3.5 h-3.5 sm:w-4 sm:h-4 stroke-[2]" />
-                            <span>عرض</span>
-                          </button>
-                        )}
+                        <button
+                          type="button"
+                          onClick={() => handleActionClick(item)}
+                          className="border border-blue-500 text-blue-600 bg-blue-50/40 hover:bg-blue-100/70 active:scale-95 px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-1.5 transition-all shadow-2xs cursor-pointer"
+                          title="عرض المحتوى"
+                        >
+                          <Eye className="w-3.5 h-3.5 sm:w-4 sm:h-4 stroke-[2.2]" />
+                          <span>عرض</span>
+                        </button>
                       </div>
                     </div>
                   );

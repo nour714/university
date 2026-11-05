@@ -107,40 +107,39 @@ export function LoginForm() {
   return (
     <div className="min-h-screen w-full flex items-center justify-center bg-gradient-to-br from-[#020617] via-[#091533] to-[#04091a] p-3 sm:p-5 relative overflow-hidden select-none">
       
-      {/* 1. Subtle High-Tech Architectural Grid Matrix */}
+      {/* 1. Subtle High-Tech Architectural Grid Matrix with smooth motion */}
       <div 
-        className="absolute inset-0 bg-[linear-gradient(to_right,#3b82f612_1px,transparent_1px),linear-gradient(to_bottom,#3b82f612_1px,transparent_1px)] bg-[size:40px_40px] [mask-image:radial-gradient(ellipse_80%_60%_at_50%_50%,#000_60%,transparent_100%)] pointer-events-none animate-grid-pulse" 
+        className="absolute inset-0 bg-[linear-gradient(to_right,#3b82f615_1px,transparent_1px),linear-gradient(to_bottom,#3b82f615_1px,transparent_1px)] bg-[size:40px_40px] [mask-image:radial-gradient(ellipse_80%_60%_at_50%_50%,#000_60%,transparent_100%)] pointer-events-none animate-grid-drift" 
         aria-hidden="true"
       />
 
       {/* 2. Floating Luminous AI Ambient Plasma Orbs (GPU accelerated smooth movement) */}
       <div 
-        className="absolute -top-24 -right-24 w-96 h-96 bg-blue-600/30 rounded-full blur-[100px] pointer-events-none animate-float-orb-1"
+        className="absolute -top-20 -right-20 w-[450px] h-[450px] bg-blue-600/35 rounded-full blur-[100px] pointer-events-none animate-float-orb-1"
         aria-hidden="true" 
       />
       <div 
-        className="absolute -bottom-28 -left-28 w-[420px] h-[420px] bg-indigo-600/30 rounded-full blur-[110px] pointer-events-none animate-float-orb-2" 
+        className="absolute -bottom-20 -left-20 w-[480px] h-[480px] bg-indigo-600/35 rounded-full blur-[110px] pointer-events-none animate-float-orb-2" 
         aria-hidden="true"
       />
       <div 
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[520px] h-[520px] bg-sky-500/15 rounded-full blur-[130px] pointer-events-none animate-float-orb-3" 
+        className="absolute top-1/2 left-1/2 w-[550px] h-[550px] bg-cyan-500/20 rounded-full blur-[130px] pointer-events-none animate-float-orb-3" 
         aria-hidden="true"
       />
 
-      {/* 3. Subtle Twinkling Neural Constellation Dust */}
+      {/* 3. Floating Neural Sparks / Data Nodes */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden" aria-hidden="true">
-        <div className="absolute top-[14%] right-[22%] w-1.5 h-1.5 rounded-full bg-blue-400 shadow-[0_0_8px_#60a5fa] animate-twinkle" style={{ animationDelay: '0s' }} />
-        <div className="absolute top-[26%] left-[16%] w-1 h-1 rounded-full bg-cyan-300 shadow-[0_0_6px_#67e8f9] animate-twinkle" style={{ animationDelay: '1.2s' }} />
-        <div className="absolute bottom-[18%] right-[24%] w-1.5 h-1.5 rounded-full bg-indigo-400 shadow-[0_0_8px_#818cf8] animate-twinkle" style={{ animationDelay: '2.4s' }} />
-        <div className="absolute bottom-[28%] left-[20%] w-1 h-1 rounded-full bg-blue-300 shadow-[0_0_6px_#93c5fd] animate-twinkle" style={{ animationDelay: '1.8s' }} />
-        <div className="absolute top-[42%] right-[8%] w-1 h-1 rounded-full bg-sky-300 shadow-[0_0_6px_#38bdf8] animate-twinkle" style={{ animationDelay: '3s' }} />
-        <div className="absolute top-[68%] left-[10%] w-1.5 h-1.5 rounded-full bg-amber-400/80 shadow-[0_0_8px_#fbbf24] animate-twinkle" style={{ animationDelay: '2s' }} />
+        <div className="absolute top-[20%] right-[22%] w-2 h-2 rounded-full bg-blue-400 shadow-[0_0_10px_#60a5fa] animate-particle-float" style={{ animationDelay: '0s' }} />
+        <div className="absolute top-[35%] left-[16%] w-1.5 h-1.5 rounded-full bg-cyan-300 shadow-[0_0_8px_#67e8f9] animate-particle-float" style={{ animationDelay: '1.2s' }} />
+        <div className="absolute bottom-[25%] right-[24%] w-2 h-2 rounded-full bg-indigo-400 shadow-[0_0_10px_#818cf8] animate-particle-float" style={{ animationDelay: '2.5s' }} />
+        <div className="absolute bottom-[35%] left-[20%] w-1.5 h-1.5 rounded-full bg-blue-300 shadow-[0_0_8px_#93c5fd] animate-particle-float" style={{ animationDelay: '1.8s' }} />
+        <div className="absolute top-[50%] right-[10%] w-1.5 h-1.5 rounded-full bg-sky-300 shadow-[0_0_8px_#38bdf8] animate-particle-float" style={{ animationDelay: '3.2s' }} />
+        <div className="absolute top-[65%] left-[12%] w-2 h-2 rounded-full bg-amber-400/90 shadow-[0_0_10px_#fbbf24] animate-particle-float" style={{ animationDelay: '2.1s' }} />
       </div>
 
-      {/* 4. Ambient Institutional Watermark Logo in Background */}
+      {/* 4. Ambient Institutional Watermark Logo in Background with Organic Breathing */}
       <div 
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[520px] h-[520px] sm:w-[680px] sm:h-[680px] pointer-events-none select-none opacity-[0.16] z-0 flex items-center justify-center animate-pulse"
-        style={{ animationDuration: '8s' }}
+        className="absolute top-1/2 left-1/2 w-[520px] h-[520px] sm:w-[680px] sm:h-[680px] pointer-events-none select-none z-0 flex items-center justify-center animate-logo-breathe"
         aria-hidden="true"
       >
         <div className="relative w-full h-full filter drop-shadow-[0_0_90px_rgba(59,130,246,0.55)] brightness-125 contrast-110">

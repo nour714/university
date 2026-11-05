@@ -88,13 +88,13 @@ export function LoginForm() {
       <div className="absolute top-1/4 -right-24 w-80 h-80 bg-blue-600/15 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute bottom-1/4 -left-24 w-80 h-80 bg-indigo-600/15 rounded-full blur-3xl pointer-events-none" />
 
-      {/* Main Container Card (Balanced 6/6 cols with Compact Height) */}
-      <div className="w-full max-w-4xl bg-white rounded-2xl sm:rounded-3xl shadow-2xl border border-slate-200/90 overflow-hidden grid grid-cols-1 lg:grid-cols-12 relative z-10">
+      {/* Main Container Card (Compact Form 46% & Expanded Showcase 54% with Timeline Divider) */}
+      <div className="w-full max-w-4xl bg-white rounded-2xl sm:rounded-3xl shadow-2xl border border-slate-200/90 overflow-hidden flex flex-col lg:flex-row relative z-10">
         
         {/* ========================================================= */}
-        {/* RIGHT COLUMN: Interactive Login Form (6 cols)             */}
+        {/* RIGHT COLUMN: Interactive Login Form (Reduced to 46%)     */}
         {/* ========================================================= */}
-        <div className="lg:col-span-6 p-4 sm:p-5 lg:p-6 flex flex-col justify-between bg-white">
+        <div className="w-full lg:w-[46%] p-4 sm:p-5 lg:p-6 flex flex-col justify-between bg-white shrink-0">
           <div>
             {/* Mobile Header Logo (visible only on mobile) */}
             <div className="lg:hidden flex items-center gap-2 mb-3 pb-2.5 border-b border-slate-100">
@@ -258,6 +258,25 @@ export function LoginForm() {
               <span>نظام موثق ومحمي SSL</span>
             </div>
           </div>
+        </div>
+
+        {/* ========================================================= */}
+        {/* VERTICAL DIVIDER TRACK WITH CENTRAL ACADEMIC BADGE NODE   */}
+        {/* ========================================================= */}
+        <div 
+          className="hidden lg:flex absolute top-0 bottom-0 start-[46%] -translate-x-1/2 z-30 flex-col items-center pointer-events-none"
+          aria-hidden="true"
+        >
+          {/* Top Half of the Vertical Line */}
+          <div className="w-[3px] flex-1 bg-gradient-to-b from-[#172554] via-blue-600 to-blue-500 shadow-sm" />
+          
+          {/* Central Circular Node Badge (Floating directly on the line) */}
+          <div className="w-9 h-9 rounded-full bg-gradient-to-br from-blue-600 via-indigo-600 to-blue-700 border-2 border-white shadow-xl shadow-blue-950/40 flex items-center justify-center text-white my-1 shrink-0 animate-pulse">
+            <GraduationCap className="w-4.5 h-4.5 drop-shadow-xs" />
+          </div>
+          
+          {/* Bottom Half of the Vertical Line */}
+          <div className="w-[3px] flex-1 bg-gradient-to-b from-blue-500 via-blue-600 to-[#172554] shadow-sm" />
         </div>
 
         {/* ========================================================= */}

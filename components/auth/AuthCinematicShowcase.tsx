@@ -65,7 +65,7 @@ export function AuthCinematicShowcase() {
 
   return (
     <div 
-      className="hidden lg:flex lg:col-span-6 relative overflow-hidden select-none group min-h-[460px] bg-slate-950 rounded-l-2xl sm:rounded-l-3xl"
+      className="hidden lg:flex flex-1 relative overflow-hidden select-none group min-h-[460px] bg-slate-950 rounded-l-2xl sm:rounded-l-3xl"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
       role="region"

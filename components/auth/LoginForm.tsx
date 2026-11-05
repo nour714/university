@@ -174,6 +174,29 @@ export function LoginForm() {
         </div>
       </div>
 
+      {/* Mobile Floating Brand Crest Capsule (Directly above the card in a distinctive style) */}
+      <div className="lg:hidden flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-slate-900/85 backdrop-blur-md border border-white/20 shadow-xl shadow-blue-950/60 mb-2.5 z-20 select-none">
+        <div className="w-7 h-7 rounded-full bg-white p-1 shadow-md flex items-center justify-center shrink-0 border border-white/80">
+          <Image
+            src="/logo.png"
+            alt="شعار كلية الذكاء الاصطناعي"
+            width={20}
+            height={20}
+            className="w-full h-full object-contain select-none"
+            priority
+            unoptimized
+          />
+        </div>
+        <div className="flex flex-col text-right">
+          <span className="text-xs font-black text-white tracking-wide drop-shadow-xs">
+            كلية الذكاء الاصطناعي
+          </span>
+          <span className="text-[9px] font-semibold text-blue-300 drop-shadow-xs">
+            جامعة المستقبل • البوابة الأكاديمية
+          </span>
+        </div>
+      </div>
+
       {/* Main Container Card (Compact Form 46% & Expanded Showcase 54% with Timeline Divider) */}
       <div className="w-full max-w-sm sm:max-w-md lg:max-w-4xl bg-white rounded-2xl sm:rounded-3xl shadow-2xl border border-slate-200/90 overflow-hidden flex flex-col lg:flex-row relative z-10">
         
@@ -182,27 +205,6 @@ export function LoginForm() {
         {/* ========================================================= */}
         <div className="w-full lg:w-[46%] p-3.5 sm:p-5 lg:p-6 flex flex-col justify-between bg-white shrink-0">
           <div>
-            {/* Mobile Header Logo & Faculty Title (Compact & cleanly integrated inside the card) */}
-            <div className="lg:hidden flex items-center gap-2 mb-2 pb-2 border-b border-slate-100">
-              <div className="w-8 h-8 rounded-xl bg-white border border-slate-200 shadow-xs p-1 flex items-center justify-center shrink-0">
-                <Image
-                  src="/logo.png"
-                  alt="شعار كلية الذكاء الاصطناعي"
-                  width={24}
-                  height={24}
-                  className="w-full h-full object-contain select-none"
-                  priority
-                  unoptimized
-                />
-              </div>
-              <div className="flex-1">
-                <h1 className="text-xs sm:text-sm font-extrabold text-[#172554] tracking-tight">
-                  كلية الذكاء الاصطناعي
-                </h1>
-                <p className="text-[10px] text-slate-500 font-medium">البوابة الأكاديمية للطلاب</p>
-              </div>
-            </div>
-
             {/* Form Title */}
             <div className="mb-2 sm:mb-3">
               <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 text-[10px] font-bold mb-1 border border-blue-200/60">

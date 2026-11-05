@@ -225,105 +225,110 @@ body {
   pointer-events: none;
 }
 
-/* Login Ambient Background Animations */
-@keyframes cyberGridDrift {
-  0% {
-    background-position: 0 0;
+/* Login Ambient Background Animations (Optimized for 60fps GPU Compositing without layout thrashing) */
+@keyframes gridSoftPulse {
+  0%, 100% {
+    opacity: 0.18;
   }
-  100% {
-    background-position: 40px 40px;
+  50% {
+    opacity: 0.32;
   }
 }
 
 @keyframes floatOrb1 {
   0%, 100% {
-    transform: translate(0, 0) scale(1);
-    opacity: 0.5;
+    transform: translate3d(0, 0, 0) scale(1);
+    opacity: 0.45;
   }
   33% {
-    transform: translate(50px, -35px) scale(1.15);
-    opacity: 0.75;
+    transform: translate3d(35px, -25px, 0) scale(1.12);
+    opacity: 0.65;
   }
   66% {
-    transform: translate(-40px, 40px) scale(0.95);
-    opacity: 0.55;
+    transform: translate3d(-25px, 25px, 0) scale(0.95);
+    opacity: 0.5;
   }
 }
 
 @keyframes floatOrb2 {
   0%, 100% {
-    transform: translate(0, 0) scale(1);
-    opacity: 0.45;
+    transform: translate3d(0, 0, 0) scale(1);
+    opacity: 0.4;
   }
   33% {
-    transform: translate(-55px, 45px) scale(1.18);
-    opacity: 0.7;
+    transform: translate3d(-35px, 30px, 0) scale(1.14);
+    opacity: 0.6;
   }
   66% {
-    transform: translate(45px, -35px) scale(0.92);
-    opacity: 0.5;
+    transform: translate3d(30px, -20px, 0) scale(0.92);
+    opacity: 0.45;
   }
 }
 
 @keyframes floatOrb3 {
   0%, 100% {
-    transform: translate(-50%, -50%) scale(1);
-    opacity: 0.3;
+    transform: translate3d(-50%, -50%, 0) scale(1);
+    opacity: 0.25;
   }
   50% {
-    transform: translate(-50%, -50%) scale(1.22);
-    opacity: 0.55;
+    transform: translate3d(-50%, -50%, 0) scale(1.15);
+    opacity: 0.45;
   }
 }
 
 @keyframes logoBreathe {
   0%, 100% {
-    transform: translate(-50%, -50%) scale(1);
-    opacity: 0.14;
+    transform: translate3d(-50%, -50%, 0) scale(1);
+    opacity: 0.12;
   }
   50% {
-    transform: translate(-50%, -50%) scale(1.06);
-    opacity: 0.24;
+    transform: translate3d(-50%, -50%, 0) scale(1.04);
+    opacity: 0.2;
   }
 }
 
 @keyframes particleFloatUp {
   0% {
-    transform: translateY(0) scale(0.85);
+    transform: translate3d(0, 0, 0) scale(0.85);
     opacity: 0.3;
   }
   50% {
-    transform: translateY(-22px) scale(1.35);
-    opacity: 0.95;
+    transform: translate3d(0, -18px, 0) scale(1.25);
+    opacity: 0.9;
   }
   100% {
-    transform: translateY(-44px) scale(0.85);
+    transform: translate3d(0, -36px, 0) scale(0.85);
     opacity: 0.3;
   }
 }
 
-.animate-grid-drift {
-  animation: cyberGridDrift 20s linear infinite;
+.animate-grid-pulse {
+  animation: gridSoftPulse 6s ease-in-out infinite;
 }
 
 .animate-float-orb-1 {
-  animation: floatOrb1 9s ease-in-out infinite;
+  animation: floatOrb1 10s ease-in-out infinite;
+  will-change: transform, opacity;
 }
 
 .animate-float-orb-2 {
-  animation: floatOrb2 11s ease-in-out infinite;
+  animation: floatOrb2 12s ease-in-out infinite;
+  will-change: transform, opacity;
 }
 
 .animate-float-orb-3 {
-  animation: floatOrb3 10s ease-in-out infinite;
+  animation: floatOrb3 11s ease-in-out infinite;
+  will-change: transform, opacity;
 }
 
 .animate-logo-breathe {
-  animation: logoBreathe 9s ease-in-out infinite;
+  animation: logoBreathe 10s ease-in-out infinite;
+  will-change: transform, opacity;
 }
 
 .animate-particle-float {
   animation: particleFloatUp 5s ease-in-out infinite;
+  will-change: transform, opacity;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -336,7 +341,7 @@ body {
   .animate-float-orb-1,
   .animate-float-orb-2,
   .animate-float-orb-3,
-  .animate-grid-drift,
+  .animate-grid-pulse,
   .animate-logo-breathe,
   .animate-particle-float {
     animation: none !important;

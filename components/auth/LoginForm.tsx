@@ -105,56 +105,53 @@ export function LoginForm() {
   };
 
   return (
-    <div className="min-h-screen w-full flex flex-col items-center justify-center bg-gradient-to-br from-[#020617] via-[#091533] to-[#04091a] p-3 sm:p-5 py-6 sm:py-8 lg:py-4 relative overflow-x-hidden select-none">
+    <div className="h-screen h-[100dvh] w-full flex items-center justify-center bg-gradient-to-br from-[#020617] via-[#091533] to-[#04091a] p-3 sm:p-5 relative overflow-hidden select-none">
       
-      {/* 1. Subtle High-Tech Architectural Grid Matrix with smooth motion */}
-      <div 
-        className="absolute inset-0 bg-[linear-gradient(to_right,#3b82f615_1px,transparent_1px),linear-gradient(to_bottom,#3b82f615_1px,transparent_1px)] bg-[size:40px_40px] [mask-image:radial-gradient(ellipse_80%_60%_at_50%_50%,#000_60%,transparent_100%)] pointer-events-none animate-grid-drift" 
-        aria-hidden="true"
-      />
+      {/* Background Decorative Layer (Bounded strictly to prevent layout jitter or mobile overflow) */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none select-none z-0" aria-hidden="true">
+        {/* 1. Subtle High-Tech Architectural Grid Matrix */}
+        <div 
+          className="absolute inset-0 bg-[linear-gradient(to_right,#3b82f612_1px,transparent_1px),linear-gradient(to_bottom,#3b82f612_1px,transparent_1px)] bg-[size:40px_40px] [mask-image:radial-gradient(ellipse_80%_60%_at_50%_50%,#000_60%,transparent_100%)] animate-grid-pulse" 
+        />
 
-      {/* 2. Floating Luminous AI Ambient Plasma Orbs (GPU accelerated smooth movement) */}
-      <div 
-        className="absolute -top-20 -right-20 w-[450px] h-[450px] bg-blue-600/35 rounded-full blur-[100px] pointer-events-none animate-float-orb-1"
-        aria-hidden="true" 
-      />
-      <div 
-        className="absolute -bottom-20 -left-20 w-[480px] h-[480px] bg-indigo-600/35 rounded-full blur-[110px] pointer-events-none animate-float-orb-2" 
-        aria-hidden="true"
-      />
-      <div 
-        className="absolute top-1/2 left-1/2 w-[550px] h-[550px] bg-cyan-500/20 rounded-full blur-[130px] pointer-events-none animate-float-orb-3" 
-        aria-hidden="true"
-      />
+        {/* 2. Floating Luminous AI Ambient Plasma Orbs */}
+        <div 
+          className="absolute -top-16 -right-16 w-72 sm:w-[450px] h-72 sm:h-[450px] bg-blue-600/30 rounded-full blur-[80px] sm:blur-[110px] animate-float-orb-1" 
+        />
+        <div 
+          className="absolute -bottom-16 -left-16 w-72 sm:w-[480px] h-72 sm:h-[480px] bg-indigo-600/30 rounded-full blur-[80px] sm:blur-[110px] animate-float-orb-2" 
+        />
+        <div 
+          className="absolute top-1/2 left-1/2 w-80 sm:w-[550px] h-80 sm:h-[550px] bg-cyan-500/15 rounded-full blur-[90px] sm:blur-[130px] animate-float-orb-3" 
+        />
 
-      {/* 3. Floating Neural Sparks / Data Nodes */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden" aria-hidden="true">
-        <div className="absolute top-[20%] right-[22%] w-2 h-2 rounded-full bg-blue-400 shadow-[0_0_10px_#60a5fa] animate-particle-float" style={{ animationDelay: '0s' }} />
-        <div className="absolute top-[35%] left-[16%] w-1.5 h-1.5 rounded-full bg-cyan-300 shadow-[0_0_8px_#67e8f9] animate-particle-float" style={{ animationDelay: '1.2s' }} />
-        <div className="absolute bottom-[25%] right-[24%] w-2 h-2 rounded-full bg-indigo-400 shadow-[0_0_10px_#818cf8] animate-particle-float" style={{ animationDelay: '2.5s' }} />
-        <div className="absolute bottom-[35%] left-[20%] w-1.5 h-1.5 rounded-full bg-blue-300 shadow-[0_0_8px_#93c5fd] animate-particle-float" style={{ animationDelay: '1.8s' }} />
-        <div className="absolute top-[50%] right-[10%] w-1.5 h-1.5 rounded-full bg-sky-300 shadow-[0_0_8px_#38bdf8] animate-particle-float" style={{ animationDelay: '3.2s' }} />
-        <div className="absolute top-[65%] left-[12%] w-2 h-2 rounded-full bg-amber-400/90 shadow-[0_0_10px_#fbbf24] animate-particle-float" style={{ animationDelay: '2.1s' }} />
-      </div>
+        {/* 3. Floating Neural Sparks / Data Nodes */}
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute top-[20%] right-[22%] w-2 h-2 rounded-full bg-blue-400 shadow-[0_0_10px_#60a5fa] animate-particle-float" style={{ animationDelay: '0s' }} />
+          <div className="absolute top-[35%] left-[16%] w-1.5 h-1.5 rounded-full bg-cyan-300 shadow-[0_0_8px_#67e8f9] animate-particle-float" style={{ animationDelay: '1.2s' }} />
+          <div className="absolute bottom-[25%] right-[24%] w-2 h-2 rounded-full bg-indigo-400 shadow-[0_0_10px_#818cf8] animate-particle-float" style={{ animationDelay: '2.5s' }} />
+          <div className="absolute bottom-[35%] left-[20%] w-1.5 h-1.5 rounded-full bg-blue-300 shadow-[0_0_8px_#93c5fd] animate-particle-float" style={{ animationDelay: '1.8s' }} />
+          <div className="absolute top-[50%] right-[10%] w-1.5 h-1.5 rounded-full bg-sky-300 shadow-[0_0_8px_#38bdf8] animate-particle-float" style={{ animationDelay: '3.2s' }} />
+        </div>
 
-      {/* 4. Ambient Institutional Watermark Logo in Background with Organic Breathing */}
-      <div 
-        className="absolute top-1/2 left-1/2 w-[520px] h-[520px] sm:w-[680px] sm:h-[680px] pointer-events-none select-none z-0 flex items-center justify-center animate-logo-breathe"
-        aria-hidden="true"
-      >
-        <div className="relative w-full h-full filter drop-shadow-[0_0_90px_rgba(59,130,246,0.55)] brightness-125 contrast-110">
-          <Image
-            src="/logo.png"
-            alt="شعار الكلية بالخلفية"
-            fill
-            className="object-contain"
-            priority
-            unoptimized
-          />
+        {/* 4. Ambient Institutional Watermark Logo in Background */}
+        <div 
+          className="absolute top-1/2 left-1/2 w-[420px] h-[420px] sm:w-[680px] sm:h-[680px] flex items-center justify-center animate-logo-breathe"
+        >
+          <div className="relative w-full h-full filter drop-shadow-[0_0_90px_rgba(59,130,246,0.55)] brightness-125 contrast-110">
+            <Image
+              src="/logo.png"
+              alt="شعار الكلية بالخلفية"
+              fill
+              className="object-contain"
+              priority
+              unoptimized
+            />
+          </div>
         </div>
       </div>
 
-      {/* 5. Top Institutional Brand Header (Desktop) */}
+      {/* 5. Top Institutional Brand Header (Desktop Only) */}
       <div className="hidden lg:flex absolute top-6 right-8 z-20 items-center gap-3 select-none pointer-events-none">
         <div className="w-12 h-12 flex items-center justify-center shrink-0">
           <Image
@@ -177,56 +174,56 @@ export function LoginForm() {
         </div>
       </div>
 
-      {/* 6. Top Institutional Brand Header (Mobile & Tablet) */}
-      <div className="lg:hidden flex flex-col items-center justify-center text-center mb-4 sm:mb-5 z-20 select-none">
-        <div className="w-13 h-13 rounded-2xl bg-white shadow-xl shadow-blue-950/40 border border-white/90 p-2 flex items-center justify-center mb-2.5 shrink-0">
-          <Image
-            src="/logo.png"
-            alt="شعار كلية الذكاء الاصطناعي"
-            width={42}
-            height={42}
-            className="w-full h-full object-contain"
-            priority
-            unoptimized
-          />
-        </div>
-        <h1 className="text-base sm:text-lg font-black text-white tracking-tight drop-shadow-xs">
-          كلية الذكاء الاصطناعي
-        </h1>
-        <p className="text-xs font-bold text-blue-300 drop-shadow-xs">
-          جامعة المستقبل • البوابة الأكاديمية الذكية
-        </p>
-      </div>
-
       {/* Main Container Card (Compact Form 46% & Expanded Showcase 54% with Timeline Divider) */}
       <div className="w-full max-w-sm sm:max-w-md lg:max-w-4xl bg-white rounded-2xl sm:rounded-3xl shadow-2xl border border-slate-200/90 overflow-hidden flex flex-col lg:flex-row relative z-10">
         
         {/* ========================================================= */}
         {/* RIGHT COLUMN: Interactive Login Form (Reduced to 46%)     */}
         {/* ========================================================= */}
-        <div className="w-full lg:w-[46%] p-4 sm:p-5 lg:p-6 flex flex-col justify-between bg-white shrink-0">
+        <div className="w-full lg:w-[46%] p-3.5 sm:p-5 lg:p-6 flex flex-col justify-between bg-white shrink-0">
           <div>
+            {/* Mobile Header Logo & Faculty Title (Compact & cleanly integrated inside the card) */}
+            <div className="lg:hidden flex items-center gap-2 mb-2 pb-2 border-b border-slate-100">
+              <div className="w-8 h-8 rounded-xl bg-white border border-slate-200 shadow-xs p-1 flex items-center justify-center shrink-0">
+                <Image
+                  src="/logo.png"
+                  alt="شعار كلية الذكاء الاصطناعي"
+                  width={24}
+                  height={24}
+                  className="w-full h-full object-contain select-none"
+                  priority
+                  unoptimized
+                />
+              </div>
+              <div className="flex-1">
+                <h1 className="text-xs sm:text-sm font-extrabold text-[#172554] tracking-tight">
+                  كلية الذكاء الاصطناعي
+                </h1>
+                <p className="text-[10px] text-slate-500 font-medium">البوابة الأكاديمية للطلاب</p>
+              </div>
+            </div>
+
             {/* Form Title */}
-            <div className="mb-3.5">
-              <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 text-[10px] font-bold mb-1.5 border border-blue-200/60">
+            <div className="mb-2 sm:mb-3">
+              <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 text-[10px] font-bold mb-1 border border-blue-200/60">
                 <GraduationCap className="w-3 h-3 text-blue-600" />
                 <span>العام الأكاديمي 2026/2027</span>
               </div>
-              <h2 className="text-lg sm:text-xl font-extrabold text-slate-900 tracking-tight">
+              <h2 className="text-base sm:text-xl font-extrabold text-slate-900 tracking-tight">
                 تسجيل الدخول إلى حسابك
               </h2>
             </div>
 
             {/* Error Message */}
             {errorMessage && (
-              <div className="mb-3.5 p-2.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs flex items-start gap-2 animate-fadeIn">
+              <div className="mb-2.5 p-2 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs flex items-start gap-2 animate-fadeIn">
                 <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
                 <span className="font-bold">{errorMessage}</span>
               </div>
             )}
 
             {/* Login Form */}
-            <form onSubmit={handleSubmit} className="space-y-3.5">
+            <form onSubmit={handleSubmit} className="space-y-2.5 sm:space-y-3.5">
               {/* Field 1: National ID */}
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1">
@@ -240,10 +237,10 @@ export function LoginForm() {
                     value={identifier}
                     onChange={(e) => setIdentifier(e.target.value)}
                     placeholder="مثال: الرقم القومي 14 رقم"
-                    className="w-full h-11 px-3.5 ps-10 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 text-sm text-slate-900 transition-all outline-hidden font-medium"
+                    className="w-full h-10 sm:h-11 px-3.5 ps-9 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 text-xs sm:text-sm text-slate-900 transition-all outline-hidden font-medium"
                     required
                   />
-                  <User className="w-4 h-4 text-slate-400 absolute start-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                  <User className="w-4 h-4 text-slate-400 absolute start-3 top-1/2 -translate-y-1/2 pointer-events-none" />
                 </div>
               </div>
 
@@ -268,14 +265,14 @@ export function LoginForm() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="أدخل كلمة المرور الخاصة بحسابك"
-                    className="w-full h-11 px-3.5 ps-10 pe-10 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 text-sm text-slate-900 transition-all outline-hidden font-medium"
+                    className="w-full h-10 sm:h-11 px-3.5 ps-9 pe-9 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 text-xs sm:text-sm text-slate-900 transition-all outline-hidden font-medium"
                     required
                   />
-                  <Lock className="w-4 h-4 text-slate-400 absolute start-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                  <Lock className="w-4 h-4 text-slate-400 absolute start-3 top-1/2 -translate-y-1/2 pointer-events-none" />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute end-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer p-1.5"
+                    className="absolute end-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer p-1"
                     title={showPassword ? 'إخفاء' : 'إظهار'}
                   >
                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -302,7 +299,7 @@ export function LoginForm() {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full h-10 sm:h-11 rounded-xl bg-blue-600 hover:bg-blue-700 active:scale-[0.99] text-white font-extrabold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-md shadow-blue-600/30 transition-all cursor-pointer disabled:opacity-60 mt-1.5"
+                className="w-full h-10 sm:h-11 rounded-xl bg-blue-600 hover:bg-blue-700 active:scale-[0.99] text-white font-extrabold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-md shadow-blue-600/30 transition-all cursor-pointer disabled:opacity-60 mt-1"
               >
                 {isLoading ? (
                   <>
@@ -319,12 +316,12 @@ export function LoginForm() {
             </form>
 
             {/* Quick Demo Login Option */}
-            <div className="mt-3.5 pt-3 border-t border-slate-100">
+            <div className="mt-2.5 pt-2 border-t border-slate-100">
               <button
                 type="button"
                 onClick={handleQuickDemoLogin}
                 disabled={isLoading}
-                className="w-full py-2 px-3 rounded-xl bg-slate-50 hover:bg-blue-50/70 border border-slate-200/80 text-slate-700 hover:text-blue-700 text-xs font-bold flex items-center justify-center gap-2 transition-all cursor-pointer active:scale-[0.99]"
+                className="w-full py-1.5 sm:py-2 px-3 rounded-xl bg-slate-50 hover:bg-blue-50/70 border border-slate-200/80 text-slate-700 hover:text-blue-700 text-xs font-bold flex items-center justify-center gap-2 transition-all cursor-pointer active:scale-[0.99]"
               >
                 <Sparkles className="w-3.5 h-3.5 text-amber-500 shrink-0" />
                 <span>دخول تجريبي سريع بحساب الطالب عبد الرحمن خالد</span>
@@ -333,7 +330,7 @@ export function LoginForm() {
           </div>
 
           {/* Footer Assistance */}
-          <div className="mt-3.5 pt-2.5 border-t border-slate-100 flex items-center justify-center text-[11px] text-slate-500 font-medium">
+          <div className="mt-2.5 pt-2 border-t border-slate-100 flex items-center justify-center text-[11px] text-slate-500 font-medium">
             <div className="flex items-center gap-1.5">
               <HelpCircle className="w-3.5 h-3.5 text-slate-400" />
               <span>تواجه صعوبة في الدخول؟</span>

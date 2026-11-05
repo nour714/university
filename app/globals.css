@@ -225,13 +225,100 @@ body {
   pointer-events: none;
 }
 
+/* Login Ambient Background Animations */
+@keyframes floatOrb1 {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+    opacity: 0.4;
+  }
+  33% {
+    transform: translate(35px, -45px) scale(1.12);
+    opacity: 0.65;
+  }
+  66% {
+    transform: translate(-30px, 30px) scale(0.92);
+    opacity: 0.45;
+  }
+}
+
+@keyframes floatOrb2 {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+    opacity: 0.35;
+  }
+  33% {
+    transform: translate(-45px, 35px) scale(1.15);
+    opacity: 0.55;
+  }
+  66% {
+    transform: translate(30px, -25px) scale(0.95);
+    opacity: 0.38;
+  }
+}
+
+@keyframes floatOrb3 {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+    opacity: 0.25;
+  }
+  50% {
+    transform: translate(40px, 40px) scale(1.2);
+    opacity: 0.45;
+  }
+}
+
+@keyframes gridGlowPulse {
+  0%, 100% {
+    opacity: 0.25;
+  }
+  50% {
+    opacity: 0.45;
+  }
+}
+
+@keyframes particleTwinkle {
+  0%, 100% {
+    opacity: 0.2;
+    transform: scale(0.85);
+  }
+  50% {
+    opacity: 0.9;
+    transform: scale(1.25);
+  }
+}
+
+.animate-float-orb-1 {
+  animation: floatOrb1 16s ease-in-out infinite;
+}
+
+.animate-float-orb-2 {
+  animation: floatOrb2 20s ease-in-out infinite;
+}
+
+.animate-float-orb-3 {
+  animation: floatOrb3 18s ease-in-out infinite;
+}
+
+.animate-grid-pulse {
+  animation: gridGlowPulse 8s ease-in-out infinite;
+}
+
+.animate-twinkle {
+  animation: particleTwinkle 3.5s ease-in-out infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .animate-gold-pulse,
   .animate-gold-wave,
   .animate-white-pulse,
   .animate-white-wave,
   .shimmer::after,
-  .shimmer-dark::after {
+  .shimmer-dark::after,
+  .animate-float-orb-1,
+  .animate-float-orb-2,
+  .animate-float-orb-3,
+  .animate-grid-pulse,
+  .animate-twinkle {
     animation: none !important;
   }
 }

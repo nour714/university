@@ -340,7 +340,7 @@ export function LoginForm() {
             <button
               type="button"
               onClick={() => setIsForgotModalOpen(false)}
-              className="absolute top-4 start-4 w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center transition-colors cursor-pointer"
+              className="absolute top-4 left-4 w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center transition-colors cursor-pointer"
               title="إغلاق"
             >
               <X className="w-4 h-4" />
@@ -399,7 +399,7 @@ export function LoginForm() {
             <button
               type="button"
               onClick={() => setIsHelpModalOpen(false)}
-              className="absolute top-4 start-4 w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center transition-colors cursor-pointer"
+              className="absolute top-4 left-4 w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center transition-colors cursor-pointer"
               title="إغلاق"
             >
               <X className="w-4 h-4" />

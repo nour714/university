@@ -10,12 +10,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const isAuthPage = pathname === '/login';
 
-  // Standalone Full-Screen Auth Pages (no sidebar, no header, no bottom nav)
+  // Standalone Full-Screen Auth Pages (no sidebar, no header, no bottom nav, strictly locked viewport)
   if (isAuthPage) {
     return (
-      <div className="min-h-screen w-full flex flex-col bg-slate-900 text-slate-100">
+      <div data-auth-page className="fixed inset-0 w-full h-[100dvh] overflow-hidden bg-slate-900 text-slate-100 select-none overscroll-none">
         <NotificationToast />
-        <main className="flex-1 w-full flex flex-col justify-center">
+        <main className="w-full h-full overflow-hidden">
           {children}
         </main>
       </div>

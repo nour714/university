@@ -30,6 +30,15 @@ body {
   overflow-x: hidden;
 }
 
+/* Strictly lock viewport and eliminate all scroll / bounce on login / auth pages */
+body:has([data-auth-page]),
+html:has([data-auth-page]) {
+  overflow: hidden !important;
+  height: 100% !important;
+  max-height: 100dvh !important;
+  overscroll-behavior: none !important;
+}
+
 /* Custom scrollbars for clean academic dashboards */
 ::-webkit-scrollbar {
   width: 6px;

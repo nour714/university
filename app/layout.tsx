@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { Cairo } from 'next/font/google';
 import './globals.css';
 import { NotificationProvider } from '@/context/NotificationContext';
@@ -10,6 +10,13 @@ const cairo = Cairo({
   display: 'swap',
   weight: ['400', '500', '600', '700', '800'],
 });
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+};
 
 export const metadata: Metadata = {
   title: 'كلية الذكاء الاصطناعي | مكتبة المقررات الأكاديمية',

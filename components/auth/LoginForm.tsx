@@ -105,7 +105,7 @@ export function LoginForm() {
   };
 
   return (
-    <div className="h-screen h-[100dvh] w-full flex flex-col items-center justify-center bg-gradient-to-br from-[#020617] via-[#091533] to-[#04091a] p-3 sm:p-5 relative overflow-hidden select-none">
+    <div data-auth-page className="fixed inset-0 w-full h-[100dvh] flex flex-col items-center justify-center bg-gradient-to-br from-[#020617] via-[#091533] to-[#04091a] p-3 sm:p-5 overflow-hidden select-none overscroll-none">
       
       {/* Background Decorative Layer (Bounded strictly to prevent layout jitter or mobile overflow) */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none select-none z-0" aria-hidden="true">

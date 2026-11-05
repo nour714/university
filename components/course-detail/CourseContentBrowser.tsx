@@ -13,7 +13,8 @@ import {
   ExternalLink, 
   Download, 
   Clock, 
-  FolderSearch
+  FolderSearch,
+  Calendar
 } from 'lucide-react';
 
 interface CourseContentBrowserProps {
@@ -216,239 +217,147 @@ export function CourseContentBrowser({ items, courseCode }: CourseContentBrowser
         </div>
       </div>
 
-      {/* Content Rendering: Mobile Cards View (< md) + Desktop Table (>= md) */}
+      {/* Content Rendering: Organized Individual Cards */}
       {filteredItems.length > 0 ? (
-        <div className="space-y-3">
-          {/* 1. Mobile Cards View (< md) */}
-          <div className="md:hidden space-y-3">
-            {filteredItems.map((item) => (
-              <div 
-                key={item.id}
-                className="bg-white rounded-2xl p-4 border border-slate-200/90 shadow-2xs space-y-3"
-              >
-                <div className="flex items-start gap-3">
+        <div className="space-y-3 sm:space-y-3.5">
+          {filteredItems.map((item) => (
+            <div 
+              key={item.id}
+              className="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200/90 hover:border-blue-400 hover:shadow-md transition-all flex flex-col md:flex-row md:items-center justify-between gap-4 group"
+            >
+              {/* Right Side: Icon + Title + Description */}
+              <div className="flex items-start gap-3.5 flex-1 min-w-0">
+                <div className="shrink-0 mt-0.5">
                   {getItemIcon(item.type)}
-                  <div className="min-w-0 flex-1">
-                    <p className="font-bold text-slate-900 text-sm leading-snug">
+                </div>
+                <div className="min-w-0 flex-1">
+                  <div className="flex flex-wrap items-center gap-2 mb-1">
+                    <h4 className="font-bold text-slate-900 group-hover:text-blue-600 transition-colors text-sm sm:text-base leading-snug">
                       {item.title}
+                    </h4>
+                    {/* Format badge inline on title row on mobile */}
+                    <div className="md:hidden">
+                      {getFormatBadge(item.type, item.format)}
+                    </div>
+                  </div>
+                  
+                  {item.description && (
+                    <p className="text-xs text-slate-500 line-clamp-2 leading-relaxed">
+                      {item.description}
                     </p>
-                    {item.description && (
-                      <p className="text-xs text-slate-500 line-clamp-2 mt-1">
-                        {item.description}
-                      </p>
-                    )}
+                  )}
+
+                  {/* Mobile Meta Details Bar */}
+                  <div className="flex flex-wrap items-center gap-3 mt-2.5 text-[11px] text-slate-500 md:hidden pt-2 border-t border-slate-100">
+                    <div className="flex items-center gap-1.5 font-medium text-slate-600">
+                      {item.duration ? (
+                        <span className="flex items-center gap-1 text-indigo-700 font-bold">
+                          <Clock className="w-3.5 h-3.5" />
+                          {item.duration}
+                        </span>
+                      ) : (
+                        <span>{item.size || 'رابط خارجي'}</span>
+                      )}
+                    </div>
+                    <span className="text-slate-300">•</span>
+                    <div className="flex items-center gap-1 text-slate-400">
+                      <Calendar className="w-3 h-3" />
+                      <span>{item.uploadedAt}</span>
+                    </div>
                   </div>
                 </div>
+              </div>
 
-                <div className="flex items-center justify-between text-[11px] text-slate-500 pt-2 border-t border-slate-100">
-                  <div className="flex items-center gap-2">
-                    {getFormatBadge(item.type, item.format)}
-                    <span>{item.size || item.duration || 'رابط خارجي'}</span>
-                  </div>
-                  <span className="text-[10px] text-slate-400">{item.uploadedAt}</span>
+              {/* Center Side (Tablet & Desktop): Organized Meta Badges in Clean Capsules */}
+              <div className="hidden md:flex items-center gap-3.5 shrink-0 px-4 border-x border-slate-100">
+                {/* Format Badge */}
+                <div>
+                  {getFormatBadge(item.type, item.format)}
                 </div>
 
-                {/* Mobile Action Buttons (44px touch targets) */}
-                <div className="grid grid-cols-2 gap-2 pt-1">
-                  {isSafeExternalUrl(item.url) ? (
+                {/* Size or Duration Badge */}
+                <div className="text-xs font-semibold min-w-[75px] text-center">
+                  {item.duration ? (
+                    <span className="inline-flex items-center gap-1.5 text-indigo-700 bg-indigo-50 border border-indigo-200/60 px-2.5 py-1 rounded-lg">
+                      <Clock className="w-3.5 h-3.5" />
+                      <span>{item.duration}</span>
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center gap-1 text-slate-600 bg-slate-100 border border-slate-200/60 px-2.5 py-1 rounded-lg">
+                      <span>{item.size || '—'}</span>
+                    </span>
+                  )}
+                </div>
+
+                {/* Upload Date Badge */}
+                <div className="inline-flex items-center gap-1.5 text-xs text-slate-400 min-w-[95px] justify-center bg-slate-50 border border-slate-200/50 px-2.5 py-1 rounded-lg">
+                  <Calendar className="w-3.5 h-3.5 text-slate-400" />
+                  <span>{item.uploadedAt}</span>
+                </div>
+              </div>
+
+              {/* Left Side: Direct Action Buttons */}
+              <div className="flex items-center gap-2 shrink-0 pt-2 md:pt-0 border-t md:border-t-0 border-slate-100">
+                {/* View / Open Button */}
+                {isSafeExternalUrl(item.url) ? (
+                  <a
+                    href={item.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex-1 md:flex-initial inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl bg-blue-50 hover:bg-blue-600 text-blue-700 hover:text-white border border-blue-200 hover:border-blue-600 text-xs font-bold transition-all shadow-2xs cursor-pointer active:scale-95"
+                    title="عرض في علامة تبويب جديدة"
+                  >
+                    <ExternalLink className="w-3.5 h-3.5" />
+                    <span>عرض</span>
+                  </a>
+                ) : (
+                  <button
+                    type="button"
+                    disabled
+                    aria-disabled="true"
+                    className="flex-1 md:flex-initial inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl bg-blue-50 text-blue-700 border border-blue-200 text-xs font-bold shadow-2xs opacity-50 cursor-not-allowed"
+                    title="الرابط غير متاح"
+                  >
+                    <ExternalLink className="w-3.5 h-3.5" />
+                    <span>عرض</span>
+                  </button>
+                )}
+
+                {/* Download Button (for files, videos, images) */}
+                {item.type !== 'link' && (
+                  isSafeExternalUrl(item.downloadUrl || item.url) ? (
                     <a
-                      href={item.url}
+                      href={item.downloadUrl || item.url}
+                      download
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-blue-50 hover:bg-blue-600 text-blue-700 hover:text-white border border-blue-200/80 font-bold text-xs transition-all active:scale-95"
+                      className="flex-1 md:flex-initial inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-800 text-slate-700 hover:text-white border border-slate-200 hover:border-slate-800 text-xs font-bold transition-all shadow-2xs cursor-pointer active:scale-95"
+                      title="تنزيل الملف مباشرة"
                     >
-                      <ExternalLink className="w-3.5 h-3.5" />
-                      <span>عرض مباشر</span>
+                      <Download className="w-3.5 h-3.5" />
+                      <span>تنزيل</span>
                     </a>
                   ) : (
                     <button
                       type="button"
                       disabled
                       aria-disabled="true"
-                      className="flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-blue-50 text-blue-700 border border-blue-200/80 font-bold text-xs opacity-50 cursor-not-allowed"
+                      className="flex-1 md:flex-initial inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl bg-slate-100 text-slate-700 border border-slate-200 text-xs font-bold shadow-2xs opacity-50 cursor-not-allowed"
+                      title="رابط التنزيل غير متاح"
                     >
-                      <ExternalLink className="w-3.5 h-3.5" />
-                      <span>عرض مباشر</span>
+                      <Download className="w-3.5 h-3.5" />
+                      <span>تنزيل</span>
                     </button>
-                  )}
-
-                  {item.type !== 'link' ? (
-                    isSafeExternalUrl(item.downloadUrl || item.url) ? (
-                      <a
-                        href={item.downloadUrl || item.url}
-                        download
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-slate-100 hover:bg-slate-800 text-slate-700 hover:text-white border border-slate-200 font-bold text-xs transition-all active:scale-95"
-                      >
-                        <Download className="w-3.5 h-3.5" />
-                        <span>تنزيل الملف</span>
-                      </a>
-                    ) : (
-                      <button
-                        type="button"
-                        disabled
-                        aria-disabled="true"
-                        className="flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-slate-100 text-slate-700 border border-slate-200 font-bold text-xs opacity-50 cursor-not-allowed"
-                      >
-                        <Download className="w-3.5 h-3.5" />
-                        <span>تنزيل الملف</span>
-                      </button>
-                    )
-                  ) : (
-                    isSafeExternalUrl(item.url) ? (
-                      <a
-                        href={item.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-200 font-bold text-xs transition-all"
-                      >
-                        <Link2 className="w-3.5 h-3.5" />
-                        <span>فتح الرابط</span>
-                      </a>
-                    ) : (
-                      <button
-                        type="button"
-                        disabled
-                        aria-disabled="true"
-                        className="flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-200 font-bold text-xs opacity-50 cursor-not-allowed"
-                      >
-                        <Link2 className="w-3.5 h-3.5" />
-                        <span>فتح الرابط</span>
-                      </button>
-                    )
-                  )}
-                </div>
+                  )
+                )}
               </div>
-            ))}
-          </div>
-
-          {/* 2. Desktop Google Drive Style Table (>= md) */}
-          <div className="hidden md:block bg-white rounded-2xl border border-slate-200/90 shadow-xs overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="w-full text-right border-collapse">
-                <thead>
-                  <tr className="bg-slate-50/90 border-b border-slate-200 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
-                    <th scope="col" className="py-3.5 px-4 sm:px-6">اسم العنصر والمحتوى</th>
-                    <th scope="col" className="py-3.5 px-4">النوع</th>
-                    <th scope="col" className="py-3.5 px-4">الحجم / المدة</th>
-                    <th scope="col" className="py-3.5 px-4">تاريخ الرفع</th>
-                    <th scope="col" className="py-3.5 px-4 text-center">الإجراءات</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100 text-sm">
-                  {filteredItems.map((item) => (
-                    <tr 
-                      key={item.id}
-                      className="hover:bg-blue-50/40 transition-colors group"
-                    >
-                      {/* Item Title & Icon */}
-                      <td className="py-3.5 px-4 sm:px-6">
-                        <div className="flex items-start gap-3">
-                          {getItemIcon(item.type)}
-                          <div className="min-w-0">
-                            <p className="font-bold text-slate-900 group-hover:text-blue-600 transition-colors line-clamp-1">
-                              {item.title}
-                            </p>
-                            {item.description && (
-                              <p className="text-xs text-slate-500 line-clamp-1 mt-0.5">
-                                {item.description}
-                              </p>
-                            )}
-                          </div>
-                        </div>
-                      </td>
-
-                      {/* Format Badge */}
-                      <td className="py-3.5 px-4">
-                        {getFormatBadge(item.type, item.format)}
-                      </td>
-
-                      {/* Size or Duration */}
-                      <td className="py-3.5 px-4 text-xs text-slate-600 font-medium">
-                        {item.duration ? (
-                          <span className="flex items-center gap-1 text-indigo-700">
-                            <Clock className="w-3.5 h-3.5" />
-                            {item.duration}
-                          </span>
-                        ) : (
-                          <span>{item.size || '—'}</span>
-                        )}
-                      </td>
-
-                      {/* Upload Date */}
-                      <td className="py-3.5 px-4 text-xs text-slate-500">
-                        {item.uploadedAt}
-                      </td>
-
-                      {/* Actions: View in New Tab & Download */}
-                      <td className="py-3.5 px-4 text-center">
-                        <div className="flex items-center justify-center gap-1.5">
-                          {/* View in New Tab Button */}
-                          {isSafeExternalUrl(item.url) ? (
-                            <a
-                              href={item.url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-50 hover:bg-blue-600 text-blue-700 hover:text-white border border-blue-200/80 hover:border-blue-600 text-xs font-semibold transition-all shadow-2xs"
-                              title="عرض في علامة تبويب جديدة"
-                            >
-                              <ExternalLink className="w-3.5 h-3.5" />
-                              <span>عرض</span>
-                            </a>
-                          ) : (
-                            <button
-                              type="button"
-                              disabled
-                              aria-disabled="true"
-                              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-50 text-blue-700 border border-blue-200/80 text-xs font-semibold shadow-2xs opacity-50 cursor-not-allowed"
-                              title="الرابط غير متاح"
-                            >
-                              <ExternalLink className="w-3.5 h-3.5" />
-                              <span>عرض</span>
-                            </button>
-                          )}
-
-                          {/* Download Button (for files, videos, images) */}
-                          {item.type !== 'link' && (
-                            isSafeExternalUrl(item.downloadUrl || item.url) ? (
-                              <a
-                                href={item.downloadUrl || item.url}
-                                download
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-800 text-slate-700 hover:text-white border border-slate-200 hover:border-slate-800 text-xs font-semibold transition-all shadow-2xs"
-                                title="تنزيل الملف مباشرة"
-                              >
-                                <Download className="w-3.5 h-3.5" />
-                                <span>تنزيل</span>
-                              </a>
-                            ) : (
-                              <button
-                                type="button"
-                                disabled
-                                aria-disabled="true"
-                                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-100 text-slate-700 border border-slate-200 text-xs font-semibold shadow-2xs opacity-50 cursor-not-allowed"
-                                title="رابط التنزيل غير متاح"
-                              >
-                                <Download className="w-3.5 h-3.5" />
-                                <span>تنزيل</span>
-                              </button>
-                            )
-                          )}
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
             </div>
+          ))}
 
-            {/* Table Footer Summary */}
-            <div className="bg-slate-50 px-6 py-3 border-t border-slate-200 text-xs text-slate-500 flex items-center justify-between">
-              <span>إجمالي المعروض: {filteredItems.length} عنصر</span>
-              <span className="text-[11px] text-slate-400">الملفات مخزنة وموثقة سحابياً بواسطة كلية الذكاء الاصطناعي</span>
-            </div>
+          {/* Footer Card Summary */}
+          <div className="bg-slate-50/80 rounded-2xl px-5 py-3 border border-slate-200 text-xs text-slate-500 flex flex-col sm:flex-row items-center justify-between gap-2 shadow-2xs">
+            <span className="font-semibold text-slate-700">إجمالي المعروض: {filteredItems.length} عنصر</span>
+            <span className="text-[11px] text-slate-400">الملفات مخزنة وموثقة سحابياً بواسطة كلية الذكاء الاصطناعي</span>
           </div>
         </div>
       ) : (

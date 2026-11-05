@@ -139,11 +139,11 @@ export function LoginForm() {
 
       {/* 4. Ambient Institutional Watermark Logo in Background */}
       <div 
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[520px] h-[520px] sm:w-[680px] sm:h-[680px] pointer-events-none select-none opacity-[0.14] z-0 flex items-center justify-center animate-pulse"
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[520px] h-[520px] sm:w-[680px] sm:h-[680px] pointer-events-none select-none opacity-[0.16] z-0 flex items-center justify-center animate-pulse"
         style={{ animationDuration: '8s' }}
         aria-hidden="true"
       >
-        <div className="relative w-full h-full filter drop-shadow-[0_0_80px_rgba(59,130,246,0.4)]">
+        <div className="relative w-full h-full filter drop-shadow-[0_0_90px_rgba(59,130,246,0.55)] brightness-125 contrast-110">
           <Image
             src="/logo.png"
             alt="شعار الكلية بالخلفية"
@@ -155,24 +155,24 @@ export function LoginForm() {
         </div>
       </div>
 
-      {/* 5. Top Floating Institutional Brand Badge in Background */}
-      <div className="absolute top-3 sm:top-5 right-4 sm:right-8 z-10 flex items-center gap-2.5 sm:gap-3 select-none pointer-events-none">
-        <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 p-1.5 sm:p-2 flex items-center justify-center shadow-xl shadow-blue-950/40">
+      {/* 5. Top Floating Institutional Brand Capsule in Background */}
+      <div className="absolute top-3 sm:top-5 right-4 sm:right-8 z-20 flex items-center gap-2.5 sm:gap-3 p-1.5 pe-4 rounded-2xl bg-slate-900/75 backdrop-blur-md border border-white/15 shadow-2xl shadow-blue-950/50 select-none">
+        <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-white shadow-md p-1.5 flex items-center justify-center shrink-0 border border-white/90">
           <Image
             src="/logo.png"
             alt="شعار كلية الذكاء الاصطناعي"
-            width={32}
-            height={32}
-            className="w-full h-full object-contain"
+            width={36}
+            height={36}
+            className="w-full h-full object-contain select-none"
             priority
             unoptimized
           />
         </div>
         <div className="flex flex-col text-right">
-          <span className="text-xs sm:text-sm font-extrabold text-white tracking-wide drop-shadow-sm">
+          <span className="text-xs sm:text-sm font-black text-white tracking-tight drop-shadow-xs">
             كلية الذكاء الاصطناعي
           </span>
-          <span className="text-[10px] text-blue-300 font-medium drop-shadow-sm">
+          <span className="text-[10px] sm:text-[11px] font-bold text-blue-400 drop-shadow-xs">
             جامعة المستقبل • البوابة الأكاديمية
           </span>
         </div>

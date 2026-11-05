@@ -3,7 +3,7 @@ import Image from 'next/image';
 import { GraduationCap, User, Sparkles } from 'lucide-react';
 import { CURRENT_STUDENT } from '@/data/student';
 import { NotificationBell } from '@/components/notifications/NotificationBell';
-import { SettingsMenu } from '@/components/settings/SettingsMenu';
+import { SettingsButton } from '@/components/layout/SettingsButton';
 
 export function Header() {
   return (
@@ -50,8 +50,8 @@ export function Header() {
 
         {/* Left side: Settings + Notifications Bell + Student Profile */}
         <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-          {/* Settings Menu (Password & Support) */}
-          <SettingsMenu />
+          {/* Settings Page Button (with hover spin) */}
+          <SettingsButton />
 
           {/* Academic Notifications Bell */}
           <NotificationBell />

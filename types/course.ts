@@ -22,6 +22,9 @@ export interface CourseContentItem {
   url: string;
   downloadUrl?: string;
   duration?: string; // for videos (e.g., '45:20')
+  chapter?: string;  // e.g., 'الفصل 1', 'محتوى عام'
+  requiresCode?: boolean; // whether this item requires an access code (يتطلب كود)
+  categoryLabel?: string; // e.g., 'ملف/محاضرة', 'رابط خارجي', 'كتاب إلكتروني'
 }
 
 export interface Course {

@@ -3,16 +3,11 @@
 import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import { 
-  Sparkles, 
   KeyRound, 
   CheckCircle2, 
   BookOpen, 
   ChevronRight, 
   ChevronLeft, 
-  Play, 
-  Pause,
-  ArrowRight,
-  ShieldCheck,
   GraduationCap,
   FileText
 } from 'lucide-react';
@@ -226,60 +221,11 @@ export function AuthCinematicShowcase() {
       </div>
 
       {/* ============================================================== */}
-      {/* 1. TOP HEADER: University Emblem & Live Slide Progress Bar     */}
-      {/* ============================================================== */}
-      <div className="relative z-10 flex items-center justify-between pb-3 border-b border-white/10">
-        <div className="flex items-center gap-2.5">
-          <div className="w-10 h-10 rounded-xl bg-white border border-white shadow-md shadow-blue-950/50 flex items-center justify-center p-1 shrink-0">
-            <Image
-              src="/logo.png"
-              alt="شعار كلية الذكاء الاصطناعي"
-              width={32}
-              height={32}
-              className="w-full h-full object-contain select-none"
-              priority
-              unoptimized
-            />
-          </div>
-          <div>
-            <h3 className="text-xs sm:text-sm font-extrabold text-white leading-tight">
-              كلية الذكاء الاصطناعي
-            </h3>
-            <p className="text-[10px] text-blue-200/90 font-medium">جامعة المستقبل • دليل الاستخدام</p>
-          </div>
-        </div>
-
-        {/* Slide Counter & Pause/Play Indicator */}
-        <div className="flex items-center gap-2">
-          <span className="text-[11px] font-bold font-mono text-blue-200/80 bg-white/10 px-2 py-0.5 rounded-md backdrop-blur-xs">
-            {currentSlideIndex + 1} / {SLIDES.length}
-          </span>
-          <button
-            type="button"
-            onClick={() => setIsPaused(!isPaused)}
-            className="w-7 h-7 rounded-lg bg-white/10 hover:bg-white/20 text-white/90 flex items-center justify-center transition-colors cursor-pointer"
-            title={isPaused ? 'تشغيل العرض التلقائي' : 'إيقاف مؤقت'}
-            aria-label={isPaused ? 'تشغيل' : 'إيقاف مؤقت'}
-          >
-            {isPaused ? <Play className="w-3 h-3 fill-current" /> : <Pause className="w-3 h-3 fill-current" />}
-          </button>
-        </div>
-      </div>
-
-      {/* Thin Synchronized Cinematic Progress Bar */}
-      <div className="relative z-10 w-full h-1 bg-white/10 rounded-full overflow-hidden my-3">
-        <div 
-          className="h-full bg-gradient-to-r from-amber-400 to-blue-400 transition-all duration-75 ease-linear rounded-full"
-          style={{ width: `${progress}%` }}
-        />
-      </div>
-
-      {/* ============================================================== */}
-      {/* 2. CENTER CONTENT: Dynamic Slide with Animated Reveal          */}
+      {/* CENTER CONTENT: Dynamic Slide with Animated Reveal             */}
       {/* ============================================================== */}
       <div 
         key={currentSlide.id} 
-        className="relative z-10 my-auto py-2 space-y-3 animate-fadeIn"
+        className="relative z-10 my-auto py-3 space-y-3 animate-fadeIn"
       >
         {/* Step Badge Pill */}
         <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-white/10 text-blue-200 text-[10px] font-extrabold border border-white/15 backdrop-blur-md">

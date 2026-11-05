@@ -22,6 +22,7 @@ import {
 } from 'lucide-react';
 import { useNotifications } from '@/context/NotificationContext';
 import { CURRENT_STUDENT } from '@/data/student';
+import { AuthCinematicShowcase } from '@/components/auth/AuthCinematicShowcase';
 
 export function LoginForm() {
   const router = useRouter();
@@ -260,79 +261,9 @@ export function LoginForm() {
         </div>
 
         {/* ========================================================= */}
-        {/* LEFT COLUMN: Academic Showcase (Balanced 6 cols & Compact)*/}
+        {/* LEFT COLUMN: Cinematic Interactive Onboarding Carousel    */}
         {/* ========================================================= */}
-        <div className="hidden lg:flex lg:col-span-6 bg-gradient-to-br from-slate-900 via-[#172554] to-blue-950 p-5 sm:p-6 text-white flex-col justify-between relative overflow-hidden">
-          {/* Ambient Lighting */}
-          <div className="absolute -top-16 -right-16 w-56 h-56 bg-blue-500/20 rounded-full blur-3xl pointer-events-none" />
-          <div className="absolute -bottom-16 -left-16 w-56 h-56 bg-indigo-500/20 rounded-full blur-3xl pointer-events-none" />
-
-          {/* Top: University Crest */}
-          <div className="relative z-10">
-            <div className="w-10 h-10 rounded-xl bg-white border border-white shadow-md shadow-blue-950/50 flex items-center justify-center p-1 mb-2">
-              <Image
-                src="/logo.png"
-                alt="شعار كلية الذكاء الاصطناعي"
-                width={32}
-                height={32}
-                className="w-full h-full object-contain select-none"
-                priority
-                unoptimized
-              />
-            </div>
-
-            <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-200 text-[10px] font-bold mb-1.5 border border-blue-400/30">
-              <Sparkles className="w-2.5 h-2.5 text-amber-300" />
-              <span>جامعة المستقبل للذكاء الاصطناعي</span>
-            </div>
-
-            <h3 className="text-base xl:text-lg font-extrabold tracking-tight text-white mb-1 leading-tight">
-              بوابة كلية الذكاء الاصطناعي الأكاديمية
-            </h3>
-            <p className="text-xs text-blue-100/90 leading-relaxed max-w-sm">
-              منظومة التعليم الرقمي المتكاملة لتصفح المقررات، حضور المحاضرات، إدارة أكواد الوصول، ومتابعة الدرجات والتقييمات.
-            </p>
-          </div>
-
-          {/* Middle: Feature Highlights (Sleek Compact Cards) */}
-          <div className="my-2.5 space-y-1.5 relative z-10">
-            <div className="p-2 px-2.5 rounded-xl bg-white/5 border border-white/10 backdrop-blur-xs flex items-center gap-2.5 hover:bg-white/10 transition-colors">
-              <div className="w-7 h-7 rounded-lg bg-blue-500/20 text-blue-300 flex items-center justify-center shrink-0 border border-blue-400/30">
-                <BookOpen className="w-3.5 h-3.5" />
-              </div>
-              <div className="min-w-0">
-                <h4 className="text-xs font-bold text-white leading-tight">مكتبة المقررات المعتمدة</h4>
-                <p className="text-[10px] text-blue-200/80 truncate mt-0.5">سلايدات وملفات الشرح لجميع المستويات الأكاديمية</p>
-              </div>
-            </div>
-
-            <div className="p-2 px-2.5 rounded-xl bg-white/5 border border-white/10 backdrop-blur-xs flex items-center gap-2.5 hover:bg-white/10 transition-colors">
-              <div className="w-7 h-7 rounded-lg bg-amber-500/20 text-amber-300 flex items-center justify-center shrink-0 border border-amber-400/30">
-                <CheckCircle2 className="w-3.5 h-3.5" />
-              </div>
-              <div className="min-w-0">
-                <h4 className="text-xs font-bold text-white leading-tight">نتائج واختبارات دورية فورية</h4>
-                <p className="text-[10px] text-blue-200/80 truncate mt-0.5">تقييم مستمر ومتابعة دقيقة للأداء والتحصيل</p>
-              </div>
-            </div>
-
-            <div className="p-2 px-2.5 rounded-xl bg-white/5 border border-white/10 backdrop-blur-xs flex items-center gap-2.5 hover:bg-white/10 transition-colors">
-              <div className="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-300 flex items-center justify-center shrink-0 border border-emerald-400/30">
-                <ShieldCheck className="w-3.5 h-3.5" />
-              </div>
-              <div className="min-w-0">
-                <h4 className="text-xs font-bold text-white leading-tight">حسابات مشفرة ومؤمنة</h4>
-                <p className="text-[10px] text-blue-200/80 truncate mt-0.5">حماية كاملة للبيانات الأكاديمية وسجلات الطلاب</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Bottom Copyright */}
-          <div className="pt-2 border-t border-white/10 text-[10px] text-blue-300/80 flex items-center justify-between relative z-10">
-            <span>جميع الحقوق محفوظة © 2026</span>
-            <span>كلية الذكاء الاصطناعي</span>
-          </div>
-        </div>
+        <AuthCinematicShowcase />
       </div>
 
       {/* ========================================================= */}

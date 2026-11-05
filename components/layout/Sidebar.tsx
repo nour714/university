@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { 
   BookOpen, 
   LogOut, 
@@ -14,9 +14,12 @@ import {
   KeyRound, 
   Home 
 } from 'lucide-react';
+import { useNotifications } from '@/context/NotificationContext';
 
 export function Sidebar({ currentPath }: { currentPath?: string }) {
   const [isExpanded, setIsExpanded] = useState(false);
+  const router = useRouter();
+  const { addNotification } = useNotifications();
   const pathname = usePathname() || currentPath || '/';
   const isHomeActive = pathname === '/';
   const isCoursesActive = pathname.startsWith('/courses');
@@ -243,6 +246,14 @@ export function Sidebar({ currentPath }: { currentPath?: string }) {
           {/* Logout button (smooth width between 40px when expanded and full 48px when collapsed) */}
           <button
             type="button"
+            onClick={() => {
+              addNotification({
+                title: 'تم تسجيل الخروج بنجاح',
+                message: 'تم إنهاء الجلسة الأكاديمية بنجاح.',
+                type: 'announcement',
+              });
+              router.push('/login');
+            }}
             className={`h-11 rounded-xl flex items-center justify-center text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 transition-all cursor-pointer shrink-0 ${
               isExpanded ? 'w-10' : 'w-full'
             }`}

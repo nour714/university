@@ -3,6 +3,7 @@
 import { useState, useEffect, useSyncExternalStore } from 'react';
 import { createPortal } from 'react-dom';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { 
   LogOut, 
   X, 
@@ -23,6 +24,7 @@ const emptySubscribe = () => () => {};
 
 export function MoreMenuSheet({ isOpen, onClose }: MoreMenuSheetProps) {
   const mounted = useSyncExternalStore(emptySubscribe, () => true, () => false);
+  const router = useRouter();
   const [logoutLoading, setLogoutLoading] = useState(false);
 
   const { addNotification } = useNotifications();
@@ -60,6 +62,7 @@ export function MoreMenuSheet({ isOpen, onClose }: MoreMenuSheetProps) {
         type: 'announcement',
       });
       onClose();
+      router.push('/login');
     }, 500);
   };
 

@@ -137,6 +137,47 @@ export function LoginForm() {
         <div className="absolute top-[68%] left-[10%] w-1.5 h-1.5 rounded-full bg-amber-400/80 shadow-[0_0_8px_#fbbf24] animate-twinkle" style={{ animationDelay: '2s' }} />
       </div>
 
+      {/* 4. Ambient Institutional Watermark Logo in Background */}
+      <div 
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[520px] h-[520px] sm:w-[680px] sm:h-[680px] pointer-events-none select-none opacity-[0.14] z-0 flex items-center justify-center animate-pulse"
+        style={{ animationDuration: '8s' }}
+        aria-hidden="true"
+      >
+        <div className="relative w-full h-full filter drop-shadow-[0_0_80px_rgba(59,130,246,0.4)]">
+          <Image
+            src="/logo.png"
+            alt="شعار الكلية بالخلفية"
+            fill
+            className="object-contain"
+            priority
+            unoptimized
+          />
+        </div>
+      </div>
+
+      {/* 5. Top Floating Institutional Brand Badge in Background */}
+      <div className="absolute top-3 sm:top-5 right-4 sm:right-8 z-10 flex items-center gap-2.5 sm:gap-3 select-none pointer-events-none">
+        <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 p-1.5 sm:p-2 flex items-center justify-center shadow-xl shadow-blue-950/40">
+          <Image
+            src="/logo.png"
+            alt="شعار كلية الذكاء الاصطناعي"
+            width={32}
+            height={32}
+            className="w-full h-full object-contain"
+            priority
+            unoptimized
+          />
+        </div>
+        <div className="flex flex-col text-right">
+          <span className="text-xs sm:text-sm font-extrabold text-white tracking-wide drop-shadow-sm">
+            كلية الذكاء الاصطناعي
+          </span>
+          <span className="text-[10px] text-blue-300 font-medium drop-shadow-sm">
+            جامعة المستقبل • البوابة الأكاديمية
+          </span>
+        </div>
+      </div>
+
       {/* Main Container Card (Compact Form 46% & Expanded Showcase 54% with Timeline Divider) */}
       <div className="w-full max-w-4xl bg-white rounded-2xl sm:rounded-3xl shadow-2xl border border-slate-200/90 overflow-hidden flex flex-col lg:flex-row relative z-10">
         

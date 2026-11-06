@@ -11,6 +11,9 @@ interface ExamDetailPageProps {
   }>;
 }
 
+// Allow blocking route for params access in Next.js 16
+export const instant = false;
+
 export function generateStaticParams() {
   return RAW_EXAMS_DATA.map((exam) => ({
     id: exam.id,

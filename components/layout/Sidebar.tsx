@@ -23,9 +23,16 @@ export function Sidebar({ currentPath }: { currentPath?: string }) {
   const pathname = usePathname() || currentPath || '/';
   const isHomeActive = pathname === '/';
   const isCoursesActive = pathname.startsWith('/courses');
+  const isExamsActive = pathname.startsWith('/exams');
   const isCodesActive = pathname.startsWith('/codes');
 
-  const navItems = [
+  const navItems: {
+    title: string;
+    href: string;
+    icon: typeof Home;
+    isActive: boolean;
+    isButton?: boolean;
+  }[] = [
     {
       title: 'الرئيسية',
       href: '/',
@@ -40,10 +47,9 @@ export function Sidebar({ currentPath }: { currentPath?: string }) {
     },
     {
       title: 'الاختبارات',
-      href: '#',
+      href: '/exams',
       icon: ClipboardCheck,
-      isActive: false,
-      isButton: true,
+      isActive: isExamsActive,
     },
     {
       title: 'أكوادي',

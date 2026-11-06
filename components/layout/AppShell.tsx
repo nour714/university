@@ -9,13 +9,14 @@ import { NotificationToast } from '@/components/notifications/NotificationToast'
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const isAuthPage = pathname === '/login';
+  const isExamSession = pathname?.startsWith('/exams/') && pathname !== '/exams';
 
-  // Standalone Full-Screen Auth Pages (no sidebar, no header, no bottom nav)
-  if (isAuthPage) {
+  // Standalone Full-Screen Pages (Auth & Distraction-Free Exam Hall)
+  if (isAuthPage || isExamSession) {
     return (
-      <div className="min-h-[100dvh] w-full flex flex-col bg-slate-900 text-slate-100">
+      <div className={`min-h-[100dvh] w-full flex flex-col ${isAuthPage ? 'bg-slate-900 text-slate-100 justify-center' : 'bg-slate-900 text-slate-100'}`}>
         <NotificationToast />
-        <main className="flex-1 w-full flex flex-col justify-center">
+        <main className="flex-1 w-full flex flex-col">
           {children}
         </main>
       </div>

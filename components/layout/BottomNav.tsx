@@ -45,15 +45,18 @@ export function BottomNav() {
 
         {/* 2. Exams / Tests Icon (الاختبارات) */}
         <div className="flex items-center justify-center">
-          <button
-            type="button"
-            onClick={(e) => e.preventDefault()}
-            className="w-12 h-12 rounded-full flex flex-col items-center justify-center text-slate-400 hover:text-white transition-colors cursor-pointer group shrink-0 active:scale-95"
-            title="الاختبارات (قريباً)"
+          <Link
+            href="/exams"
+            className={`w-12 h-12 rounded-full flex flex-col items-center justify-center transition-colors group shrink-0 active:scale-95 ${
+              pathname.startsWith('/exams')
+                ? 'text-white'
+                : 'text-slate-400 hover:text-white'
+            }`}
+            title="الاختبارات"
           >
-            <ClipboardCheck className="w-4.5 h-4.5 group-hover:scale-105 transition-transform" />
-            <span className="text-[9px] font-medium mt-0.5 leading-none text-slate-300">الاختبارات</span>
-          </button>
+            <ClipboardCheck className={`w-4.5 h-4.5 group-hover:scale-105 transition-transform ${pathname.startsWith('/exams') ? 'text-blue-400 stroke-[2.5]' : ''}`} />
+            <span className={`text-[9px] font-bold mt-0.5 leading-none ${pathname.startsWith('/exams') ? 'text-blue-300' : 'text-slate-300'}`}>الاختبارات</span>
+          </Link>
         </div>
 
         {/* 3. Center Navigation Button - Home (الرئيسية) Dead Center */}

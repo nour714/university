@@ -60,15 +60,23 @@ export function ExamResultView({
           {/* Subtle Ambient Glow */}
           <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/10 rounded-full blur-2xl pointer-events-none" />
 
-          {/* Right Side in RTL: Exam Title */}
-          <div className="flex items-center gap-2.5 min-w-0 relative z-10">
-            <span className="w-2.5 h-2.5 rounded-full bg-blue-400 shrink-0 shadow-xs" />
+          {/* Right Side in RTL: White Back Button + Exam Title */}
+          <div className="flex items-center gap-3 min-w-0 relative z-10 flex-wrap sm:flex-nowrap">
+            {/* White Back Button on the Right */}
+            <Link
+              href="/exams"
+              className="h-9 px-3.5 inline-flex items-center justify-center gap-1.5 rounded-xl bg-white hover:bg-slate-100 text-slate-800 text-xs font-bold transition-all shadow-sm active:scale-95 cursor-pointer shrink-0 border border-slate-200/60"
+            >
+              <span>رجوع</span>
+              <ArrowLeft className="w-3.5 h-3.5 rotate-180 text-slate-700" />
+            </Link>
+
             <h1 className="text-base sm:text-lg lg:text-xl font-bold text-white tracking-tight leading-snug">
               {exam.title}
             </h1>
           </div>
 
-          {/* Left Side in RTL: Organized Action Pills */}
+          {/* Left Side in RTL: Course Title & Model Pills */}
           <div className="flex items-center gap-2 sm:gap-2.5 shrink-0 flex-wrap relative z-10">
             {/* Course Title Pill */}
             <span className="h-9 px-3.5 inline-flex items-center justify-center rounded-xl text-xs font-bold bg-white/15 text-white border border-white/20 shadow-xs backdrop-blur-xs">
@@ -79,15 +87,6 @@ export function ExamResultView({
             <span className="h-9 px-3 inline-flex items-center justify-center rounded-xl text-xs font-bold bg-white/10 text-blue-100 border border-white/15">
               نموذج 1
             </span>
-
-            {/* Back Button */}
-            <Link
-              href="/exams"
-              className="h-9 px-3.5 inline-flex items-center justify-center gap-1.5 rounded-xl border border-white/25 hover:border-white/50 bg-white/15 hover:bg-white/25 text-white text-xs font-bold transition-all shadow-xs active:scale-95 cursor-pointer backdrop-blur-xs"
-            >
-              <span>رجوع</span>
-              <ArrowLeft className="w-3.5 h-3.5 rotate-180" />
-            </Link>
           </div>
         </div>
 

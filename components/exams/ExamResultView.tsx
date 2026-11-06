@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { Exam } from '@/types/exam';
-import { ArrowRight, EyeOff, RotateCcw } from 'lucide-react';
+import { ArrowRight, EyeOff } from 'lucide-react';
 
 interface ExamResultViewProps {
   exam: Exam;
@@ -160,20 +160,6 @@ export function ExamResultView({
         </div>
 
       </div>
-
-      {/* Subtle bottom retake option */}
-      {onRetake && (
-        <div className="flex justify-center mt-5">
-          <button
-            type="button"
-            onClick={onRetake}
-            className="text-xs font-bold text-slate-400 hover:text-blue-600 flex items-center gap-1.5 transition-colors cursor-pointer py-1.5 px-3 rounded-lg hover:bg-white/80"
-          >
-            <RotateCcw className="w-3.5 h-3.5" />
-            <span>إعادة خوض الامتحان للتجربة الذاتية</span>
-          </button>
-        </div>
-      )}
     </div>
   );
 }

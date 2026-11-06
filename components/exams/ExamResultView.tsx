@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { Exam } from '@/types/exam';
-import { ArrowLeft, EyeOff, RotateCcw } from 'lucide-react';
+import { ArrowRight, EyeOff, RotateCcw } from 'lucide-react';
 
 interface ExamResultViewProps {
   exam: Exam;
@@ -60,15 +60,21 @@ export function ExamResultView({
           {/* Subtle Ambient Glow */}
           <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/10 rounded-full blur-2xl pointer-events-none" />
 
-          {/* Right Side in RTL: White Back Button + Exam Title */}
+          {/* Right Side in RTL: White Animated Back Button + Exam Title */}
           <div className="flex items-center gap-3 min-w-0 relative z-10 flex-wrap sm:flex-nowrap">
-            {/* White Back Button on the Right */}
+            {/* White Animated Back Button on the Right */}
             <Link
               href="/exams"
-              className="h-9 px-3.5 inline-flex items-center justify-center gap-1.5 rounded-xl bg-white hover:bg-slate-100 text-slate-800 text-xs font-bold transition-all shadow-sm active:scale-95 cursor-pointer shrink-0 border border-slate-200/60"
+              className="group relative h-9 px-4 inline-flex items-center justify-center gap-2 rounded-xl bg-white hover:bg-slate-50 text-slate-800 hover:text-blue-700 text-xs font-extrabold transition-all duration-300 ease-out shadow-sm hover:shadow-md hover:scale-[1.04] active:scale-95 cursor-pointer shrink-0 border border-slate-200/80 overflow-hidden"
+              title="العودة إلى لوحة الاختبارات"
             >
+              {/* Subtle hover light sweep effect */}
+              <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-blue-500/10 to-transparent pointer-events-none" />
+
+              {/* Arrow on the Right with hover nudge animation */}
+              <ArrowRight className="w-3.5 h-3.5 text-slate-600 group-hover:text-blue-600 transition-transform duration-200 ease-out group-hover:translate-x-0.5" />
+              
               <span>رجوع</span>
-              <ArrowLeft className="w-3.5 h-3.5 rotate-180 text-slate-700" />
             </Link>
 
             <h1 className="text-base sm:text-lg lg:text-xl font-bold text-white tracking-tight leading-snug">

@@ -176,163 +176,16 @@ export function ExamSession({
         </div>
       </header>
 
-      {/* 2. Main Workspace Layout */}
+      {/* 2. Main Workspace Layout: Navigator on the Right, English Questions on the Left */}
       <div className="flex-1 max-w-7xl w-full mx-auto p-3 sm:p-6 lg:p-8 grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         
-        {/* Left/Main Column: Active Question Workspace (8 cols) */}
-        <main className="lg:col-span-8 flex flex-col gap-4">
-          
-          {/* Question Card */}
-          <div className="bg-slate-950/70 border border-slate-800/80 rounded-3xl p-5 sm:p-7 shadow-2xl relative overflow-hidden">
-            {/* Subtle Top Glow */}
-            <div className="absolute top-0 right-0 w-64 h-64 bg-blue-600/10 rounded-full blur-3xl pointer-events-none" />
-
-            {/* Question Header & Controls */}
-            <div className="flex items-center justify-between gap-3 pb-4 mb-5 border-b border-slate-800/70">
-              <div className="flex items-center gap-2.5">
-                <span className="w-8 h-8 rounded-xl bg-blue-600 text-white font-extrabold text-sm flex items-center justify-center">
-                  {currentQuestion.number}
-                </span>
-                <span className="text-xs text-slate-400 font-semibold">
-                  السؤال {currentIndex + 1} من {exam.questions.length}
-                </span>
-                <span className="text-xs font-bold px-2 py-0.5 rounded-md bg-slate-800 text-blue-300 border border-slate-700">
-                  {currentQuestion.points} درجات
-                </span>
-              </div>
-
-              {/* Mark for review / Flag Button */}
-              <button
-                type="button"
-                onClick={() => toggleFlag(currentQuestion.id)}
-                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all border ${
-                  flagged.has(currentQuestion.id)
-                    ? 'bg-amber-950/80 text-amber-300 border-amber-600'
-                    : 'bg-slate-800/60 text-slate-400 border-slate-700 hover:text-slate-200'
-                }`}
-              >
-                <Flag className={`w-3.5 h-3.5 ${flagged.has(currentQuestion.id) ? 'fill-amber-400 text-amber-400' : ''}`} />
-                <span>{flagged.has(currentQuestion.id) ? 'معلم للمراجعة' : 'تعليم للمراجعة'}</span>
-              </button>
-            </div>
-
-            {/* Question Statement */}
-            <h2 className="text-base sm:text-lg lg:text-xl font-bold text-white leading-relaxed mb-6">
-              {currentQuestion.questionText}
-            </h2>
-
-            {/* Optional Code Snippet */}
-            {currentQuestion.codeSnippet && (
-              <div className="bg-slate-900 border border-slate-800 p-4 rounded-2xl text-xs sm:text-sm font-mono dir-ltr text-left overflow-x-auto mb-6 text-emerald-400">
-                <pre><code>{currentQuestion.codeSnippet}</code></pre>
-              </div>
-            )}
-
-            {/* Options List */}
-            <div className="space-y-3">
-              {currentQuestion.options.map((option, optIdx) => {
-                const isSelected = answers[currentQuestion.id] === option.id;
-                const letter = ['أ', 'ب', 'ج', 'د', 'هـ'][optIdx] || (optIdx + 1);
-
-                return (
-                  <button
-                    key={option.id}
-                    type="button"
-                    onClick={() => handleSelectOption(option.id)}
-                    className={`w-full text-right p-4 rounded-2xl border transition-all flex items-center justify-between gap-4 group ${
-                      isSelected
-                        ? 'bg-blue-900/30 border-blue-500 text-white shadow-lg shadow-blue-950/50 ring-1 ring-blue-500'
-                        : 'bg-slate-900/60 border-slate-800/80 text-slate-300 hover:bg-slate-800/70 hover:border-slate-700'
-                    }`}
-                  >
-                    <div className="flex items-center gap-3.5">
-                      <span className={`w-7 h-7 rounded-xl text-xs font-bold flex items-center justify-center shrink-0 transition-colors ${
-                        isSelected
-                          ? 'bg-blue-600 text-white'
-                          : 'bg-slate-800 text-slate-400 group-hover:bg-slate-700 group-hover:text-slate-200'
-                      }`}>
-                        {letter}
-                      </span>
-                      <span className="text-sm sm:text-base font-medium leading-relaxed">
-                        {option.text}
-                      </span>
-                    </div>
-
-                    <div className="shrink-0">
-                      <div className={`w-5 h-5 rounded-full border flex items-center justify-center transition-colors ${
-                        isSelected
-                          ? 'border-blue-400 bg-blue-500 text-white'
-                          : 'border-slate-700 bg-slate-800'
-                      }`}>
-                        {isSelected && <div className="w-2 h-2 rounded-full bg-white" />}
-                      </div>
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
-
-            {/* Auto-save & Status indicator */}
-            <div className="mt-6 pt-4 border-t border-slate-800/60 flex items-center justify-between text-xs text-slate-400">
-              <div className="flex items-center gap-1.5">
-                <ShieldCheck className="w-4 h-4 text-emerald-400" />
-                <span>
-                  {answers[currentQuestion.id]
-                    ? 'تم حفظ الإجابة تلقائياً على خوادم الكلية'
-                    : 'بانتظار تحديد إجابتك...'}
-                </span>
-              </div>
-              <span className="text-slate-500">
-                متبقي {unansweredCount} أسئلة دون إجابة
-              </span>
-            </div>
-          </div>
-
-          {/* Navigation Controls (Prev / Next) */}
-          <div className="flex items-center justify-between gap-3">
-            <button
-              type="button"
-              onClick={() => setCurrentIndex((prev) => Math.max(0, prev - 1))}
-              disabled={currentIndex === 0}
-              className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all ${
-                currentIndex === 0
-                  ? 'opacity-40 cursor-not-allowed bg-slate-900 text-slate-500 border border-slate-800'
-                  : 'bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 active:scale-95'
-              }`}
-            >
-              <ChevronRight className="w-4 h-4" />
-              <span>السؤال السابق</span>
-            </button>
-
-            {currentIndex === exam.questions.length - 1 ? (
-              <button
-                type="button"
-                onClick={() => setShowSubmitModal(true)}
-                className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-emerald-600 hover:bg-emerald-500 text-white transition-all shadow-md active:scale-95"
-              >
-                <span>مراجعة وتسليم الاختبار</span>
-                <Send className="w-4 h-4" />
-              </button>
-            ) : (
-              <button
-                type="button"
-                onClick={() => setCurrentIndex((prev) => Math.min(exam.questions.length - 1, prev + 1))}
-                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-blue-600 hover:bg-blue-500 text-white transition-all shadow-md active:scale-95"
-              >
-                <span>السؤال التالي</span>
-                <ChevronLeft className="w-4 h-4" />
-              </button>
-            )}
-          </div>
-        </main>
-
-        {/* Right Column: Question Navigator Map & Instructions (4 cols) */}
-        <aside className="lg:col-span-4 flex flex-col gap-4">
+        {/* Right Side in RTL: Question Navigator Map & Instructions (4 cols) */}
+        <aside className="order-2 lg:order-1 lg:col-span-4 flex flex-col gap-4">
           
           {/* Question Grid Map */}
           <div className="bg-slate-950/70 border border-slate-800/80 rounded-3xl p-5 shadow-xl">
             <h3 className="text-sm font-bold text-white mb-3 flex items-center justify-between">
-              <span>خريطة الأسئلة</span>
+              <span>خريطة الأسئلة (Questions Map)</span>
               <span className="text-xs text-slate-400 font-normal">
                 {answeredCount}/{exam.questions.length} مُجاب
               </span>
@@ -360,7 +213,7 @@ export function ExamSession({
                     key={q.id}
                     type="button"
                     onClick={() => setCurrentIndex(idx)}
-                    className={`h-11 rounded-xl border flex flex-col items-center justify-center text-xs relative transition-all active:scale-95 ${btnStyle}`}
+                    className={`h-11 rounded-xl border flex flex-col items-center justify-center text-xs relative transition-all active:scale-95 cursor-pointer ${btnStyle}`}
                   >
                     <span>{idx + 1}</span>
                     {isFlagged && (
@@ -399,12 +252,161 @@ export function ExamSession({
               <span>إرشادات الجلسة الامتحانية</span>
             </div>
             <ul className="space-y-1.5 list-disc list-inside leading-relaxed text-slate-400">
-              <li>لا تقم بإعادة تحميل الصفحة لتفادي فقدان توقيت الجلسة.</li>
-              <li>الأسئلة المعلمة بعلامة المراجعة لن تسقط درجاتها إذا تمت إجابتها.</li>
-              <li>عند انتهاء العداد التنازلي، سيتم اعتماد إجاباتك الحالية تلقائياً.</li>
+              <li>الأسئلة والخيارات محررة باللغة الإنجليزية.</li>
+              <li>يتم حفظ كل إجابة تختارها تلقائياً على خوادم الكلية.</li>
+              <li>عند انتهاء العداد التنازلي، يتم تسليم الامتحان آلياً.</li>
             </ul>
           </div>
         </aside>
+
+        {/* Left Side in RTL: Active English Question Workspace (8 cols) */}
+        <main className="order-1 lg:order-2 lg:col-span-8 flex flex-col gap-4">
+          
+          {/* Question Card */}
+          <div className="bg-slate-950/70 border border-slate-800/80 rounded-3xl p-5 sm:p-7 shadow-2xl relative overflow-hidden">
+            {/* Subtle Top Glow */}
+            <div className="absolute top-0 left-0 w-64 h-64 bg-blue-600/10 rounded-full blur-3xl pointer-events-none" />
+
+            {/* Question Header & Controls (English LTR layout) */}
+            <div className="flex items-center justify-between gap-3 pb-4 mb-5 border-b border-slate-800/70" dir="ltr">
+              <div className="flex items-center gap-2.5">
+                <span className="w-8 h-8 rounded-xl bg-blue-600 text-white font-extrabold text-sm flex items-center justify-center font-mono">
+                  {currentQuestion.number}
+                </span>
+                <span className="text-xs text-slate-300 font-bold font-sans">
+                  Question {currentIndex + 1} of {exam.questions.length}
+                </span>
+                <span className="text-xs font-bold px-2.5 py-0.5 rounded-md bg-slate-800 text-blue-300 border border-slate-700 font-mono">
+                  {currentQuestion.points} Points
+                </span>
+              </div>
+
+              {/* Mark for review / Flag Button */}
+              <button
+                type="button"
+                onClick={() => toggleFlag(currentQuestion.id)}
+                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all border cursor-pointer ${
+                  flagged.has(currentQuestion.id)
+                    ? 'bg-amber-950/80 text-amber-300 border-amber-600'
+                    : 'bg-slate-800/60 text-slate-400 border-slate-700 hover:text-slate-200'
+                }`}
+              >
+                <Flag className={`w-3.5 h-3.5 ${flagged.has(currentQuestion.id) ? 'fill-amber-400 text-amber-400' : ''}`} />
+                <span>{flagged.has(currentQuestion.id) ? 'Marked for Review' : 'Mark for Review'}</span>
+              </button>
+            </div>
+
+            {/* Question Statement in English (LTR) */}
+            <div dir="ltr" className="text-left mb-6">
+              <h2 className="text-base sm:text-lg lg:text-xl font-bold text-white leading-relaxed font-sans">
+                {currentQuestion.questionText}
+              </h2>
+            </div>
+
+            {/* Optional Code Snippet in English (LTR) */}
+            {currentQuestion.codeSnippet && (
+              <div className="bg-slate-900 border border-slate-800 p-4 rounded-2xl text-xs sm:text-sm font-mono dir-ltr text-left overflow-x-auto mb-6 text-emerald-400" dir="ltr">
+                <pre><code>{currentQuestion.codeSnippet}</code></pre>
+              </div>
+            )}
+
+            {/* Options List in English (A, B, C, D in LTR) */}
+            <div className="space-y-3" dir="ltr">
+              {currentQuestion.options.map((option, optIdx) => {
+                const isSelected = answers[currentQuestion.id] === option.id;
+                const letter = ['A', 'B', 'C', 'D', 'E'][optIdx] || String.fromCharCode(65 + optIdx);
+
+                return (
+                  <button
+                    key={option.id}
+                    type="button"
+                    onClick={() => handleSelectOption(option.id)}
+                    className={`w-full text-left p-4 rounded-2xl border transition-all flex items-center justify-between gap-4 group cursor-pointer ${
+                      isSelected
+                        ? 'bg-blue-900/30 border-blue-500 text-white shadow-lg shadow-blue-950/50 ring-1 ring-blue-500'
+                        : 'bg-slate-900/60 border-slate-800/80 text-slate-200 hover:bg-slate-800/70 hover:border-slate-700'
+                    }`}
+                  >
+                    <div className="flex items-center gap-3.5">
+                      <span className={`w-7 h-7 rounded-xl text-xs font-bold font-mono flex items-center justify-center shrink-0 transition-colors ${
+                        isSelected
+                          ? 'bg-blue-600 text-white'
+                          : 'bg-slate-800 text-slate-400 group-hover:bg-slate-700 group-hover:text-slate-200'
+                      }`}>
+                        {letter}
+                      </span>
+                      <span className="text-sm sm:text-base font-medium leading-relaxed font-sans">
+                        {option.text}
+                      </span>
+                    </div>
+
+                    <div className="shrink-0">
+                      <div className={`w-5 h-5 rounded-full border flex items-center justify-center transition-colors ${
+                        isSelected
+                          ? 'border-blue-400 bg-blue-500 text-white'
+                          : 'border-slate-700 bg-slate-800'
+                      }`}>
+                        {isSelected && <div className="w-2 h-2 rounded-full bg-white" />}
+                      </div>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Auto-save & Status indicator (LTR) */}
+            <div className="mt-6 pt-4 border-t border-slate-800/60 flex items-center justify-between text-xs text-slate-400" dir="ltr">
+              <div className="flex items-center gap-1.5 text-emerald-400">
+                <ShieldCheck className="w-4 h-4 shrink-0" />
+                <span>
+                  {answers[currentQuestion.id]
+                    ? 'Answer automatically saved'
+                    : 'Select an option to save answer...'}
+                </span>
+              </div>
+              <span className="text-slate-400 font-sans">
+                {unansweredCount} questions remaining
+              </span>
+            </div>
+          </div>
+
+          {/* Navigation Controls (Prev / Next in LTR) */}
+          <div className="flex items-center justify-between gap-3" dir="ltr">
+            <button
+              type="button"
+              onClick={() => setCurrentIndex((prev) => Math.max(0, prev - 1))}
+              disabled={currentIndex === 0}
+              className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
+                currentIndex === 0
+                  ? 'opacity-40 cursor-not-allowed bg-slate-900 text-slate-500 border border-slate-800'
+                  : 'bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 active:scale-95'
+              }`}
+            >
+              <ChevronLeft className="w-4 h-4" />
+              <span>Previous Question</span>
+            </button>
+
+            {currentIndex === exam.questions.length - 1 ? (
+              <button
+                type="button"
+                onClick={() => setShowSubmitModal(true)}
+                className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-emerald-600 hover:bg-emerald-500 text-white transition-all shadow-md active:scale-95 cursor-pointer"
+              >
+                <span>Review & Submit</span>
+                <Send className="w-4 h-4" />
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setCurrentIndex((prev) => Math.min(exam.questions.length - 1, prev + 1))}
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-blue-600 hover:bg-blue-500 text-white transition-all shadow-md active:scale-95 cursor-pointer"
+              >
+                <span>Next Question</span>
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            )}
+          </div>
+        </main>
       </div>
 
       {/* 3. Submit Confirmation Modal */}

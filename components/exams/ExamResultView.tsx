@@ -55,35 +55,38 @@ export function ExamResultView({
       {/* ========================================================================= */}
       <div className="bg-white rounded-3xl border border-slate-200/90 p-5 sm:p-8 shadow-xs">
         
-        {/* 1. Header (Exam Title on the right, Badges & Back Button on the left) */}
-        <div className="flex flex-col-reverse sm:flex-row sm:items-center justify-between gap-4 pb-1">
+        {/* 1. Header (Organized & Harmonious Toolbar) */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 mb-6 border-b border-slate-100">
           
-          {/* Left Side: Badges & Back Button */}
-          <div className="flex items-center gap-2.5 sm:gap-3 flex-wrap">
-            {/* Back Button */}
-            <Link
-              href="/exams"
-              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl border border-slate-200 hover:border-slate-300 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold transition-all shadow-2xs active:scale-95"
-            >
-              <span>رجوع</span>
-              <ArrowLeft className="w-3.5 h-3.5 rotate-180" />
-            </Link>
+          {/* Right Side in RTL: Exam Title */}
+          <div className="flex items-center gap-2.5 min-w-0">
+            <span className="w-2.5 h-2.5 rounded-full bg-blue-600 shrink-0" />
+            <h1 className="text-base sm:text-lg lg:text-xl font-bold text-slate-900 tracking-tight leading-snug">
+              {exam.title}
+            </h1>
+          </div>
 
-            {/* Model/Form Label */}
-            <span className="text-xs font-medium text-slate-500">
+          {/* Left Side in RTL: Organized Action Pills (Unified height & alignment) */}
+          <div className="flex items-center gap-2 sm:gap-2.5 shrink-0 flex-wrap">
+            {/* Course Title Pill */}
+            <span className="h-9 px-3.5 inline-flex items-center justify-center rounded-xl text-xs font-bold bg-blue-50 text-blue-600 border border-blue-200/60 shadow-2xs">
+              {exam.courseTitle}
+            </span>
+
+            {/* Model/Form Label Pill */}
+            <span className="h-9 px-3 inline-flex items-center justify-center rounded-xl text-xs font-bold bg-slate-100 text-slate-600 border border-slate-200/80 shadow-2xs">
               نموذج 1
             </span>
 
-            {/* Course Title Pill */}
-            <span className="px-3.5 py-1 rounded-full text-xs font-semibold bg-[#eef4ff] text-[#2563eb] border border-blue-100/60">
-              {exam.courseTitle}
-            </span>
+            {/* Back Button */}
+            <Link
+              href="/exams"
+              className="h-9 px-3.5 inline-flex items-center justify-center gap-1.5 rounded-xl border border-slate-200 hover:border-blue-400 bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold transition-all shadow-2xs active:scale-95"
+            >
+              <span>رجوع</span>
+              <ArrowLeft className="w-3.5 h-3.5 rotate-180 text-slate-500" />
+            </Link>
           </div>
-
-          {/* Right Side: Exam Title */}
-          <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-slate-900 tracking-normal text-right">
-            {exam.title}
-          </h1>
         </div>
 
         {/* 2. Four KPI Metric Boxes Grid (Centered & Perfectly Organized) */}

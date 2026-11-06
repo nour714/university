@@ -12,9 +12,7 @@ import {
   ArrowLeft, 
   CheckCircle2, 
   AlertCircle,
-  Sparkles,
-  User,
-  GraduationCap
+  Sparkles
 } from 'lucide-react';
 
 interface ExamCardProps {
@@ -94,18 +92,13 @@ export function ExamCard({ exam }: ExamCardProps) {
       isLiveNow ? 'border-emerald-300 ring-1 ring-emerald-500/20' : 'border-slate-200/90 hover:border-blue-300'
     }`}>
       
-      {/* Top Meta Line: Course, Status Badge */}
+      {/* Top Header: Code, Badges, and Course Name under the Code */}
       <div>
-        <div className="flex flex-wrap items-center justify-between gap-2 mb-2.5">
-          {/* Course Badge & Code */}
-          <div className="flex items-center gap-2">
-            <span className="px-2.5 py-1 rounded-lg bg-slate-900 text-white font-mono text-xs font-bold tracking-wider">
-              {exam.courseCode}
-            </span>
-            <span className="text-xs font-bold text-slate-700 truncate max-w-[200px] sm:max-w-none">
-              {exam.courseTitle}
-            </span>
-          </div>
+        <div className="flex items-center justify-between gap-2 mb-2">
+          {/* Course Code */}
+          <span className="px-2.5 py-1 rounded-lg bg-slate-900 text-white font-mono text-xs font-bold tracking-wider">
+            {exam.courseCode}
+          </span>
 
           {/* Status Badge */}
           <div className="flex items-center gap-1.5">
@@ -134,26 +127,10 @@ export function ExamCard({ exam }: ExamCardProps) {
           </div>
         </div>
 
-        {/* Exam Title */}
-        <h3 className="text-base sm:text-lg font-extrabold text-slate-900 mb-1.5 leading-snug">
-          {exam.title}
+        {/* Course Name under the Code */}
+        <h3 className="text-base sm:text-lg font-extrabold text-slate-900 mb-3 leading-snug">
+          {exam.courseTitle}
         </h3>
-
-        {/* Doctor Info */}
-        <div className="flex items-center gap-1.5 text-xs text-slate-500 mb-3">
-          <User className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-          <span>مرفوع بواسطة:</span>
-          <span className="font-semibold text-slate-700">{exam.doctorName}</span>
-          <span className="text-slate-300">•</span>
-          <span className="text-slate-400 text-[11px]">{exam.doctorTitle}</span>
-        </div>
-
-        {/* Description */}
-        {exam.description && (
-          <p className="text-xs text-slate-600 mb-4 leading-relaxed line-clamp-2">
-            {exam.description}
-          </p>
-        )}
 
         {/* Key Metrics Grid: Questions, Duration, Marks, Timing */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 py-3 px-3.5 rounded-xl bg-slate-50/80 border border-slate-100 text-xs">

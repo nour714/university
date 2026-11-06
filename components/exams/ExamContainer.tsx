@@ -47,6 +47,12 @@ export function ExamContainer({ exam, initialView }: ExamContainerProps) {
   };
 
   const handleRetake = () => {
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.removeItem(`exam_endtime_${exam.id}`);
+        localStorage.removeItem(`exam_answers_${exam.id}`);
+      } catch {}
+    }
     setSubmittedAnswers({});
     setTimeSpentSeconds(0);
     setIsAutoSubmitted(false);

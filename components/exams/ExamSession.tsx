@@ -33,55 +33,121 @@ export function ExamSession({
   // Total duration in seconds
   const totalSeconds = useMemo(() => exam.durationMinutes * 60, [exam.durationMinutes]);
 
+  // Real-world absolute end time (timestamp in milliseconds)
+  const [endTime] = useState<number>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const stored = localStorage.getItem(`exam_endtime_${exam.id}`);
+        if (stored) {
+          const parsed = parseInt(stored, 10);
+          // If stored end time is valid and in the future, resume it
+          if (!isNaN(parsed) && parsed > Date.now()) {
+            return parsed;
+          }
+        }
+        // Initialize fresh absolute end time
+        const newEndTime = Date.now() + totalSeconds * 1000;
+        localStorage.setItem(`exam_endtime_${exam.id}`, newEndTime.toString());
+        return newEndTime;
+      } catch {}
+    }
+    return Date.now() + totalSeconds * 1000;
+  });
+
+  const getRemainingSeconds = useCallback(() => {
+    return Math.max(0, Math.ceil((endTime - Date.now()) / 1000));
+  }, [endTime]);
+
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [answers, setAnswers] = useState<Record<string, string>>({});
+  const [answers, setAnswers] = useState<Record<string, string>>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const saved = localStorage.getItem(`exam_answers_${exam.id}`);
+        if (saved) return JSON.parse(saved);
+      } catch {}
+    }
+    return {};
+  });
   const [flagged, setFlagged] = useState<Set<string>>(new Set());
-  const [timeRemaining, setTimeRemaining] = useState(totalSeconds);
-  const [timeSpent, setTimeSpent] = useState(0);
+  const [timeRemaining, setTimeRemaining] = useState<number>(() => getRemainingSeconds());
+  const [timeSpent, setTimeSpent] = useState<number>(() => totalSeconds - getRemainingSeconds());
   const [showSubmitModal, setShowSubmitModal] = useState(false);
   const [lastSavedQuestionId, setLastSavedQuestionId] = useState<string | null>(null);
 
   const currentQuestion = exam.questions[currentIndex];
 
+  // Clear local storage exam session keys
+  const clearExamStorage = useCallback(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.removeItem(`exam_endtime_${exam.id}`);
+        localStorage.removeItem(`exam_answers_${exam.id}`);
+      } catch {}
+    }
+  }, [exam.id]);
+
   // Auto-submit handler (called when countdown hits zero)
   const handleAutoSubmit = useCallback(() => {
-    onFinishExam(answers, totalSeconds - timeRemaining, true);
-  }, [answers, totalSeconds, timeRemaining, onFinishExam]);
+    clearExamStorage();
+    const finalSpent = Math.min(totalSeconds, totalSeconds - getRemainingSeconds());
+    onFinishExam(answers, finalSpent, true);
+  }, [answers, totalSeconds, getRemainingSeconds, onFinishExam, clearExamStorage]);
 
   // Manual submit handler (called when student confirms modal)
   const handleManualSubmit = () => {
+    clearExamStorage();
     setShowSubmitModal(false);
-    onFinishExam(answers, totalSeconds - timeRemaining, false);
+    const finalSpent = Math.min(totalSeconds, totalSeconds - getRemainingSeconds());
+    onFinishExam(answers, finalSpent, false);
   };
 
-  // Countdown timer effect
+  // Real-time Countdown timer effect (resilient to tab switching & background suspension)
   useEffect(() => {
-    if (timeRemaining <= 0) {
-      handleAutoSubmit();
-      return;
-    }
+    const updateCountdown = () => {
+      const remaining = Math.max(0, Math.ceil((endTime - Date.now()) / 1000));
+      setTimeRemaining(remaining);
+      setTimeSpent(totalSeconds - remaining);
 
-    const interval = setInterval(() => {
-      setTimeRemaining((prev) => {
-        if (prev <= 1) {
-          clearInterval(interval);
-          handleAutoSubmit();
-          return 0;
-        }
-        return prev - 1;
-      });
-      setTimeSpent((prev) => prev + 1);
-    }, 1000);
+      if (remaining <= 0) {
+        handleAutoSubmit();
+      }
+    };
 
-    return () => clearInterval(interval);
-  }, [timeRemaining, handleAutoSubmit]);
+    // Immediate check
+    updateCountdown();
 
-  // Handle option select
+    // Regular tick
+    const interval = setInterval(updateCountdown, 1000);
+
+    // Refresh immediately when returning to tab or window focus
+    const handleVisibilityOrFocus = () => {
+      updateCountdown();
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityOrFocus);
+    window.addEventListener('focus', handleVisibilityOrFocus);
+
+    return () => {
+      clearInterval(interval);
+      document.removeEventListener('visibilitychange', handleVisibilityOrFocus);
+      window.removeEventListener('focus', handleVisibilityOrFocus);
+    };
+  }, [endTime, totalSeconds, handleAutoSubmit]);
+
+  // Handle option select with persistent backup
   const handleSelectOption = (optionId: string) => {
-    setAnswers((prev) => ({
-      ...prev,
-      [currentQuestion.id]: optionId,
-    }));
+    setAnswers((prev) => {
+      const next = {
+        ...prev,
+        [currentQuestion.id]: optionId,
+      };
+      if (typeof window !== 'undefined') {
+        try {
+          localStorage.setItem(`exam_answers_${exam.id}`, JSON.stringify(next));
+        } catch {}
+      }
+      return next;
+    });
     setLastSavedQuestionId(currentQuestion.id);
   };
 

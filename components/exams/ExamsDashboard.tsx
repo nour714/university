@@ -8,11 +8,7 @@ import {
   ClipboardCheck, 
   Search, 
   Clock, 
-  CheckCircle2, 
-  Sparkles, 
-  AlertCircle,
-  HelpCircle,
-  GraduationCap
+  CheckCircle2
 } from 'lucide-react';
 
 interface ExamsDashboardProps {
@@ -61,46 +57,7 @@ export function ExamsDashboard({ initialExams }: ExamsDashboardProps) {
 
   return (
     <div className="space-y-4 sm:space-y-6">
-      
-      {/* 1. Page Header & Key Academic Stats */}
-      <div className="bg-gradient-to-r from-blue-900 via-indigo-900 to-slate-900 rounded-3xl p-5 sm:p-7 text-white shadow-xl relative overflow-hidden border border-blue-800/40">
-        {/* Background Decorative Glow */}
-        <div className="absolute top-0 right-0 w-80 h-80 bg-blue-500/15 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 left-0 w-80 h-80 bg-indigo-500/15 rounded-full blur-3xl pointer-events-none" />
-
-        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-5">
-          <div>
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-500/20 border border-blue-400/30 text-blue-200 text-xs font-bold mb-2">
-              <ClipboardCheck className="w-3.5 h-3.5 text-blue-300" />
-              <span>منصة الامتحانات الإلكترونية المعتمدة</span>
-            </div>
-            <h1 className="text-xl sm:text-2xl lg:text-3xl font-black tracking-tight mb-2">
-              قسم الاختبارات والتقييمات الأكاديمية
-            </h1>
-            <p className="text-xs sm:text-sm text-blue-200/80 max-w-xl leading-relaxed">
-              تصفح الاختبارات المرفوعة من قِبل أعضاء هيئة التدريس، وتعرف على مواعيد البدء والانتهاء، وأدّ الاختبارات مباشرة في بيئة معزولة وآمنة.
-            </p>
-          </div>
-
-          {/* Quick Stats Badges */}
-          <div className="flex items-center gap-2.5 sm:gap-3 shrink-0">
-            <div className="bg-white/10 backdrop-blur-md border border-white/10 rounded-2xl px-4 py-3 text-center min-w-[90px]">
-              <p className="text-2xl font-black text-emerald-400">{counts.live}</p>
-              <p className="text-[11px] font-semibold text-emerald-200 mt-0.5">جارية الآن</p>
-            </div>
-            <div className="bg-white/10 backdrop-blur-md border border-white/10 rounded-2xl px-4 py-3 text-center min-w-[90px]">
-              <p className="text-2xl font-black text-amber-300">{counts.upcoming}</p>
-              <p className="text-[11px] font-semibold text-amber-200 mt-0.5">قادمة قريباً</p>
-            </div>
-            <div className="bg-white/10 backdrop-blur-md border border-white/10 rounded-2xl px-4 py-3 text-center min-w-[90px]">
-              <p className="text-2xl font-black text-blue-300">{counts.completed}</p>
-              <p className="text-[11px] font-semibold text-blue-200 mt-0.5">مكتملة</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* 2. Search & Tab Filter Controller */}
+      {/* 1. Search & Tab Filter Controller */}
       <div className="bg-white rounded-2xl p-3 sm:p-4 border border-slate-200/90 shadow-xs space-y-3">
         {/* Search Input */}
         <div className="relative">

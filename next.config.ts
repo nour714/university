@@ -10,7 +10,7 @@ const nextConfig: NextConfig = {
   images: {
     unoptimized: true,
   },
-  allowedDevOrigins: ['192.168.1.4', 'localhost:5500', '192.168.4.2'],
+  allowedDevOrigins: ['192.168.1.4', 'localhost:5500', '192.168.4.6'],
   cacheComponents: true,
   partialPrefetching: true,
   turbopack: {
@@ -58,3 +58,4 @@ const nextConfig: NextConfig = {
 };
 
 export default nextConfig;
+

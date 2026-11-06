@@ -11,8 +11,7 @@ import {
   Calendar, 
   ArrowLeft, 
   CheckCircle2, 
-  AlertCircle,
-  Sparkles
+  AlertCircle
 } from 'lucide-react';
 
 interface ExamCardProps {
@@ -217,19 +216,6 @@ export function ExamCard({ exam }: ExamCardProps) {
 
         {/* Buttons */}
         <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
-          {/* Quick Demo Simulator Toggle (For testing upcoming exams immediately) */}
-          {!isLiveNow && !isCompleted && (
-            <button
-              type="button"
-              onClick={() => setSimulatedLive(true)}
-              className="px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer active:scale-95"
-              title="تفعيل الدخول الفوري لمحاكاة وتجربة الامتحان"
-            >
-              <Sparkles className="w-3.5 h-3.5 text-amber-500" />
-              <span>محاكاة البدء الفوري</span>
-            </button>
-          )}
-
           {/* Primary Action Button */}
           {isLiveNow && (
             <Link

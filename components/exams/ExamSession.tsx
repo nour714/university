@@ -335,47 +335,6 @@ export function ExamSession({
             {/* Subtle Top Glow */}
             <div className="absolute top-0 left-0 w-64 h-64 bg-blue-600/10 rounded-full blur-3xl pointer-events-none" />
 
-            {/* Mobile Question Quick-Jump Strip */}
-            <div className="lg:hidden mb-4 pb-3 border-b border-slate-800/70">
-              <div className="flex items-center justify-between text-xs text-slate-400 mb-2">
-                <span className="font-bold text-slate-300">الأسئلة ({answeredCount}/{exam.questions.length})</span>
-                <span className="text-[11px] text-blue-400">انتقال سريع</span>
-              </div>
-              <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar scroll-smooth touch-pan-x py-1 -mx-1 px-1">
-                {exam.questions.map((q, idx) => {
-                  const isCurrent = idx === currentIndex;
-                  const isAnswered = !!answers[q.id];
-                  const isFlagged = flagged.has(q.id);
-
-                  let pillStyle = 'bg-slate-900 border-slate-800 text-slate-400';
-                  if (isCurrent) {
-                    pillStyle = 'bg-blue-600 text-white border-blue-400 ring-2 ring-blue-400/50 font-black';
-                  } else if (isFlagged) {
-                    pillStyle = 'bg-amber-950/80 border-amber-500 text-amber-300 font-bold';
-                  } else if (isAnswered) {
-                    pillStyle = 'bg-emerald-950/70 border-emerald-600/70 text-emerald-300 font-semibold';
-                  }
-
-                  return (
-                    <button
-                      key={q.id}
-                      type="button"
-                      onClick={() => {
-                        setCurrentIndex(idx);
-                        questionWorkspaceRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                      }}
-                      className={`w-8.5 h-8.5 rounded-xl border flex items-center justify-center text-xs shrink-0 relative transition-all active:scale-95 cursor-pointer ${pillStyle}`}
-                    >
-                      <span>{idx + 1}</span>
-                      {isFlagged && (
-                        <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-amber-400 ring-2 ring-slate-950" />
-                      )}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-
             {/* Question Header & Controls (English LTR layout) */}
             <div className="flex flex-wrap sm:flex-nowrap items-center justify-between gap-2.5 pb-3.5 sm:pb-4 mb-4 sm:mb-5 border-b border-slate-800/70" dir="ltr">
               <div className="flex items-center gap-2 sm:gap-2.5">

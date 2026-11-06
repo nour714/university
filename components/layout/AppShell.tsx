@@ -14,7 +14,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   // Standalone Full-Screen Pages (Auth & Distraction-Free Exam Hall)
   if (isAuthPage || isExamSession) {
     return (
-      <div className={`min-h-[100dvh] w-full flex flex-col ${isAuthPage ? 'bg-slate-900 text-slate-100 justify-center' : 'bg-slate-900 text-slate-100'}`}>
+      <div className={`min-h-[100dvh] w-full flex flex-col ${isAuthPage ? 'bg-slate-900 text-slate-100 justify-center' : ''}`}>
         <NotificationToast />
         <main className="flex-1 w-full flex flex-col">
           {children}

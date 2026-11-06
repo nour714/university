@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { Exam } from '@/types/exam';
-import { ArrowRight, EyeOff } from 'lucide-react';
+import { ArrowRight, EyeOff, ClipboardCheck } from 'lucide-react';
 
 interface ExamResultViewProps {
   exam: Exam;
@@ -53,19 +53,19 @@ export function ExamResultView({
       {/* ========================================================================= */}
       {/* Main Official Exam Submission Summary Card                                */}
       {/* ========================================================================= */}
-      <div className="bg-white rounded-3xl border border-slate-200/90 p-5 sm:p-8 shadow-xs">
+      <div className="bg-white rounded-3xl border border-slate-200/90 p-4 sm:p-8 shadow-xs">
         
         {/* 1. Header (#1A3073 Navy Theme Banner) */}
-        <div className="bg-[#1A3073] text-white rounded-2xl p-4 sm:p-5 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 relative overflow-hidden">
+        <div className="bg-[#1A3073] text-white rounded-2xl p-3.5 sm:p-5 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 mb-5 sm:mb-6 relative overflow-hidden">
           {/* Subtle Ambient Glow */}
           <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/10 rounded-full blur-2xl pointer-events-none" />
 
           {/* Right Side in RTL: White Animated Back Button + Exam Title */}
-          <div className="flex items-center gap-3 min-w-0 relative z-10 flex-wrap sm:flex-nowrap">
+          <div className="flex items-center gap-2.5 sm:gap-3 min-w-0 relative z-10 flex-wrap sm:flex-nowrap">
             {/* White Animated Back Button on the Right */}
             <Link
               href="/exams"
-              className="group relative h-9 px-4 inline-flex items-center justify-center gap-2 rounded-xl bg-white hover:bg-slate-50 text-slate-800 hover:text-blue-700 text-xs font-extrabold transition-all duration-300 ease-out shadow-sm hover:shadow-md hover:scale-[1.04] active:scale-95 cursor-pointer shrink-0 border border-slate-200/80 overflow-hidden"
+              className="group relative h-9 px-3.5 sm:px-4 inline-flex items-center justify-center gap-1.5 sm:gap-2 rounded-xl bg-white hover:bg-slate-50 text-slate-800 hover:text-blue-700 text-xs font-extrabold transition-all duration-300 ease-out shadow-sm hover:shadow-md hover:scale-[1.04] active:scale-95 cursor-pointer shrink-0 border border-slate-200/80 overflow-hidden"
               title="العودة إلى لوحة الاختبارات"
             >
               {/* Subtle hover light sweep effect */}
@@ -77,7 +77,7 @@ export function ExamResultView({
               <span>رجوع</span>
             </Link>
 
-            <h1 className="text-base sm:text-lg lg:text-xl font-bold text-white tracking-tight leading-snug">
+            <h1 className="text-sm sm:text-lg lg:text-xl font-bold text-white tracking-tight leading-snug">
               {exam.title}
             </h1>
           </div>
@@ -85,78 +85,89 @@ export function ExamResultView({
           {/* Left Side in RTL: Course Title & Model Pills */}
           <div className="flex items-center gap-2 sm:gap-2.5 shrink-0 flex-wrap relative z-10">
             {/* Course Title Pill */}
-            <span className="h-9 px-3.5 inline-flex items-center justify-center rounded-xl text-xs font-bold bg-white/15 text-white border border-white/20 shadow-xs backdrop-blur-xs">
+            <span className="h-8 sm:h-9 px-3 sm:px-3.5 inline-flex items-center justify-center rounded-xl text-[11px] sm:text-xs font-bold bg-white/15 text-white border border-white/20 shadow-xs backdrop-blur-xs">
               {exam.courseTitle}
             </span>
 
             {/* Model/Form Label Pill */}
-            <span className="h-9 px-3 inline-flex items-center justify-center rounded-xl text-xs font-bold bg-white/10 text-blue-100 border border-white/15">
+            <span className="h-8 sm:h-9 px-2.5 sm:px-3 inline-flex items-center justify-center rounded-xl text-[11px] sm:text-xs font-bold bg-white/10 text-blue-100 border border-white/15">
               نموذج 1
             </span>
           </div>
         </div>
 
         {/* 2. Four KPI Metric Boxes Grid (Centered & Perfectly Organized) */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 my-6 sm:my-7">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4 my-5 sm:my-7">
           
           {/* Card 1 (Far Right in RTL): الدرجة */}
-          <div className="bg-white rounded-2xl border border-slate-200/90 p-5 flex flex-col items-center justify-center text-center min-h-[140px] sm:min-h-[155px] shadow-2xs">
-            <span className="text-xs font-semibold text-slate-400 mb-2">
-              الدرجة
+          <div className="bg-white rounded-2xl border border-slate-200/90 p-3.5 sm:p-5 flex flex-col items-center justify-center text-center min-h-[125px] sm:min-h-[155px] shadow-2xs">
+            <span className="text-[11px] sm:text-xs font-semibold text-slate-400 mb-1.5 sm:mb-2">
+              الدرجة المحققة
             </span>
-            <div className="text-4xl sm:text-5xl font-black text-blue-600 font-mono tracking-tight leading-none my-1">
+            <div className="text-3xl sm:text-5xl font-black text-blue-600 font-mono tracking-tight leading-none my-1">
               {finalScore}
             </div>
-            <span className="text-xs font-medium text-slate-400 mt-2">
-              من {exam.totalMarks}
+            <span className="text-[11px] sm:text-xs font-medium text-slate-400 mt-1.5 sm:mt-2">
+              من {exam.totalMarks} درجة
             </span>
           </div>
 
           {/* Card 2: النسبة */}
-          <div className="bg-white rounded-2xl border border-slate-200/90 p-5 flex flex-col items-center justify-center text-center min-h-[140px] sm:min-h-[155px] shadow-2xs">
-            <span className="text-xs font-semibold text-slate-400 mb-2">
-              النسبة
+          <div className="bg-white rounded-2xl border border-slate-200/90 p-3.5 sm:p-5 flex flex-col items-center justify-center text-center min-h-[125px] sm:min-h-[155px] shadow-2xs">
+            <span className="text-[11px] sm:text-xs font-semibold text-slate-400 mb-1.5 sm:mb-2">
+              النسبة المئوية
             </span>
-            <div className="text-4xl sm:text-5xl font-black text-slate-800 font-mono tracking-tight leading-none my-1">
+            <div className="text-3xl sm:text-5xl font-black text-slate-800 font-mono tracking-tight leading-none my-1">
               {percentage}%
             </div>
-            <span className="text-xs font-medium text-transparent select-none mt-2">
-              -
+            <span className="text-[11px] sm:text-xs font-bold text-emerald-600 mt-1.5 sm:mt-2">
+              {percentage >= 85 ? 'تقدير ممتاز' : percentage >= 75 ? 'تقدير جيد جداً' : percentage >= 65 ? 'تقدير جيد' : 'تقدير مقبول'}
             </span>
           </div>
 
           {/* Card 3: التسليم */}
-          <div className="bg-white rounded-2xl border border-slate-200/90 p-5 flex flex-col items-center justify-center text-center min-h-[140px] sm:min-h-[155px] shadow-2xs">
-            <span className="text-xs font-semibold text-slate-400 mb-2">
-              التسليم
+          <div className="bg-white rounded-2xl border border-slate-200/90 p-3.5 sm:p-5 flex flex-col items-center justify-center text-center min-h-[125px] sm:min-h-[155px] shadow-2xs">
+            <span className="text-[11px] sm:text-xs font-semibold text-slate-400 mb-1.5 sm:mb-2">
+              وقت التسليم
             </span>
-            <div className="text-3xl sm:text-4xl font-black text-slate-800 font-mono tracking-tight leading-none my-1">
+            <div className="text-2xl sm:text-4xl font-black text-slate-800 font-mono tracking-tight leading-none my-1">
               {formattedSubmissionTime}
             </div>
-            <span className="text-xs font-medium text-slate-400 mt-2">
-              {isAutoSubmitted ? 'تلقائي عند انتهاء الوقت' : 'بضغطة منك'}
+            <span className="text-[10px] sm:text-xs font-medium text-slate-400 mt-1.5 sm:mt-2 truncate max-w-full">
+              {isAutoSubmitted ? 'تسليم تلقائي' : 'تسليم يدوي'}
             </span>
           </div>
 
           {/* Card 4 (Far Left in RTL): إجابات صحيحة */}
-          <div className="bg-white rounded-2xl border border-slate-200/90 p-5 flex flex-col items-center justify-center text-center min-h-[140px] sm:min-h-[155px] shadow-2xs">
-            <span className="text-xs font-semibold text-slate-400 mb-2">
+          <div className="bg-white rounded-2xl border border-slate-200/90 p-3.5 sm:p-5 flex flex-col items-center justify-center text-center min-h-[125px] sm:min-h-[155px] shadow-2xs">
+            <span className="text-[11px] sm:text-xs font-semibold text-slate-400 mb-1.5 sm:mb-2">
               إجابات صحيحة
             </span>
-            <div className="text-4xl sm:text-5xl font-black text-slate-800 font-mono tracking-tight leading-none my-1">
+            <div className="text-3xl sm:text-5xl font-black text-slate-800 font-mono tracking-tight leading-none my-1">
               {correctCount}
             </div>
-            <span className="text-xs font-medium text-transparent select-none mt-2">
-              -
+            <span className="text-[11px] sm:text-xs font-medium text-slate-400 mt-1.5 sm:mt-2">
+              من {exam.questions.length} أسئلة
             </span>
           </div>
 
         </div>
 
         {/* 3. Bottom Notice Banner (Centered & Harmonious with Accent Border) */}
-        <div className="rounded-2xl bg-[#eff5ff] border border-blue-200/70 border-r-4 border-r-blue-600 p-4 sm:p-4.5 flex items-center justify-center gap-2.5 text-blue-700 text-xs sm:text-sm font-bold text-center">
+        <div className="rounded-2xl bg-[#eff5ff] border border-blue-200/70 border-r-4 border-r-blue-600 p-3.5 sm:p-4.5 flex items-center justify-center gap-2.5 text-blue-700 text-xs sm:text-sm font-bold text-center mb-5">
           <EyeOff className="w-4 h-4 text-blue-600 shrink-0" />
           <span>مراجعة الإجابات التفصيلية غير متاحة لهذا الاختبار.</span>
+        </div>
+
+        {/* 4. Action Button for Mobile & Desktop Navigation */}
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2 border-t border-slate-100">
+          <Link
+            href="/exams"
+            className="w-full sm:w-auto px-6 py-3 min-h-[44px] rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs sm:text-sm text-center flex items-center justify-center gap-2 shadow-md shadow-blue-600/20 active:scale-95 transition-all cursor-pointer"
+          >
+            <ClipboardCheck className="w-4 h-4" />
+            <span>العودة إلى جدول الاختبارات</span>
+          </Link>
         </div>
 
       </div>

@@ -17,6 +17,7 @@ export function BottomNav() {
   const [isMoreOpen, setIsMoreOpen] = useState(false);
   const isCoursesActive = pathname.startsWith('/courses');
   const isCodesActive = pathname.startsWith('/codes');
+  const isExamsActive = pathname.startsWith('/exams');
   const isHomeActive = pathname === '/';
 
   return (
@@ -47,15 +48,15 @@ export function BottomNav() {
         <div className="flex items-center justify-center">
           <Link
             href="/exams"
-            className={`w-12 h-12 rounded-full flex flex-col items-center justify-center transition-colors group shrink-0 active:scale-95 ${
-              pathname.startsWith('/exams')
-                ? 'text-white'
-                : 'text-slate-400 hover:text-white'
+            className={`w-12 h-12 rounded-full flex flex-col items-center justify-center transition-all shrink-0 ${
+              isExamsActive
+                ? 'bg-blue-600 text-white font-bold shadow-md shadow-blue-600/40 border border-blue-400/50'
+                : 'text-slate-300 hover:text-white active:scale-95'
             }`}
             title="الاختبارات"
           >
-            <ClipboardCheck className={`w-4.5 h-4.5 group-hover:scale-105 transition-transform ${pathname.startsWith('/exams') ? 'text-blue-400 stroke-[2.5]' : ''}`} />
-            <span className={`text-[9px] font-bold mt-0.5 leading-none ${pathname.startsWith('/exams') ? 'text-blue-300' : 'text-slate-300'}`}>الاختبارات</span>
+            <ClipboardCheck className="w-4.5 h-4.5 stroke-[2.2]" />
+            <span className="text-[9px] font-bold mt-0.5 leading-none">الاختبارات</span>
           </Link>
         </div>
 

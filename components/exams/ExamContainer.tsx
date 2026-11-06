@@ -25,11 +25,10 @@ export function ExamContainer({ exam, initialView }: ExamContainerProps) {
   const [timeSpentSeconds, setTimeSpentSeconds] = useState<number>(0);
   const [isAutoSubmitted, setIsAutoSubmitted] = useState<boolean>(false);
   const [submissionTime, setSubmissionTime] = useState<string>(() => {
-    return new Date().toLocaleTimeString('ar-EG', {
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: false,
-    });
+    const d = new Date();
+    const h = d.getHours().toString().padStart(2, '0');
+    const m = d.getMinutes().toString().padStart(2, '0');
+    return `${h}:${m}`;
   });
 
   const handleFinishExam = (
@@ -40,13 +39,10 @@ export function ExamContainer({ exam, initialView }: ExamContainerProps) {
     setSubmittedAnswers(answers);
     setTimeSpentSeconds(timeSpent);
     setIsAutoSubmitted(autoSubmitted);
-    setSubmissionTime(
-      new Date().toLocaleTimeString('ar-EG', {
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: false,
-      })
-    );
+    const d = new Date();
+    const h = d.getHours().toString().padStart(2, '0');
+    const m = d.getMinutes().toString().padStart(2, '0');
+    setSubmissionTime(`${h}:${m}`);
     setView('result');
   };
 

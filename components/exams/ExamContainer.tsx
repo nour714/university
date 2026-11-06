@@ -55,7 +55,7 @@ export function ExamContainer({ exam, initialView }: ExamContainerProps) {
 
   if (view === 'result') {
     return (
-      <div className="min-h-screen bg-[#f8fafc] text-slate-900 p-3 sm:p-6 lg:p-8">
+      <div className="min-h-screen bg-[#f8fafc] text-slate-900 flex flex-col justify-center items-center p-3 sm:p-6 lg:p-8">
         <ExamResultView
           exam={exam}
           answers={submittedAnswers}

@@ -40,7 +40,7 @@ export function ExamResultView({
 
   const percentage = Math.round((finalScore / exam.totalMarks) * 100);
 
-  // Formatted submission time (standard digits e.g. 21:13 or 02:59)
+  // Formatted submission time (standard digits e.g. 21:13 or 03:07)
   const formattedSubmissionTime = submissionTime || (() => {
     const d = new Date();
     const h = d.getHours().toString().padStart(2, '0');
@@ -49,21 +49,21 @@ export function ExamResultView({
   })();
 
   return (
-    <div className="w-full max-w-5xl mx-auto animate-fadeIn py-3 sm:py-6">
+    <div className="w-full max-w-5xl mx-auto animate-fadeIn py-2 sm:py-4">
       {/* ========================================================================= */}
       {/* Main Official Exam Submission Summary Card                                */}
       {/* ========================================================================= */}
-      <div className="bg-white rounded-3xl border border-slate-200/80 p-5 sm:p-8 shadow-xs">
+      <div className="bg-white rounded-3xl border border-slate-200/90 p-5 sm:p-8 shadow-xs">
         
         {/* 1. Header (Exam Title on the right, Badges & Back Button on the left) */}
-        <div className="flex flex-col-reverse sm:flex-row sm:items-center justify-between gap-4">
+        <div className="flex flex-col-reverse sm:flex-row sm:items-center justify-between gap-4 pb-1">
           
           {/* Left Side: Badges & Back Button */}
-          <div className="flex items-center gap-3 flex-wrap">
+          <div className="flex items-center gap-2.5 sm:gap-3 flex-wrap">
             {/* Back Button */}
             <Link
               href="/exams"
-              className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl border border-slate-200 hover:border-slate-300 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold transition-all shadow-2xs active:scale-95"
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl border border-slate-200 hover:border-slate-300 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold transition-all shadow-2xs active:scale-95"
             >
               <span>رجوع</span>
               <ArrowLeft className="w-3.5 h-3.5 rotate-180" />
@@ -86,86 +86,78 @@ export function ExamResultView({
           </h1>
         </div>
 
-        {/* 2. Four KPI Metric Boxes Grid (Right-aligned content inside each card) */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 my-7">
+        {/* 2. Four KPI Metric Boxes Grid (Centered & Perfectly Organized) */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 my-6 sm:my-7">
           
           {/* Card 1 (Far Right in RTL): الدرجة */}
-          <div className="bg-white rounded-2xl border border-slate-200/80 p-5 flex flex-col justify-between items-start text-right min-h-[135px]">
-            <span className="text-xs font-medium text-slate-400">
+          <div className="bg-white rounded-2xl border border-slate-200/90 p-5 flex flex-col items-center justify-center text-center min-h-[140px] sm:min-h-[155px] shadow-2xs">
+            <span className="text-xs font-semibold text-slate-400 mb-2">
               الدرجة
             </span>
-            <div className="w-full text-right mt-3">
-              <div className="text-3xl sm:text-4xl font-extrabold text-[#2563eb] leading-tight">
-                {finalScore}
-              </div>
-              <div className="text-xs font-medium text-slate-400 mt-1">
-                من {exam.totalMarks}
-              </div>
+            <div className="text-4xl sm:text-5xl font-black text-blue-600 font-mono tracking-tight leading-none my-1">
+              {finalScore}
             </div>
+            <span className="text-xs font-medium text-slate-400 mt-2">
+              من {exam.totalMarks}
+            </span>
           </div>
 
           {/* Card 2: النسبة */}
-          <div className="bg-white rounded-2xl border border-slate-200/80 p-5 flex flex-col justify-between items-start text-right min-h-[135px]">
-            <span className="text-xs font-medium text-slate-400">
+          <div className="bg-white rounded-2xl border border-slate-200/90 p-5 flex flex-col items-center justify-center text-center min-h-[140px] sm:min-h-[155px] shadow-2xs">
+            <span className="text-xs font-semibold text-slate-400 mb-2">
               النسبة
             </span>
-            <div className="w-full text-right mt-3">
-              <div className="text-3xl sm:text-4xl font-extrabold text-slate-900 leading-tight">
-                {percentage}%
-              </div>
+            <div className="text-4xl sm:text-5xl font-black text-slate-800 font-mono tracking-tight leading-none my-1">
+              {percentage}%
             </div>
+            <span className="text-xs font-medium text-transparent select-none mt-2">
+              -
+            </span>
           </div>
 
           {/* Card 3: التسليم */}
-          <div className="bg-white rounded-2xl border border-slate-200/80 p-5 flex flex-col justify-between items-start text-right min-h-[135px]">
-            <span className="text-xs font-medium text-slate-400">
+          <div className="bg-white rounded-2xl border border-slate-200/90 p-5 flex flex-col items-center justify-center text-center min-h-[140px] sm:min-h-[155px] shadow-2xs">
+            <span className="text-xs font-semibold text-slate-400 mb-2">
               التسليم
             </span>
-            <div className="w-full text-right mt-3">
-              <div className="text-3xl sm:text-4xl font-extrabold text-slate-900 leading-tight">
-                {formattedSubmissionTime}
-              </div>
-              <div className="text-xs font-medium text-slate-400 mt-1">
-                {isAutoSubmitted ? 'تلقائي عند انتهاء الوقت' : 'بضغطة منك'}
-              </div>
+            <div className="text-3xl sm:text-4xl font-black text-slate-800 font-mono tracking-tight leading-none my-1">
+              {formattedSubmissionTime}
             </div>
+            <span className="text-xs font-medium text-slate-400 mt-2">
+              {isAutoSubmitted ? 'تلقائي عند انتهاء الوقت' : 'بضغطة منك'}
+            </span>
           </div>
 
           {/* Card 4 (Far Left in RTL): إجابات صحيحة */}
-          <div className="bg-white rounded-2xl border border-slate-200/80 p-5 flex flex-col justify-between items-start text-right min-h-[135px]">
-            <span className="text-xs font-medium text-slate-400">
+          <div className="bg-white rounded-2xl border border-slate-200/90 p-5 flex flex-col items-center justify-center text-center min-h-[140px] sm:min-h-[155px] shadow-2xs">
+            <span className="text-xs font-semibold text-slate-400 mb-2">
               إجابات صحيحة
             </span>
-            <div className="w-full text-right mt-3">
-              <div className="text-3xl sm:text-4xl font-extrabold text-slate-900 leading-tight">
-                {correctCount}
-              </div>
+            <div className="text-4xl sm:text-5xl font-black text-slate-800 font-mono tracking-tight leading-none my-1">
+              {correctCount}
             </div>
+            <span className="text-xs font-medium text-transparent select-none mt-2">
+              -
+            </span>
           </div>
 
         </div>
 
-        {/* 3. Bottom Notice Banner (Clean, with right blue accent capsule) */}
-        <div className="relative rounded-2xl bg-[#eff5ff] p-4 sm:p-5 flex items-center justify-end overflow-hidden">
-          {/* Blue Accent Vertical Pill on Right edge */}
-          <div className="absolute right-0 top-2 bottom-2 w-1.5 bg-[#2563eb] rounded-l-full" />
-
-          {/* Banner Text with EyeOff Icon */}
-          <div className="flex items-center gap-2.5 text-[#2563eb] text-xs sm:text-sm font-semibold pe-2 text-right">
-            <span>مراجعة الإجابات التفصيلية غير متاحة لهذا الاختبار.</span>
-            <EyeOff className="w-4 h-4 shrink-0 text-[#2563eb]" />
-          </div>
+        {/* 3. Bottom Notice Banner (Centered & Harmonious with Accent Border) */}
+        <div className="rounded-2xl bg-[#eff5ff] border border-blue-200/70 border-r-4 border-r-blue-600 p-4 sm:p-4.5 flex items-center justify-center gap-2.5 text-blue-700 text-xs sm:text-sm font-bold text-center">
+          <EyeOff className="w-4 h-4 text-blue-600 shrink-0" />
+          <span>مراجعة الإجابات التفصيلية غير متاحة لهذا الاختبار.</span>
         </div>
 
       </div>
 
-      {/* Subtle bottom retake option (outside the main official card) */}
+      {/* Subtle bottom retake option */}
       {onRetake && (
-        <div className="flex justify-center mt-4">
+        <div className="flex justify-center mt-5">
           <button
             type="button"
             onClick={onRetake}
-            className="text-xs font-bold text-slate-400 hover:text-blue-600 flex items-center gap-1.5 transition-colors cursor-pointer py-1.5 px-3 rounded-lg hover:bg-white"
+            className="text-xs font-bold text-slate-400 hover:text-blue-600 flex items-center gap-1.5 transition-colors cursor-pointer py-1.5 px-3 rounded-lg hover:bg-white/80"
           >
             <RotateCcw className="w-3.5 h-3.5" />
             <span>إعادة خوض الامتحان للتجربة الذاتية</span>

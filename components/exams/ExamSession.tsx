@@ -20,7 +20,7 @@ import {
 interface ExamSessionProps {
   exam: Exam;
   studentName?: string;
-  onFinishExam: (answers: Record<string, string>, timeSpentSeconds: number) => void;
+  onFinishExam: (answers: Record<string, string>, timeSpentSeconds: number, isAutoSubmitted?: boolean) => void;
   onCancel?: () => void;
 }
 
@@ -43,10 +43,16 @@ export function ExamSession({
 
   const currentQuestion = exam.questions[currentIndex];
 
-  // Auto-submit handler
+  // Auto-submit handler (called when countdown hits zero)
   const handleAutoSubmit = useCallback(() => {
-    onFinishExam(answers, totalSeconds - timeRemaining);
+    onFinishExam(answers, totalSeconds - timeRemaining, true);
   }, [answers, totalSeconds, timeRemaining, onFinishExam]);
+
+  // Manual submit handler (called when student confirms modal)
+  const handleManualSubmit = () => {
+    setShowSubmitModal(false);
+    onFinishExam(answers, totalSeconds - timeRemaining, false);
+  };
 
   // Countdown timer effect
   useEffect(() => {
@@ -457,7 +463,7 @@ export function ExamSession({
               </button>
               <button
                 type="button"
-                onClick={handleAutoSubmit}
+                onClick={handleManualSubmit}
                 className="flex-1 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs sm:text-sm transition-colors shadow-lg shadow-emerald-950"
               >
                 تأكيد وتسليم الآن

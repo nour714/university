@@ -23,26 +23,49 @@ export function ExamContainer({ exam, initialView }: ExamContainerProps) {
     exam.submission?.answers ?? {}
   );
   const [timeSpentSeconds, setTimeSpentSeconds] = useState<number>(0);
+  const [isAutoSubmitted, setIsAutoSubmitted] = useState<boolean>(false);
+  const [submissionTime, setSubmissionTime] = useState<string>(() => {
+    return new Date().toLocaleTimeString('ar-EG', {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+    });
+  });
 
-  const handleFinishExam = (answers: Record<string, string>, timeSpent: number) => {
+  const handleFinishExam = (
+    answers: Record<string, string>,
+    timeSpent: number,
+    autoSubmitted: boolean = false
+  ) => {
     setSubmittedAnswers(answers);
     setTimeSpentSeconds(timeSpent);
+    setIsAutoSubmitted(autoSubmitted);
+    setSubmissionTime(
+      new Date().toLocaleTimeString('ar-EG', {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false,
+      })
+    );
     setView('result');
   };
 
   const handleRetake = () => {
     setSubmittedAnswers({});
     setTimeSpentSeconds(0);
+    setIsAutoSubmitted(false);
     setView('session');
   };
 
   if (view === 'result') {
     return (
-      <div className="min-h-screen bg-[#f8fafc] text-slate-900 p-4 sm:p-6 lg:p-8">
+      <div className="min-h-screen bg-[#f8fafc] text-slate-900 p-3 sm:p-6 lg:p-8">
         <ExamResultView
           exam={exam}
           answers={submittedAnswers}
           timeSpentSeconds={timeSpentSeconds}
+          isAutoSubmitted={isAutoSubmitted}
+          submissionTime={submissionTime}
           onRetake={handleRetake}
         />
       </div>

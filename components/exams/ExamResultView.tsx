@@ -55,36 +55,38 @@ export function ExamResultView({
       {/* ========================================================================= */}
       <div className="bg-white rounded-3xl border border-slate-200/90 p-5 sm:p-8 shadow-xs">
         
-        {/* 1. Header (Organized & Harmonious Toolbar) */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 mb-6 border-b border-slate-100">
-          
+        {/* 1. Header (#1A3073 Navy Theme Banner) */}
+        <div className="bg-[#1A3073] text-white rounded-2xl p-4 sm:p-5 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 relative overflow-hidden">
+          {/* Subtle Ambient Glow */}
+          <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/10 rounded-full blur-2xl pointer-events-none" />
+
           {/* Right Side in RTL: Exam Title */}
-          <div className="flex items-center gap-2.5 min-w-0">
-            <span className="w-2.5 h-2.5 rounded-full bg-blue-600 shrink-0" />
-            <h1 className="text-base sm:text-lg lg:text-xl font-bold text-slate-900 tracking-tight leading-snug">
+          <div className="flex items-center gap-2.5 min-w-0 relative z-10">
+            <span className="w-2.5 h-2.5 rounded-full bg-blue-400 shrink-0 shadow-xs" />
+            <h1 className="text-base sm:text-lg lg:text-xl font-bold text-white tracking-tight leading-snug">
               {exam.title}
             </h1>
           </div>
 
-          {/* Left Side in RTL: Organized Action Pills (Unified height & alignment) */}
-          <div className="flex items-center gap-2 sm:gap-2.5 shrink-0 flex-wrap">
+          {/* Left Side in RTL: Organized Action Pills */}
+          <div className="flex items-center gap-2 sm:gap-2.5 shrink-0 flex-wrap relative z-10">
             {/* Course Title Pill */}
-            <span className="h-9 px-3.5 inline-flex items-center justify-center rounded-xl text-xs font-bold bg-blue-50 text-blue-600 border border-blue-200/60 shadow-2xs">
+            <span className="h-9 px-3.5 inline-flex items-center justify-center rounded-xl text-xs font-bold bg-white/15 text-white border border-white/20 shadow-xs backdrop-blur-xs">
               {exam.courseTitle}
             </span>
 
             {/* Model/Form Label Pill */}
-            <span className="h-9 px-3 inline-flex items-center justify-center rounded-xl text-xs font-bold bg-slate-100 text-slate-600 border border-slate-200/80 shadow-2xs">
+            <span className="h-9 px-3 inline-flex items-center justify-center rounded-xl text-xs font-bold bg-white/10 text-blue-100 border border-white/15">
               نموذج 1
             </span>
 
             {/* Back Button */}
             <Link
               href="/exams"
-              className="h-9 px-3.5 inline-flex items-center justify-center gap-1.5 rounded-xl border border-slate-200 hover:border-blue-400 bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold transition-all shadow-2xs active:scale-95"
+              className="h-9 px-3.5 inline-flex items-center justify-center gap-1.5 rounded-xl border border-white/25 hover:border-white/50 bg-white/15 hover:bg-white/25 text-white text-xs font-bold transition-all shadow-xs active:scale-95 cursor-pointer backdrop-blur-xs"
             >
               <span>رجوع</span>
-              <ArrowLeft className="w-3.5 h-3.5 rotate-180 text-slate-500" />
+              <ArrowLeft className="w-3.5 h-3.5 rotate-180" />
             </Link>
           </div>
         </div>

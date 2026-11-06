@@ -223,3 +223,4 @@ export function ExamsDashboard({ initialExams }: ExamsDashboardProps) {
     </div>
   );
 }
+

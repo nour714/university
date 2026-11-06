@@ -26,13 +26,15 @@ export function Sidebar({ currentPath }: { currentPath?: string }) {
   const isExamsActive = pathname.startsWith('/exams');
   const isCodesActive = pathname.startsWith('/codes');
 
-  const navItems: {
+  interface NavItem {
     title: string;
     href: string;
     icon: typeof Home;
     isActive: boolean;
     isButton?: boolean;
-  }[] = [
+  }
+
+  const navItems: NavItem[] = [
     {
       title: 'الرئيسية',
       href: '/',

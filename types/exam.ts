@@ -46,3 +46,4 @@ export interface Exam {
     answers: Record<string, string>; // questionId -> selectedOptionId
   };
 }
+

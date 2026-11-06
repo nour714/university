@@ -125,20 +125,15 @@ export function ExamSession({
     <div className="min-h-screen bg-slate-900 text-slate-100 flex flex-col font-sans select-none antialiased">
       {/* 1. Distraction-Free Top Bar */}
       <header className="sticky top-0 z-40 bg-slate-950/90 backdrop-blur-md border-b border-slate-800 px-4 sm:px-8 py-3.5 flex items-center justify-between gap-4">
-        {/* Left/Start side: Exam Info */}
+        {/* Left/Start side: Exam Info (Only Course Code) */}
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-blue-600/20 border border-blue-500/30 flex items-center justify-center text-blue-400 shrink-0">
             <BookOpen className="w-5 h-5" />
           </div>
           <div>
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-bold px-2 py-0.5 rounded bg-blue-900/60 text-blue-300 border border-blue-700/50">
-                {exam.courseCode}
-              </span>
-              <h1 className="text-sm sm:text-base font-bold text-white line-clamp-1">
-                {exam.title}
-              </h1>
-            </div>
+            <h1 className="text-base sm:text-lg font-black text-white font-mono tracking-wider">
+              {exam.courseCode}
+            </h1>
             <p className="text-xs text-slate-400 flex items-center gap-2 mt-0.5">
               <span>الطالب: <strong className="text-slate-200">{studentName}</strong></span>
               <span>•</span>

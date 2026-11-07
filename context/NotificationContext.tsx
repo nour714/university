@@ -16,6 +16,7 @@ interface NotificationContextType {
   addNotification: (notif: Partial<AcademicNotification> & { title: string; message: string; type: AcademicNotification['type'] }) => void;
   simulateLectureNotification: () => void;
   simulateExamNotification: () => void;
+  resetAll: () => void;
 }
 
 const NotificationContext = createContext<NotificationContextType | undefined>(undefined);
@@ -228,6 +229,11 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
     });
   }, [addNotification]);
 
+  const resetAll = useCallback(() => {
+    setNotifications([]);
+    setToast(null);
+  }, []);
+
   return (
     <NotificationContext.Provider
       value={{
@@ -241,6 +247,7 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
         addNotification,
         simulateLectureNotification,
         simulateExamNotification,
+        resetAll,
       }}
     >
       {children}

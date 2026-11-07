@@ -15,11 +15,12 @@ import {
   Home 
 } from 'lucide-react';
 import { useNotifications } from '@/context/NotificationContext';
+import { clearSession } from '@/lib/repos/sessionRepo';
 
 export function Sidebar({ currentPath }: { currentPath?: string }) {
   const [isExpanded, setIsExpanded] = useState(false);
   const router = useRouter();
-  const { addNotification } = useNotifications();
+  const { resetAll } = useNotifications();
   const pathname = usePathname() || currentPath || '/';
   const isHomeActive = pathname === '/';
   const isCoursesActive = pathname.startsWith('/courses');
@@ -255,6 +256,8 @@ export function Sidebar({ currentPath }: { currentPath?: string }) {
           <button
             type="button"
             onClick={() => {
+              clearSession();
+              resetAll();
               router.push('/login');
             }}
             className={`h-11 rounded-xl flex items-center justify-center text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 transition-all cursor-pointer shrink-0 ${

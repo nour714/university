@@ -13,6 +13,7 @@ import {
   Settings
 } from 'lucide-react';
 import { useNotifications } from '@/context/NotificationContext';
+import { clearSession } from '@/lib/repos/sessionRepo';
 import { CURRENT_STUDENT } from '@/data/student';
 
 interface MoreMenuSheetProps {
@@ -27,7 +28,7 @@ export function MoreMenuSheet({ isOpen, onClose }: MoreMenuSheetProps) {
   const router = useRouter();
   const [logoutLoading, setLogoutLoading] = useState(false);
 
-  const { addNotification } = useNotifications();
+  const { resetAll } = useNotifications();
 
   // Lock body scroll when opened/closed
   useEffect(() => {
@@ -55,6 +56,8 @@ export function MoreMenuSheet({ isOpen, onClose }: MoreMenuSheetProps) {
   const handleLogout = () => {
     setLogoutLoading(true);
     setTimeout(() => {
+      clearSession();
+      resetAll();
       setLogoutLoading(false);
       onClose();
       router.push('/login');

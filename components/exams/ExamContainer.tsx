@@ -5,6 +5,7 @@ import { Exam, GradeResult } from '@/types/exam';
 import { ExamSession } from '@/components/exams/ExamSession';
 import { ExamResultView } from '@/components/exams/ExamResultView';
 import { gradeExam } from '@/app/exams/actions';
+import { markSubmitted } from '@/lib/repos/examSessionRepo';
 
 interface ExamContainerProps {
   exam: Exam;
@@ -46,6 +47,7 @@ export function ExamContainer({ exam, initialView, initialResult }: ExamContaine
       }
 
       setGradeResult(res);
+      markSubmitted(exam.id);
       setIsAutoSubmitted(isAuto);
       const d = new Date();
       const h = d.getHours().toString().padStart(2, '0');

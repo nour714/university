@@ -3,6 +3,11 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { Exam } from '@/types/exam';
 import { 
+  startOrResumeSession, 
+  saveAnswers, 
+  SessionState 
+} from '@/lib/repos/examSessionRepo';
+import { 
   Clock, 
   AlertTriangle, 
   CheckCircle2, 
@@ -12,8 +17,6 @@ import {
   Send, 
   BookOpen, 
   ShieldCheck, 
-  HelpCircle,
-  Sparkles,
   Info
 } from 'lucide-react';
 
@@ -33,25 +36,16 @@ export function ExamSession({
   // Total duration in seconds
   const totalSeconds = useMemo(() => exam.durationMinutes * 60, [exam.durationMinutes]);
 
-  // Real-world absolute end time (timestamp in milliseconds)
+  // Session state from hardened repo
+  const [sessionState] = useState<SessionState>(() => {
+    return startOrResumeSession(exam.id, exam.durationMinutes);
+  });
+
   const [endTime] = useState<number>(() => {
-    if (typeof window !== 'undefined') {
-      try {
-        const stored = localStorage.getItem(`exam_endtime_${exam.id}`);
-        if (stored) {
-          const parsed = parseInt(stored, 10);
-          // If stored end time is valid and in the future, resume it
-          if (!isNaN(parsed) && parsed > Date.now()) {
-            return parsed;
-          }
-        }
-        // Initialize fresh absolute end time
-        const newEndTime = Date.now() + totalSeconds * 1000;
-        localStorage.setItem(`exam_endtime_${exam.id}`, newEndTime.toString());
-        return newEndTime;
-      } catch {}
+    if (sessionState.status === 'active') {
+      return sessionState.endAt;
     }
-    return Date.now() + totalSeconds * 1000;
+    return Date.now();
   });
 
   const getRemainingSeconds = useCallback(() => {
@@ -59,43 +53,30 @@ export function ExamSession({
   }, [endTime]);
 
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [answers, setAnswers] = useState<Record<string, string>>(() => {
-    if (typeof window !== 'undefined') {
-      try {
-        const saved = localStorage.getItem(`exam_answers_${exam.id}`);
-        if (saved) return JSON.parse(saved);
-      } catch {}
-    }
-    return {};
-  });
+  const [answers, setAnswers] = useState<Record<string, string>>(() => sessionState.answers);
   const [flagged, setFlagged] = useState<Set<string>>(new Set());
   const [timeRemaining, setTimeRemaining] = useState<number>(() => getRemainingSeconds());
-  const [timeSpent, setTimeSpent] = useState<number>(() => totalSeconds - getRemainingSeconds());
   const [showSubmitModal, setShowSubmitModal] = useState(false);
-  const [lastSavedQuestionId, setLastSavedQuestionId] = useState<string | null>(null);
   const questionWorkspaceRef = useRef<HTMLDivElement>(null);
 
   const currentQuestion = exam.questions[currentIndex];
 
-  // Clear local storage exam session keys
-  const clearExamStorage = useCallback(() => {
-    if (typeof window !== 'undefined') {
-      try {
-        localStorage.removeItem(`exam_endtime_${exam.id}`);
-        localStorage.removeItem(`exam_answers_${exam.id}`);
-      } catch {}
+  // If session was already expired or submitted upon load, auto-transition immediately
+  useEffect(() => {
+    if (sessionState.status === 'expired') {
+      onFinishExam(sessionState.answers, true);
+    } else if (sessionState.status === 'submitted') {
+      onFinishExam(sessionState.answers, false);
     }
-  }, [exam.id]);
+  }, [sessionState, onFinishExam]);
 
   // Auto-submit handler (called when countdown hits zero)
   const handleAutoSubmit = useCallback(() => {
-    clearExamStorage();
     onFinishExam(answers, true);
-  }, [answers, onFinishExam, clearExamStorage]);
+  }, [answers, onFinishExam]);
 
   // Manual submit handler (called when student confirms modal)
   const handleManualSubmit = () => {
-    clearExamStorage();
     onFinishExam(answers, false);
   };
 
@@ -104,20 +85,15 @@ export function ExamSession({
     const updateCountdown = () => {
       const remaining = Math.max(0, Math.ceil((endTime - Date.now()) / 1000));
       setTimeRemaining(remaining);
-      setTimeSpent(totalSeconds - remaining);
 
       if (remaining <= 0) {
         handleAutoSubmit();
       }
     };
 
-    // Immediate check
     updateCountdown();
-
-    // Regular tick
     const interval = setInterval(updateCountdown, 1000);
 
-    // Refresh immediately when returning to tab or window focus
     const handleVisibilityOrFocus = () => {
       updateCountdown();
     };
@@ -130,23 +106,18 @@ export function ExamSession({
       document.removeEventListener('visibilitychange', handleVisibilityOrFocus);
       window.removeEventListener('focus', handleVisibilityOrFocus);
     };
-  }, [endTime, totalSeconds, handleAutoSubmit]);
+  }, [endTime, handleAutoSubmit]);
 
-  // Handle option select with persistent backup
+  // Handle option select with persistent backup via repo
   const handleSelectOption = (optionId: string) => {
     setAnswers((prev) => {
       const next = {
         ...prev,
         [currentQuestion.id]: optionId,
       };
-      if (typeof window !== 'undefined') {
-        try {
-          localStorage.setItem(`exam_answers_${exam.id}`, JSON.stringify(next));
-        } catch {}
-      }
+      saveAnswers(exam.id, next);
       return next;
     });
-    setLastSavedQuestionId(currentQuestion.id);
   };
 
   // Toggle flag for current question

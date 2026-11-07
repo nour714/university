@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Exam } from '@/types/exam';
+import { ListExam } from '@/types/exam';
 import { 
   ClipboardCheck, 
   Clock, 
@@ -10,12 +10,11 @@ import {
   Award, 
   Calendar, 
   ArrowLeft, 
-  CheckCircle2, 
-  AlertCircle
+  CheckCircle2
 } from 'lucide-react';
 
 interface ExamCardProps {
-  exam: Exam;
+  exam: ListExam;
 }
 
 export function ExamCard({ exam }: ExamCardProps) {
@@ -73,7 +72,7 @@ export function ExamCard({ exam }: ExamCardProps) {
     }
   };
 
-  const getExamTypeBadge = (type: Exam['type']) => {
+  const getExamTypeBadge = (type: ListExam['type']) => {
     switch (type) {
       case 'midterm':
         return <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200/60">ميدتيرم فصلي</span>;

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import { Exam, ExamStatus } from '@/types/exam';
+import { ListExam, ExamStatus } from '@/types/exam';
 import { ExamCard } from '@/components/exams/ExamCard';
 import { matchesSearch } from '@/lib/normalizeArabic';
 import { 
@@ -13,13 +13,13 @@ import {
 } from 'lucide-react';
 
 interface ExamsDashboardProps {
-  initialExams: Exam[];
+  initialExams: ListExam[];
 }
 
 type TabFilter = 'all' | ExamStatus;
 
 export function ExamsDashboard({ initialExams }: ExamsDashboardProps) {
-  const [exams, setExams] = useState<Exam[]>(initialExams);
+  const exams = initialExams;
   const [activeTab, setActiveTab] = useState<TabFilter>('all');
   const [searchQuery, setSearchQuery] = useState('');
 

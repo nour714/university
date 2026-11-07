@@ -1,4 +1,4 @@
-export type ExamStatus = 'live' | 'upcoming' | 'completed';
+export type ExamStatus = 'live' | 'upcoming' | 'completed' | 'ended';
 
 export type ExamType = 'midterm' | 'quiz' | 'final' | 'practical';
 
@@ -13,9 +13,18 @@ export interface ExamQuestion {
   questionText: string;
   codeSnippet?: string;
   options: ExamQuestionOption[];
-  correctOptionId: string;
-  explanation: string;
   points: number;
+}
+
+export interface GradeResult {
+  score: number;
+  totalMarks: number;
+  percentage: number;
+  passed: boolean;
+  correctCount: number;
+  wrongCount: number;
+  unansweredCount: number;
+  perQuestion: Record<string, boolean>;
 }
 
 export interface Exam {
@@ -31,9 +40,9 @@ export interface Exam {
   durationMinutes: number;
   totalMarks: number;
   passingMarks: number;
-  startDate: string; // ISO string e.g. 2026-11-06T10:00:00
-  endDate: string;   // ISO string e.g. 2026-11-06T12:00:00
-  status: ExamStatus;
+  startDate: string; // ISO string e.g. 2026-11-06T10:00:00+02:00
+  endDate: string;   // ISO string e.g. 2026-11-06T12:00:00+02:00
+  status?: ExamStatus;
   questions: ExamQuestion[];
   instructions: string[];
   // If completed previously
@@ -47,3 +56,4 @@ export interface Exam {
   };
 }
 
+export type ListExam = Omit<Exam, 'questions'>;

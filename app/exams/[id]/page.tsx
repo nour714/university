@@ -1,6 +1,8 @@
 import { notFound } from 'next/navigation';
 import { RAW_EXAMS_DATA } from '@/data/exams';
 import { ExamContainer } from '@/components/exams/ExamContainer';
+import { gradeAnswers } from '@/lib/exams/grading.server';
+import { GradeResult } from '@/types/exam';
 
 interface ExamDetailPageProps {
   params: Promise<{
@@ -40,8 +42,18 @@ export default async function ExamDetailPage({ params, searchParams }: ExamDetai
     notFound();
   }
 
+  let initialResult: GradeResult | undefined;
+  if (exam.submission) {
+    initialResult = gradeAnswers(exam.id, exam.submission.answers) ?? undefined;
+  }
+
   const initialView = resolvedSearchParams?.view === 'result' ? 'result' : undefined;
 
-  return <ExamContainer exam={exam} initialView={initialView} />;
+  return (
+    <ExamContainer
+      exam={exam}
+      initialView={initialView}
+      initialResult={initialResult}
+    />
+  );
 }
-

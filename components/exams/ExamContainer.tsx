@@ -1,28 +1,26 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { Exam } from '@/types/exam';
+import { Exam, GradeResult } from '@/types/exam';
 import { ExamSession } from '@/components/exams/ExamSession';
 import { ExamResultView } from '@/components/exams/ExamResultView';
+import { gradeExam } from '@/app/exams/actions';
 
 interface ExamContainerProps {
   exam: Exam;
   initialView?: 'session' | 'result';
+  initialResult?: GradeResult;
 }
 
-export function ExamContainer({ exam, initialView }: ExamContainerProps) {
-  const router = useRouter();
-
+export function ExamContainer({ exam, initialView, initialResult }: ExamContainerProps) {
   // If exam was completed previously or explicitly opened as result
-  const defaultView = initialView || (exam.status === 'completed' ? 'result' : 'session');
+  const defaultView = initialView || (exam.submission ? 'result' : 'session');
   const [view, setView] = useState<'session' | 'result'>(defaultView);
+  const [gradeResult, setGradeResult] = useState<GradeResult | null>(initialResult ?? null);
 
-  // Student submitted answers
-  const [submittedAnswers, setSubmittedAnswers] = useState<Record<string, string>>(
-    exam.submission?.answers ?? {}
-  );
-  const [timeSpentSeconds, setTimeSpentSeconds] = useState<number>(0);
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+
   const [isAutoSubmitted, setIsAutoSubmitted] = useState<boolean>(false);
   const [submissionTime, setSubmissionTime] = useState<string>(() => {
     const d = new Date();
@@ -31,44 +29,62 @@ export function ExamContainer({ exam, initialView }: ExamContainerProps) {
     return `${h}:${m}`;
   });
 
-  const handleFinishExam = (
-    answers: Record<string, string>,
-    timeSpent: number,
-    autoSubmitted: boolean = false
-  ) => {
-    setSubmittedAnswers(answers);
-    setTimeSpentSeconds(timeSpent);
-    setIsAutoSubmitted(autoSubmitted);
-    const d = new Date();
-    const h = d.getHours().toString().padStart(2, '0');
-    const m = d.getMinutes().toString().padStart(2, '0');
-    setSubmissionTime(`${h}:${m}`);
-    setView('result');
-  };
+  const submitWithRetry = async (
+    answersToSubmit: Record<string, string>,
+    isAuto: boolean,
+    retriesLeft: number
+  ): Promise<boolean> => {
+    try {
+      const res = await gradeExam(exam.id, answersToSubmit);
+      if ('error' in res) {
+        if (isAuto && retriesLeft > 1) {
+          await new Promise((resolve) => setTimeout(resolve, 600));
+          return submitWithRetry(answersToSubmit, isAuto, retriesLeft - 1);
+        }
+        setSubmitError(res.error || 'تعذر تسليم الاختبار، يرجى المحاولة مرة أخرى.');
+        return false;
+      }
 
-  const handleRetake = () => {
-    if (typeof window !== 'undefined') {
-      try {
-        localStorage.removeItem(`exam_endtime_${exam.id}`);
-        localStorage.removeItem(`exam_answers_${exam.id}`);
-      } catch {}
+      setGradeResult(res);
+      setIsAutoSubmitted(isAuto);
+      const d = new Date();
+      const h = d.getHours().toString().padStart(2, '0');
+      const m = d.getMinutes().toString().padStart(2, '0');
+      setSubmissionTime(`${h}:${m}`);
+      setSubmitError(null);
+      setView('result');
+      return true;
+    } catch {
+      if (isAuto && retriesLeft > 1) {
+        await new Promise((resolve) => setTimeout(resolve, 600));
+        return submitWithRetry(answersToSubmit, isAuto, retriesLeft - 1);
+      }
+      setSubmitError('حدث خطأ في الاتصال بالخادم، يرجى إعادة المحاولة.');
+      return false;
     }
-    setSubmittedAnswers({});
-    setTimeSpentSeconds(0);
-    setIsAutoSubmitted(false);
-    setView('session');
   };
 
-  if (view === 'result') {
+  const handleFinishExam = async (
+    answersToSubmit: Record<string, string>,
+    isAuto: boolean = false
+  ) => {
+    setIsSubmitting(true);
+    setSubmitError(null);
+    try {
+      await submitWithRetry(answersToSubmit, isAuto, isAuto ? 3 : 1);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  if (view === 'result' && gradeResult) {
     return (
       <div className="w-full min-h-[100dvh] bg-[#f8fafc] text-slate-900 flex flex-col justify-start sm:justify-center items-center p-3 sm:p-6 lg:p-8">
         <ExamResultView
           exam={exam}
-          answers={submittedAnswers}
-          timeSpentSeconds={timeSpentSeconds}
+          result={gradeResult}
           isAutoSubmitted={isAutoSubmitted}
           submissionTime={submissionTime}
-          onRetake={handleRetake}
         />
       </div>
     );
@@ -77,10 +93,9 @@ export function ExamContainer({ exam, initialView }: ExamContainerProps) {
   return (
     <ExamSession
       exam={exam}
-      studentName="عبد الرحمن خالد"
+      isSubmitting={isSubmitting}
+      submitError={submitError}
       onFinishExam={handleFinishExam}
-      onCancel={() => router.push('/exams')}
     />
   );
 }
-

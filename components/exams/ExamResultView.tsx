@@ -1,44 +1,25 @@
 'use client';
 
 import Link from 'next/link';
-import { Exam } from '@/types/exam';
+import { Exam, GradeResult } from '@/types/exam';
 import { ArrowRight, EyeOff, ClipboardCheck } from 'lucide-react';
 
 interface ExamResultViewProps {
   exam: Exam;
-  answers: Record<string, string>;
-  timeSpentSeconds?: number;
+  result: GradeResult;
   isAutoSubmitted?: boolean;
   submissionTime?: string;
-  onRetake?: () => void;
 }
 
 export function ExamResultView({
   exam,
-  answers,
-  timeSpentSeconds = 0,
+  result,
   isAutoSubmitted = false,
   submissionTime,
-  onRetake,
 }: ExamResultViewProps) {
-  // Calculate score and statistics
-  let totalScore = 0;
-  let correctCount = 0;
-
-  exam.questions.forEach((q) => {
-    const studentChoice = answers[q.id];
-    if (studentChoice === q.correctOptionId) {
-      totalScore += q.points;
-      correctCount++;
-    }
-  });
-
-  // If this exam was pre-recorded in mock data as completed, fallback or override if answers provided
-  const finalScore = Object.keys(answers).length > 0 
-    ? totalScore 
-    : (exam.submission?.score ?? totalScore);
-
-  const percentage = Math.round((finalScore / exam.totalMarks) * 100);
+  const finalScore = result.score;
+  const percentage = result.percentage;
+  const correctCount = result.correctCount;
 
   // Formatted submission time (standard digits e.g. 21:13 or 03:07)
   const formattedSubmissionTime = submissionTime || (() => {

@@ -19,16 +19,16 @@ import {
 
 interface ExamSessionProps {
   exam: Exam;
-  studentName?: string;
-  onFinishExam: (answers: Record<string, string>, timeSpentSeconds: number, isAutoSubmitted?: boolean) => void;
-  onCancel?: () => void;
+  isSubmitting?: boolean;
+  submitError?: string | null;
+  onFinishExam: (answers: Record<string, string>, isAutoSubmitted?: boolean) => void;
 }
 
 export function ExamSession({
   exam,
-  studentName = 'عبد الرحمن خالد',
+  isSubmitting = false,
+  submitError,
   onFinishExam,
-  onCancel,
 }: ExamSessionProps) {
   // Total duration in seconds
   const totalSeconds = useMemo(() => exam.durationMinutes * 60, [exam.durationMinutes]);
@@ -90,16 +90,13 @@ export function ExamSession({
   // Auto-submit handler (called when countdown hits zero)
   const handleAutoSubmit = useCallback(() => {
     clearExamStorage();
-    const finalSpent = Math.min(totalSeconds, totalSeconds - getRemainingSeconds());
-    onFinishExam(answers, finalSpent, true);
-  }, [answers, totalSeconds, getRemainingSeconds, onFinishExam, clearExamStorage]);
+    onFinishExam(answers, true);
+  }, [answers, onFinishExam, clearExamStorage]);
 
   // Manual submit handler (called when student confirms modal)
   const handleManualSubmit = () => {
     clearExamStorage();
-    setShowSubmitModal(false);
-    const finalSpent = Math.min(totalSeconds, totalSeconds - getRemainingSeconds());
-    onFinishExam(answers, finalSpent, false);
+    onFinishExam(answers, false);
   };
 
   // Real-time Countdown timer effect (resilient to tab switching & background suspension)
@@ -228,12 +225,17 @@ export function ExamSession({
           {/* Submit Action Button */}
           <button
             type="button"
+            disabled={isSubmitting}
             onClick={() => setShowSubmitModal(true)}
-            className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 min-h-[36px] sm:min-h-[40px] rounded-xl text-xs sm:text-sm font-bold bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white transition-all shadow-md shadow-emerald-950/40 cursor-pointer shrink-0"
+            className={`inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 min-h-[36px] sm:min-h-[40px] rounded-xl text-xs sm:text-sm font-bold transition-all shadow-md shadow-emerald-950/40 shrink-0 ${
+              isSubmitting
+                ? 'bg-slate-700 text-slate-400 cursor-not-allowed opacity-70'
+                : 'bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white cursor-pointer'
+            }`}
           >
             <Send className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-            <span className="hidden sm:inline">تسليم الامتحان</span>
-            <span className="sm:hidden">تسليم</span>
+            <span className="hidden sm:inline">{isSubmitting ? 'جاري التسليم...' : 'تسليم الامتحان'}</span>
+            <span className="sm:hidden">{isSubmitting ? 'جاري...' : 'تسليم'}</span>
           </button>
         </div>
       </header>
@@ -516,6 +518,13 @@ export function ExamSession({
               </div>
             </div>
 
+            {submitError && (
+              <div className="p-3 rounded-xl bg-rose-950/50 border border-rose-600/50 text-rose-300 text-xs flex items-start gap-2">
+                <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5 text-rose-400" />
+                <span>{submitError}</span>
+              </div>
+            )}
+
             {unansweredCount > 0 && (
               <div className="p-3 rounded-xl bg-amber-950/50 border border-amber-600/50 text-amber-300 text-xs flex items-start gap-2">
                 <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />
@@ -529,17 +538,23 @@ export function ExamSession({
             <div className="flex items-center gap-2.5 sm:gap-3 pt-2">
               <button
                 type="button"
+                disabled={isSubmitting}
                 onClick={() => setShowSubmitModal(false)}
-                className="flex-1 py-3 min-h-[44px] rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs sm:text-sm transition-colors cursor-pointer"
+                className="flex-1 py-3 min-h-[44px] rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs sm:text-sm transition-colors cursor-pointer disabled:opacity-50"
               >
                 متابعة الحل
               </button>
               <button
                 type="button"
+                disabled={isSubmitting}
                 onClick={handleManualSubmit}
-                className="flex-1 py-3 min-h-[44px] rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs sm:text-sm transition-colors shadow-lg shadow-emerald-950 cursor-pointer"
+                className={`flex-1 py-3 min-h-[44px] rounded-xl font-bold text-xs sm:text-sm transition-colors shadow-lg shadow-emerald-950 ${
+                  isSubmitting
+                    ? 'bg-slate-700 text-slate-400 cursor-not-allowed'
+                    : 'bg-emerald-600 hover:bg-emerald-500 text-white cursor-pointer'
+                }`}
               >
-                تأكيد وتسليم الآن
+                {isSubmitting ? 'جاري التسليم...' : 'تأكيد وتسليم الآن'}
               </button>
             </div>
           </div>

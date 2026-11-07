@@ -19,6 +19,10 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   title: 'كلية الذكاء الاصطناعي | مكتبة المقررات الأكاديمية',
   description: 'المنصة الرقمية لكلية الذكاء الاصطناعي - تصفح المقررات، المحاضرات، التمارين، والوسائط التعليمية بسرعة وأداء فائق.',
+  robots: {
+    index: false,
+    follow: false,
+  },
 };
 
 export default function RootLayout({

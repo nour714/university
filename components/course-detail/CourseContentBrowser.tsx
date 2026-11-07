@@ -10,7 +10,6 @@ import {
   Image as ImageIcon, 
   Link2, 
   Search, 
-  ExternalLink, 
   Download, 
   Clock, 
   FolderSearch,

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { Exam } from '@/types/exam';
 import { 
   startOrResumeSession, 
@@ -33,9 +33,6 @@ export function ExamSession({
   submitError,
   onFinishExam,
 }: ExamSessionProps) {
-  // Total duration in seconds
-  const totalSeconds = useMemo(() => exam.durationMinutes * 60, [exam.durationMinutes]);
-
   // Session state from hardened repo
   const [sessionState] = useState<SessionState>(() => {
     return startOrResumeSession(exam.id, exam.durationMinutes);

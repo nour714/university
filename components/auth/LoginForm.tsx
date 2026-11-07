@@ -13,7 +13,6 @@ import {
   CheckCircle2, 
   AlertCircle, 
   HelpCircle,
-  BookOpen,
   GraduationCap,
   MessageSquare,
   Send,

@@ -46,7 +46,7 @@ export default async function ExamDetailPage({ params, searchParams }: ExamDetai
 
   // Defer rendering until request time to read authoritative current time under Next.js 16 cacheComponents
   await connection();
-  const currentStatus = getExamStatus(exam, Date.now());
+  const currentStatus = getExamStatus(exam);
 
   // Direct access restrictions
   if (currentStatus === 'upcoming' || currentStatus === 'ended') {

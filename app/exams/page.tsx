@@ -9,8 +9,9 @@ export const metadata: Metadata = {
 };
 
 function toListExam(exam: Exam): ListExam {
-  const { questions: _unused, ...rest } = exam;
-  return rest;
+  const copy: Partial<Exam> = { ...exam };
+  delete copy.questions;
+  return copy as ListExam;
 }
 
 export default function ExamsPage() {

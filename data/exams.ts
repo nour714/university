@@ -16,7 +16,6 @@ export const RAW_EXAMS_DATA: Exam[] = [
     passingMarks: 10,
     startDate: '2026-11-01T00:00:00+02:00',
     endDate: '2026-12-31T23:59:59+02:00',
-    status: 'live',
     instructions: [
       'Questions and options are rendered in English.',
       'Every selected answer is automatically saved to the college cloud servers.',
@@ -113,7 +112,6 @@ export const RAW_EXAMS_DATA: Exam[] = [
     passingMarks: 8,
     startDate: '2027-01-10T10:00:00+02:00',
     endDate: '2027-01-10T11:00:00+02:00',
-    status: 'upcoming',
     instructions: [
       'Questions and options are rendered in English.',
       'The countdown timer will initiate automatically when exam time begins.',
@@ -197,7 +195,6 @@ export const RAW_EXAMS_DATA: Exam[] = [
     passingMarks: 5,
     startDate: '2027-01-20T09:00:00+02:00',
     endDate: '2027-01-20T11:00:00+02:00',
-    status: 'upcoming',
     instructions: [
       'Questions and options are rendered in English.',
       'Access will unlock on the specified schedule down to the second.'
@@ -244,7 +241,6 @@ export const RAW_EXAMS_DATA: Exam[] = [
     passingMarks: 10,
     startDate: '2026-10-25T09:00:00+02:00',
     endDate: '2026-10-25T09:25:00+02:00',
-    status: 'completed',
     instructions: [],
     questions: [
       {

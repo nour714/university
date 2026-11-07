@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import { ListExam, ExamStatus } from '@/types/exam';
+import { getExamStatus } from '@/lib/exams/status';
 import { ExamCard } from '@/components/exams/ExamCard';
 import { matchesSearch } from '@/lib/normalizeArabic';
 import { 
@@ -23,21 +24,23 @@ export function ExamsDashboard({ initialExams }: ExamsDashboardProps) {
   const [activeTab, setActiveTab] = useState<TabFilter>('all');
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Counts per status
+  // Counts per status computed dynamically
   const counts = useMemo(() => {
     return {
       all: exams.length,
-      live: exams.filter((e) => e.status === 'live').length,
-      upcoming: exams.filter((e) => e.status === 'upcoming').length,
-      completed: exams.filter((e) => e.status === 'completed').length,
+      live: exams.filter((e) => getExamStatus(e) === 'live').length,
+      upcoming: exams.filter((e) => getExamStatus(e) === 'upcoming').length,
+      completed: exams.filter((e) => getExamStatus(e) === 'completed').length,
     };
   }, [exams]);
 
   // Filtered exams
   const filteredExams = useMemo(() => {
     return exams.filter((exam) => {
+      const status = getExamStatus(exam);
+
       // Tab filter
-      if (activeTab !== 'all' && exam.status !== activeTab) {
+      if (activeTab !== 'all' && status !== activeTab) {
         return false;
       }
 

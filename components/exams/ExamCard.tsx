@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { ListExam } from '@/types/exam';
+import { ListExam, ExamStatus } from '@/types/exam';
+import { getExamStatus } from '@/lib/exams/status';
 import { 
   ClipboardCheck, 
   Clock, 
@@ -18,43 +19,38 @@ interface ExamCardProps {
 }
 
 export function ExamCard({ exam }: ExamCardProps) {
+  const [currentStatus, setCurrentStatus] = useState<ExamStatus>(() => getExamStatus(exam));
+
   // Real-time countdown for upcoming exams
-  const [timeLeft, setTimeLeft] = useState<{ hours: number; minutes: number; seconds: number; isReady: boolean }>({
+  const [timeLeft, setTimeLeft] = useState<{ hours: number; minutes: number; seconds: number }>({
     hours: 0,
     minutes: 0,
     seconds: 0,
-    isReady: exam.status === 'live',
   });
 
-  const [simulatedLive, setSimulatedLive] = useState(exam.status === 'live');
-
   useEffect(() => {
-    if (exam.status !== 'upcoming') return;
-
-    const targetDate = new Date(exam.startDate).getTime();
-
     const updateTimer = () => {
       const now = Date.now();
-      const diff = targetDate - now;
+      const status = getExamStatus(exam, now);
+      setCurrentStatus(status);
 
-      if (diff <= 0) {
-        setTimeLeft({ hours: 0, minutes: 0, seconds: 0, isReady: true });
-        setSimulatedLive(true);
-      } else {
+      if (status === 'upcoming') {
+        const targetDate = new Date(exam.startDate).getTime();
+        const diff = Math.max(0, targetDate - now);
         const hours = Math.floor(diff / (1000 * 60 * 60));
         const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
         const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-        setTimeLeft({ hours, minutes, seconds, isReady: false });
+        setTimeLeft({ hours, minutes, seconds });
       }
     };
 
     updateTimer();
     const interval = setInterval(updateTimer, 1000);
     return () => clearInterval(interval);
-  }, [exam.startDate, exam.status]);
+  }, [exam]);
 
-  const isLiveNow = simulatedLive || exam.status === 'live';
-  const isCompleted = exam.status === 'completed';
+  const isLiveNow = currentStatus === 'live';
+  const isCompleted = currentStatus === 'completed';
 
   // Format dates for display
   const formatDateTime = (isoString: string) => {

@@ -1,7 +1,9 @@
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
+import { connection } from 'next/server';
 import { RAW_EXAMS_DATA } from '@/data/exams';
 import { ExamContainer } from '@/components/exams/ExamContainer';
 import { gradeAnswers } from '@/lib/exams/grading.server';
+import { getExamStatus } from '@/lib/exams/status';
 import { GradeResult } from '@/types/exam';
 
 interface ExamDetailPageProps {
@@ -13,7 +15,7 @@ interface ExamDetailPageProps {
   }>;
 }
 
-// Allow blocking route for params access in Next.js 16
+// Allow dynamic params access in Next.js 16
 export const instant = false;
 
 export function generateStaticParams() {
@@ -42,12 +44,31 @@ export default async function ExamDetailPage({ params, searchParams }: ExamDetai
     notFound();
   }
 
+  // Defer rendering until request time to read authoritative current time under Next.js 16 cacheComponents
+  await connection();
+  const currentStatus = getExamStatus(exam, Date.now());
+
+  // Direct access restrictions
+  if (currentStatus === 'upcoming' || currentStatus === 'ended') {
+    redirect('/exams');
+  }
+
+  // ?view=result is allowed ONLY for completed exams
+  if (resolvedSearchParams?.view === 'result') {
+    if (currentStatus !== 'completed') {
+      if (currentStatus === 'live') {
+        redirect(`/exams/${exam.id}`);
+      }
+      redirect('/exams');
+    }
+  }
+
   let initialResult: GradeResult | undefined;
-  if (exam.submission) {
+  if (currentStatus === 'completed' && exam.submission) {
     initialResult = gradeAnswers(exam.id, exam.submission.answers) ?? undefined;
   }
 
-  const initialView = resolvedSearchParams?.view === 'result' ? 'result' : undefined;
+  const initialView = currentStatus === 'completed' || resolvedSearchParams?.view === 'result' ? 'result' : 'session';
 
   return (
     <ExamContainer

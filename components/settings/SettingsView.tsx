@@ -11,7 +11,6 @@ import {
   ShieldCheck, 
   Check, 
   MessageSquare, 
-  Mail, 
   Clock, 
   ExternalLink,
   Copy,
@@ -47,7 +46,7 @@ export function SettingsView() {
   // Support form state
   const [supportCategory, setSupportCategory] = useState('technical');
   const [supportPriority, setSupportPriority] = useState('normal');
-  const [supportSubject, setSupportSubject] = useState('');
+  const [ticketId, setTicketId] = useState('');
   const [supportMessage, setSupportMessage] = useState('');
   const [supportLoading, setSupportLoading] = useState(false);
   const [supportSuccess, setSupportSuccess] = useState(false);
@@ -122,13 +121,18 @@ export function SettingsView() {
     e.preventDefault();
     if (!supportMessage.trim()) return;
 
+    // TODO(backend): ticket generation and submission must be handled by an API route and stored in a database.
+    const generatedTicketId = typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
+      ? crypto.randomUUID().slice(0, 6).toUpperCase()
+      : Math.floor(100000 + Math.random() * 900000).toString();
+
     setSupportLoading(true);
 
     setTimeout(() => {
+      setTicketId(generatedTicketId);
       setSupportLoading(false);
       setSupportSuccess(true);
       setSupportMessage('');
-      setSupportSubject('');
 
       addNotification({
         title: 'تم استلام طلب الدعم الفني',
@@ -601,7 +605,7 @@ export function SettingsView() {
                 <div>
                   <p className="font-bold">تم إرسال تذكرتك بنجاح!</p>
                   <p className="text-[11px] text-emerald-700 mt-0.5">
-                    رقم التذكرة: #{Math.floor(100000 + Math.random() * 900000)}. سيصلك إشعار بالرد قريباً.
+                    رقم التذكرة: #{ticketId}. سيصلك إشعار بالرد قريباً.
                   </p>
                 </div>
               </div>

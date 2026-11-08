@@ -14,18 +14,21 @@ export interface RequireAuthOptions {
 export async function requireAuth(options: RequireAuthOptions = {}): Promise<AuthenticatedStudent> {
   const token = await getSessionCookie();
 
+  // No cookie present -> user is unauthenticated
   if (!token) {
     redirect('/login');
   }
 
   const student = await validateSession(token);
 
+  // Cookie is present but maps to an invalid, expired, or revoked session -> clear cookie to prevent loops
   if (!student) {
-    redirect('/login');
+    redirect('/auth/clear');
   }
 
+  // Account requires forced password change
   if (student.mustChangePassword && !options.allowMustChangePassword) {
-    redirect('/login?changePassword=true');
+    redirect('/account/change-password');
   }
 
   return student;

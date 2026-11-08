@@ -5,12 +5,17 @@ const SESSION_COOKIE_NAME =
   process.env.NODE_ENV === 'production' ? '__Host-sid' : 'academic_sid';
 
 // Public routes that never require a session
-const PUBLIC_PATHS = ['/login', '/favicon.ico'];
+const PUBLIC_PATHS = ['/login', '/auth/clear', '/favicon.ico'];
 
+/**
+ * NOTE: The proxy is a routing hint, not a security boundary.
+ * Actual authentication, authorization, and ownership checks are strictly enforced
+ * inside Server Components, Server Actions, and Route Handlers via requireAuth().
+ */
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // 1. Skip static assets, images, API routes, and internal Next.js requests
+  // 1. Skip static assets, images, API routes, cron, and internal Next.js requests
   if (
     pathname.startsWith('/_next') ||
     pathname.startsWith('/api/') ||
@@ -20,19 +25,19 @@ export function proxy(request: NextRequest) {
   }
 
   const sessionCookie = request.cookies.get(SESSION_COOKIE_NAME)?.value;
-  const isPublicPath = PUBLIC_PATHS.some((path) => pathname === path || pathname.startsWith(path + '/'));
+  const isPublicPath = PUBLIC_PATHS.some(
+    (path) => pathname === path || pathname.startsWith(path + '/')
+  );
 
-  // 2. Unauthenticated user trying to access a protected route
+  // 2. Unauthenticated user without cookie trying to access a protected route -> redirect to /login
   if (!sessionCookie && !isPublicPath) {
     const loginUrl = new URL('/login', request.url);
     return NextResponse.redirect(loginUrl);
   }
 
-  // 3. Authenticated user trying to access /login -> redirect to home
-  if (sessionCookie && pathname === '/login') {
-    const homeUrl = new URL('/', request.url);
-    return NextResponse.redirect(homeUrl);
-  }
+  // NOTE: Removed the "cookie present + /login -> /" redirect.
+  // Stale/expired/must-change cookies must be allowed to reach /login or /account/change-password
+  // without triggering an infinite redirect loop. Verification happens in the page Server Component.
 
   return NextResponse.next();
 }

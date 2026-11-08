@@ -2,7 +2,7 @@ import 'server-only';
 import crypto from 'node:crypto';
 import { cache } from 'react';
 import { appSql } from '@/lib/db/app.server';
-import { StudentProfile } from '@/data/student';
+import { StudentProfile } from '@/types/student';
 
 export interface AuthenticatedStudent {
   accountId: string;
@@ -27,10 +27,20 @@ export interface AuthenticatedStudent {
  */
 export async function createSession(
   accountId: string,
-  meta?: { ip?: string; userAgent?: string }
+  meta?: { ip?: string | null; userAgent?: string | null }
 ): Promise<string> {
   const token = crypto.randomBytes(32).toString('hex');
   const tokenHash = crypto.createHash('sha256').update(token).digest();
+
+  // Validate and sanitize IP for PostgreSQL INET type
+  let sanitizedIp: string | null = null;
+  if (meta?.ip) {
+    const rawIp = meta.ip.trim();
+    // Only pass valid IPv4 / IPv6 to avoid postgres INET parse error
+    if (/^(\d{1,3}\.){3}\d{1,3}$/.test(rawIp) || /^[0-9a-fA-F:]+$/.test(rawIp)) {
+      sanitizedIp = rawIp;
+    }
+  }
 
   await appSql`
     INSERT INTO public.academic_sessions (
@@ -45,8 +55,8 @@ export async function createSession(
       ${tokenHash},
       now() + interval '30 minutes',
       now() + interval '12 hours',
-      ${meta?.ip || null},
-      ${meta?.userAgent || null}
+      ${sanitizedIp},
+      ${meta?.userAgent ? meta.userAgent.slice(0, 500) : null}
     )
   `;
 
@@ -55,7 +65,7 @@ export async function createSession(
 
 /**
  * Validates a raw session token against the database with React per-request memoization.
- * Sliding window: extends idle_expires_at by 30 minutes when > 5 minutes have elapsed.
+ * Sliding window: extends idle_expires_at by 30 minutes when > 60 seconds have elapsed.
  */
 export const validateSession = cache(async (rawToken: string): Promise<AuthenticatedStudent | null> => {
   if (!rawToken || typeof rawToken !== 'string' || rawToken.length < 32) {
@@ -78,6 +88,11 @@ export const validateSession = cache(async (rawToken: string): Promise<Authentic
       p.student_code,
       p.department,
       p.level,
+      p.faculty,
+      p.level_number,
+      p.registered_hours,
+      p.academic_year,
+      p.semester,
       p.current_gpa,
       p.max_gpa,
       p.avatar_url,
@@ -97,10 +112,9 @@ export const validateSession = cache(async (rawToken: string): Promise<Authentic
     return null;
   }
 
-  // Sliding idle window update: only write to DB if > 5 minutes elapsed since last update
-  // Eliminates blocking write transactions and table locks on frequent page navigations
+  // Sliding idle window update: only write to DB if > 60 seconds elapsed since last seen update
   const lastSeenMs = row.last_seen_at ? new Date(row.last_seen_at).getTime() : 0;
-  if (Date.now() - lastSeenMs > 5 * 60 * 1000) {
+  if (Date.now() - lastSeenMs > 60 * 1000) {
     await appSql`
       UPDATE public.academic_sessions
          SET last_seen_at = now(),
@@ -109,7 +123,7 @@ export const validateSession = cache(async (rawToken: string): Promise<Authentic
     `;
   }
 
-  const gpa = Number(row.current_gpa) || 3.84;
+  const gpa = Number(row.current_gpa) || 0;
   let gpaRating = 'امتياز مع مرتبة الشرف';
   if (gpa < 2.0) gpaRating = 'مقبول';
   else if (gpa < 3.0) gpaRating = 'جيد';
@@ -119,18 +133,19 @@ export const validateSession = cache(async (rawToken: string): Promise<Authentic
     id: row.account_id,
     fullName: row.full_name || 'طالب أكاديمي',
     academicId: row.student_code || row.national_id,
-    department: row.department || 'الذكاء الاصطناعي العام',
-    faculty: 'كلية الذكاء الاصطناعي',
-    level: row.level || 'المستوى الثالث',
-    levelNumber: 3,
+    department: row.department || 'الذكاء الاصطناعي',
+    faculty: row.faculty || 'كلية الذكاء الاصطناعي',
+    level: row.level || 'المستوى الأول',
+    levelNumber: row.level_number || 1,
     gpa,
     maxGpa: Number(row.max_gpa) || 4.0,
     gpaRating,
-    registeredHours: 18,
-    coursesCount: Number(row.courses_count) || 6,
-    academicYear: '2026/2027',
-    semester: 'الفصل الدراسي الأول',
+    registeredHours: row.registered_hours || 0,
+    coursesCount: Number(row.courses_count) || 0,
+    academicYear: row.academic_year || '2026/2027',
+    semester: row.semester || 'الفصل الدراسي الأول',
     status: 'منتظم',
+    avatarUrl: row.avatar_url || null,
   };
 
   return {
@@ -142,7 +157,7 @@ export const validateSession = cache(async (rawToken: string): Promise<Authentic
       email: row.email || '',
       studentCode: row.student_code || '',
       department: row.department || '',
-      level: row.level || 'المستوى الثاني',
+      level: row.level || 'المستوى الأول',
       currentGpa: Number(row.current_gpa) || 0,
       maxGpa: Number(row.max_gpa) || 4.0,
       avatarUrl: row.avatar_url || null,
@@ -165,13 +180,26 @@ export async function revokeSession(rawToken: string): Promise<void> {
 }
 
 /**
- * Revokes all active sessions for an account (e.g. upon password change).
+ * Revokes active sessions for an account (e.g. upon password change).
+ * If exceptToken is provided, leaves that token active.
  */
-export async function revokeAllAccountSessions(accountId: string): Promise<void> {
-  await appSql`
-    UPDATE public.academic_sessions
-       SET revoked_at = now()
-     WHERE account_id = ${accountId}
-       AND revoked_at IS NULL
-  `;
+export async function revokeAllAccountSessions(accountId: string, exceptToken?: string): Promise<void> {
+  const exceptHash = exceptToken ? crypto.createHash('sha256').update(exceptToken).digest() : null;
+
+  if (exceptHash) {
+    await appSql`
+      UPDATE public.academic_sessions
+         SET revoked_at = now()
+       WHERE account_id = ${accountId}
+         AND token_hash != ${exceptHash}
+         AND revoked_at IS NULL
+    `;
+  } else {
+    await appSql`
+      UPDATE public.academic_sessions
+         SET revoked_at = now()
+       WHERE account_id = ${accountId}
+         AND revoked_at IS NULL
+    `;
+  }
 }

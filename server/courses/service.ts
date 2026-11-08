@@ -1,9 +1,16 @@
+'use server';
+
 import 'server-only';
 import { cache } from 'react';
 import { appSql } from '@/lib/db/app.server';
 import { Course, CourseContentItem } from '@/types/course';
 
-export const listCourses = cache(async (): Promise<Course[]> => {
+export interface CourseWithEnrollment extends Course {
+  enrolled?: boolean;
+  locked?: boolean;
+}
+
+export const listCourses = cache(async (studentId?: string): Promise<CourseWithEnrollment[]> => {
   try {
     const rows = await appSql`
       SELECT 
@@ -25,7 +32,13 @@ export const listCourses = cache(async (): Promise<Course[]> => {
         COUNT(cc.id) FILTER (WHERE cc.type = 'video') AS count_videos,
         COUNT(cc.id) FILTER (WHERE cc.type = 'image') AS count_images,
         COUNT(cc.id) FILTER (WHERE cc.type = 'link') AS count_links,
-        COUNT(cc.id) AS count_total
+        COUNT(cc.id) AS count_total,
+        EXISTS (
+          SELECT 1 FROM public.academic_student_codes sc
+          WHERE sc.course_id = c.id 
+            AND sc.student_id = ${studentId || null} 
+            AND sc.status = 'active'
+        ) AS enrolled
       FROM public.academic_courses c
       LEFT JOIN public.academic_course_contents cc ON cc.course_id = c.id
       GROUP BY c.id
@@ -47,6 +60,8 @@ export const listCourses = cache(async (): Promise<Course[]> => {
       semester: r.semester as Course['semester'],
       iconName: r.icon_name || 'BookOpen',
       thumbnailColor: r.thumbnail_color || 'from-blue-600 to-indigo-700',
+      enrolled: Boolean(r.enrolled),
+      locked: !Boolean(r.enrolled),
       itemsCount: {
         files: Number(r.count_files) || 0,
         videos: Number(r.count_videos) || 0,
@@ -62,7 +77,7 @@ export const listCourses = cache(async (): Promise<Course[]> => {
   }
 });
 
-export const getCourseById = cache(async (courseId: string): Promise<Course | null> => {
+export const getCourseById = cache(async (courseId: string, studentId?: string): Promise<CourseWithEnrollment | null> => {
   try {
     const [c] = await appSql`
       SELECT 
@@ -79,13 +94,52 @@ export const getCourseById = cache(async (courseId: string): Promise<Course | nu
         c.department,
         c.semester,
         c.icon_name,
-        c.thumbnail_color
+        c.thumbnail_color,
+        EXISTS (
+          SELECT 1 FROM public.academic_student_codes sc
+          WHERE sc.course_id = c.id 
+            AND sc.student_id = ${studentId || null} 
+            AND sc.status = 'active'
+        ) AS enrolled
       FROM public.academic_courses c
       WHERE c.id = ${courseId}
     `;
 
     if (!c) return null;
 
+    const isEnrolled = Boolean(c.enrolled);
+
+    // Finding C1: If student is not enrolled, do not return course contents or any URLs/storage keys!
+    if (!isEnrolled) {
+      return {
+        id: c.id,
+        code: c.code,
+        title: c.title,
+        englishTitle: c.english_title || c.title,
+        description: c.description,
+        doctorName: c.doctor_name,
+        doctorTitle: c.doctor_title || 'عضو هيئة التدريس',
+        doctorAvatar: c.doctor_avatar || undefined,
+        creditHours: c.credit_hours,
+        level: c.level as 1 | 2 | 3 | 4,
+        department: c.department as Course['department'],
+        semester: c.semester as Course['semester'],
+        iconName: c.icon_name || 'BookOpen',
+        thumbnailColor: c.thumbnail_color || 'from-blue-600 to-indigo-700',
+        enrolled: false,
+        locked: true,
+        itemsCount: {
+          files: 0,
+          videos: 0,
+          images: 0,
+          links: 0,
+          total: 0,
+        },
+        content: [],
+      };
+    }
+
+    // For enrolled students, fetch contents but NEVER expose raw storage_key or external_url
     const contentRows = await appSql`
       SELECT 
         id,
@@ -95,9 +149,7 @@ export const getCourseById = cache(async (courseId: string): Promise<Course | nu
         format,
         size_label,
         duration,
-        uploaded_at,
-        storage_key,
-        external_url
+        uploaded_at
       FROM public.academic_course_contents
       WHERE course_id = ${courseId}
       ORDER BY uploaded_at DESC, id ASC
@@ -112,8 +164,9 @@ export const getCourseById = cache(async (courseId: string): Promise<Course | nu
       size: cr.size_label || undefined,
       duration: cr.duration || undefined,
       uploadedAt: new Date(cr.uploaded_at).toLocaleDateString('ar-EG'),
-      url: cr.external_url || cr.storage_key || '#',
-      downloadUrl: cr.storage_key ? `/api/files/download?contentId=${cr.id}` : undefined,
+      // All downloads and views are routed through the secure download endpoint
+      url: `/api/files/download?contentId=${cr.id}`,
+      downloadUrl: `/api/files/download?contentId=${cr.id}`,
     }));
 
     const filesCount = contents.filter((x) => x.type === 'file').length;
@@ -136,6 +189,8 @@ export const getCourseById = cache(async (courseId: string): Promise<Course | nu
       semester: c.semester as Course['semester'],
       iconName: c.icon_name || 'BookOpen',
       thumbnailColor: c.thumbnail_color || 'from-blue-600 to-indigo-700',
+      enrolled: true,
+      locked: false,
       itemsCount: {
         files: filesCount,
         videos: videosCount,
@@ -150,3 +205,57 @@ export const getCourseById = cache(async (courseId: string): Promise<Course | nu
     return null;
   }
 });
+
+export interface ContentDownloadResolution {
+  status: 'not_found' | 'forbidden' | 'authorized';
+  content?: {
+    id: string;
+    courseId: string;
+    title: string;
+    format: string;
+    storageKey?: string | null;
+    externalUrl?: string | null;
+  };
+}
+
+/**
+ * Resolves content download authorization for a student (Finding C1).
+ * Strictly requires active student enrollment in the associated course in SQL.
+ */
+export async function resolveContentDownload(
+  contentId: string,
+  studentAccountId: string
+): Promise<ContentDownloadResolution> {
+  const [content] = await appSql`
+    SELECT id, course_id, title, format, storage_key, external_url
+    FROM public.academic_course_contents
+    WHERE id = ${contentId}
+  `;
+
+  if (!content) {
+    return { status: 'not_found' };
+  }
+
+  const [enrollment] = await appSql`
+    SELECT 1 FROM public.academic_student_codes
+    WHERE student_id = ${studentAccountId} 
+      AND course_id = ${content.course_id} 
+      AND status = 'active'
+  `;
+
+  if (!enrollment) {
+    return { status: 'forbidden' };
+  }
+
+  return {
+    status: 'authorized',
+    content: {
+      id: content.id,
+      courseId: content.course_id,
+      title: content.title,
+      format: content.format,
+      storageKey: content.storage_key,
+      externalUrl: content.external_url,
+    },
+  };
+}

@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation';
 import { AcademicNotification } from '@/types/notification';
 import { safeInternalPath } from '@/lib/safeUrl';
 import { listNotifications } from '@/lib/repos/notificationsRepo';
-import { markNotificationReadAction, markAllNotificationsReadAction } from '@/app/notifications/actions';
+import { markNotificationReadAction, markAllNotificationsReadAction, deleteNotificationAction } from '@/app/notifications/actions';
 
 interface NotificationContextType {
   notifications: AcademicNotification[];
@@ -126,6 +126,7 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
 
   const removeNotification = useCallback((id: string) => {
     setNotifications((prev) => prev.filter((n) => n.id !== id));
+    deleteNotificationAction(id).catch(() => {});
   }, []);
 
   const addNotification = useCallback(

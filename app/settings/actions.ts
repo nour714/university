@@ -7,7 +7,7 @@ import { requireAuth } from '@/server/auth/requireAuth';
 import { checkRateLimit } from '@/server/security/rateLimit';
 
 const SupportTicketSchema = z.object({
-  category: z.enum(['technical', 'academic', 'codes', 'inquiry', 'complaint']),
+  category: z.enum(['technical', 'academic', 'codes', 'inquiry', 'complaint', 'code', 'exam', 'account', 'other']),
   subject: z.string().trim().min(3).max(150),
   message: z.string().trim().min(10, 'تفاصيل التذكرة يجب أن لا تقل عن 10 أحرف').max(2000),
 });
@@ -24,18 +24,25 @@ export async function submitSupportTicketAction(
     return { success: false, error: parsed.error.issues[0]?.message || 'البيانات المدخلة غير صالحة' };
   }
 
-  // Rate limit: 5 tickets per hour
+  // Rate limit: 5 tickets per hour per student
   const rateLimit = await checkRateLimit(student.accountId, 'ticket', 5, 3600);
   if (!rateLimit.allowed) {
     return { success: false, error: 'تم تجاوز الحد الأقصى لإرسال تذاكر الدعم (5 تذاكر في الساعة). يرجى المحاولة لاحقاً.' };
   }
+
+  // Map category aliases to database enum if needed
+  let dbCategory = parsed.data.category;
+  if (dbCategory === 'code') dbCategory = 'codes';
+  if (dbCategory === 'exam') dbCategory = 'academic';
+  if (dbCategory === 'account') dbCategory = 'technical';
+  if (dbCategory === 'other') dbCategory = 'inquiry';
 
   try {
     const [ticket] = await appSql`
       INSERT INTO public.academic_support_tickets (
         student_id, category, subject, message, status, priority
       ) VALUES (
-        ${student.accountId}, ${parsed.data.category}, ${parsed.data.subject},
+        ${student.accountId}, ${dbCategory}, ${parsed.data.subject},
         ${parsed.data.message}, 'open', 'medium'
       ) RETURNING ticket_no;
     `;

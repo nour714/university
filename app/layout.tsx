@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from 'next';
+import { Suspense } from 'react';
 import { Cairo } from 'next/font/google';
 import './globals.css';
 import { NotificationProvider } from '@/context/NotificationContext';
@@ -33,11 +34,13 @@ export default function RootLayout({
   return (
     <html lang="ar" dir="rtl" className={`${cairo.variable} ${cairo.className} h-full antialiased`}>
       <body className={`${cairo.className} min-h-full flex flex-col bg-[#f8fafc] text-slate-900`}>
-        <NotificationProvider>
-          <AppShell>
-            {children}
-          </AppShell>
-        </NotificationProvider>
+        <Suspense fallback={null}>
+          <NotificationProvider>
+            <AppShell>
+              {children}
+            </AppShell>
+          </NotificationProvider>
+        </Suspense>
       </body>
     </html>
   );

@@ -3,7 +3,7 @@
 import { useSyncExternalStore } from 'react';
 import Image from 'next/image';
 import { GraduationCap, Sparkles, Calendar, ShieldCheck } from 'lucide-react';
-import { StudentProfile } from '@/data/student';
+import { StudentProfile } from '@/types/student';
 
 interface StudentHeroProps {
   student: StudentProfile;

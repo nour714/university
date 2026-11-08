@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { requireAuth } from '@/server/auth/requireAuth';
 import { SettingsView } from '@/components/settings/SettingsView';
 
 export const metadata: Metadata = {
@@ -6,7 +7,7 @@ export const metadata: Metadata = {
   description: 'إدارة أمان الحساب الأكاديمي، تغيير وتحديث كلمة المرور، وخدمات الدعم الفني والمساعدة المباشرة.',
 };
 
-export default function SettingsPage() {
-  return <SettingsView />;
+export default async function SettingsPage() {
+  const authStudent = await requireAuth();
+  return <SettingsView student={authStudent.studentProfile} />;
 }
-

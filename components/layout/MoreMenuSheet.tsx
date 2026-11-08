@@ -15,7 +15,7 @@ import {
 import { useNotifications } from '@/context/NotificationContext';
 import { clearSession } from '@/lib/repos/sessionRepo';
 import { logoutAction } from '@/app/auth/actions';
-import { CURRENT_STUDENT } from '@/data/student';
+import { useStudentProfile } from '@/lib/hooks/useStudentProfile';
 
 interface MoreMenuSheetProps {
   isOpen: boolean;
@@ -28,6 +28,7 @@ export function MoreMenuSheet({ isOpen, onClose }: MoreMenuSheetProps) {
   const mounted = useSyncExternalStore(emptySubscribe, () => true, () => false);
   const router = useRouter();
   const [logoutLoading, setLogoutLoading] = useState(false);
+  const { student } = useStudentProfile();
 
   const { resetAll } = useNotifications();
 
@@ -179,8 +180,10 @@ export function MoreMenuSheet({ isOpen, onClose }: MoreMenuSheetProps) {
                     <User className="w-4 h-4" />
                   </div>
                   <div>
-                    <p className="text-xs font-bold text-slate-800">{CURRENT_STUDENT.fullName}</p>
-                    <p className="text-[10px] text-slate-500">طالب • المستوى 3 • الذكاء الاصطناعي</p>
+                    <p className="text-xs font-bold text-slate-800">{student?.fullName || 'طالب أكاديمي'}</p>
+                    <p className="text-[10px] text-slate-500">
+                      {student ? `${student.level} • ${student.department}` : 'طالب جامعي'}
+                    </p>
                   </div>
                 </div>
                 <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">

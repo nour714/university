@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { requireAuth } from '@/server/auth/requireAuth';
 import { CodesManager } from '@/components/codes/CodesManager';
 
 export const metadata: Metadata = {
@@ -6,7 +7,7 @@ export const metadata: Metadata = {
   description: 'إدارة وتفعيل أكواد الوصول للمحاضرات المعتمدة، سلايدات الشرح، والاختبارات لجميع الفصول الدراسية.',
 };
 
-export default function CodesPage() {
+export default async function CodesPage() {
+  await requireAuth();
   return <CodesManager />;
 }
-

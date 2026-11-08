@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server';
 import { getSessionCookie } from '@/server/auth/cookies';
 import { validateSession } from '@/server/auth/session';
 import { appSql } from '@/lib/db/app.server';
+import { NotificationType } from '@/types/notification';
 
 export async function GET() {
   const token = await getSessionCookie();
@@ -22,6 +23,7 @@ export async function GET() {
         title,
         message,
         type,
+        priority,
         is_read,
         action_url,
         action_label,
@@ -47,12 +49,12 @@ export async function GET() {
         id: r.id,
         title: r.title,
         message: r.message,
-        type: (r.type === 'course' ? 'lecture' : r.type === 'exam' ? 'exam' : 'lecture') as 'lecture' | 'exam',
-        isRead: r.is_read,
+        type: (r.type || 'system') as NotificationType,
+        isRead: Boolean(r.is_read),
         actionUrl: r.action_url || undefined,
         createdAt: new Date(r.created_at).toISOString(),
         timeAgo,
-        priority: 'normal' as const,
+        priority: (r.priority === 'urgent' ? 'urgent' : 'normal') as 'normal' | 'urgent',
       };
     });
 

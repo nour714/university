@@ -26,11 +26,15 @@ import {
 } from 'lucide-react';
 import { useNotifications } from '@/context/NotificationContext';
 import { submitSupportTicketAction } from '@/app/settings/actions';
-import { CURRENT_STUDENT } from '@/data/student';
+import { changePasswordAction } from '@/app/auth/actions';
+import { useStudentProfile } from '@/lib/hooks/useStudentProfile';
+import { StudentProfile } from '@/types/student';
 import { CustomSelect, SelectOption } from '@/components/ui/CustomSelect';
 
-export function SettingsView() {
+export function SettingsView({ student: initialStudent }: { student?: StudentProfile } = {}) {
   const [activeTab, setActiveTab] = useState<'password' | 'support'>('password');
+  const { student: clientStudent } = useStudentProfile();
+  const student = initialStudent || clientStudent;
   
   // Password form state
   const [currentPassword, setCurrentPassword] = useState('');
@@ -58,8 +62,8 @@ export function SettingsView() {
 
   const { addNotification } = useNotifications();
 
-  // Password validation checks
-  const hasMinLength = newPassword.length >= 8;
+  // Password validation checks (minimum 10 characters)
+  const hasMinLength = newPassword.length >= 10;
   const hasLetters = /[a-zA-Z\u0600-\u06FF]/.test(newPassword);
   const hasNumbers = /[0-9]/.test(newPassword);
   const passwordsMatch = newPassword.length > 0 && newPassword === confirmPassword;
@@ -80,7 +84,7 @@ export function SettingsView() {
 
   const strength = getPasswordStrength();
 
-  const handlePasswordSubmit = (e: React.FormEvent) => {
+  const handlePasswordSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setPasswordError('');
     setPasswordSuccess(false);
@@ -91,7 +95,7 @@ export function SettingsView() {
     }
 
     if (!hasMinLength || !hasLetters || !hasNumbers) {
-      setPasswordError('كلمة المرور الجديدة يجب أن تحتوي على 8 خانات على الأقل وتجمع بين الحروف والأرقام');
+      setPasswordError('كلمة المرور الجديدة يجب أن تحتوي على 10 خانات على الأقل وتجمع بين الحروف والأرقام');
       return;
     }
 
@@ -102,8 +106,13 @@ export function SettingsView() {
 
     setPasswordLoading(true);
 
-    setTimeout(() => {
-      setPasswordLoading(false);
+    try {
+      const res = await changePasswordAction(currentPassword, newPassword);
+      if (!res.success) {
+        setPasswordError(res.error || 'تعذر تغيير كلمة المرور.');
+        return;
+      }
+
       setPasswordSuccess(true);
       setCurrentPassword('');
       setNewPassword('');
@@ -115,7 +124,11 @@ export function SettingsView() {
         type: 'announcement',
         priority: 'urgent',
       });
-    }, 800);
+    } catch {
+      setPasswordError('حدث خطأ غير متوقع أثناء تغيير كلمة المرور. يرجى المحاولة لاحقاً.');
+    } finally {
+      setPasswordLoading(false);
+    }
   };
 
   const handleSupportSubmit = async (e: React.FormEvent) => {
@@ -125,7 +138,9 @@ export function SettingsView() {
     setSupportLoading(true);
 
     try {
-      const res = await submitSupportTicketAction('technical', 'طلب دعم فني من بوابة الإعدادات', supportMessage);
+      const selectedCategoryObj = categoryOptions.find((o) => o.value === supportCategory);
+      const subject = `طلب دعم: ${selectedCategoryObj ? selectedCategoryObj.label : supportCategory}`;
+      const res = await submitSupportTicketAction(supportCategory, subject, supportMessage);
       if (res.success && res.ticketNo) {
         setTicketId(res.ticketNo);
         setSupportSuccess(true);
@@ -137,6 +152,8 @@ export function SettingsView() {
           type: 'announcement',
           priority: 'normal',
         });
+      } else if (res.error) {
+        alert(res.error);
       }
     } catch {
       // Fallback
@@ -213,7 +230,7 @@ export function SettingsView() {
             </div>
             <div className="min-w-0">
               <h1 className="text-sm font-extrabold text-white truncate leading-tight">
-                {CURRENT_STUDENT.fullName}
+                {student?.fullName || 'طالب أكاديمي'}
               </h1>
               <p className="text-[11px] text-blue-200/90 font-medium truncate mt-0.5">
                 طالب • المستوى 3 • الذكاء الاصطناعي
@@ -262,7 +279,7 @@ export function SettingsView() {
             </div>
             <div className="min-w-0">
               <p className="text-[11px] text-slate-500 font-medium">حالة الحساب</p>
-              <p className="text-sm font-extrabold text-slate-800 truncate">{CURRENT_STUDENT.fullName}</p>
+              <p className="text-sm font-extrabold text-slate-800 truncate">{student?.fullName || 'طالب أكاديمي'}</p>
               <span className="text-[10px] font-bold text-emerald-600">نشط وموثق</span>
             </div>
           </div>

@@ -19,7 +19,7 @@ import {
 import { StudentCode } from '@/types/code';
 import { useNotifications } from '@/context/NotificationContext';
 import { CodesSkeleton } from '@/components/skeletons/CodesSkeleton';
-import { listCodes, saveCodes, redeemCode } from '@/lib/repos/codesRepo';
+import { listCodes, redeemCode } from '@/lib/repos/codesRepo';
 
 export function CodesManager() {
   const [codes, setCodes] = useState<StudentCode[]>([]);
@@ -46,11 +46,6 @@ export function CodesManager() {
     };
   }, []);
 
-  // Save via repo
-  useEffect(() => {
-    if (!isLoaded) return;
-    saveCodes(codes);
-  }, [codes, isLoaded]);
 
   // Clean and format code input with dashes (XXXX - XXXX - XXXX)
   const formatCodeInput = (raw: string) => {

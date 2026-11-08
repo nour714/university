@@ -1,9 +1,11 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { usePathname } from 'next/navigation';
 import { AcademicNotification } from '@/types/notification';
 import { safeInternalPath } from '@/lib/safeUrl';
-import { listNotifications, saveNotifications } from '@/lib/repos/notificationsRepo';
+import { listNotifications } from '@/lib/repos/notificationsRepo';
+import { markNotificationReadAction, markAllNotificationsReadAction } from '@/app/notifications/actions';
 
 interface NotificationContextType {
   notifications: AcademicNotification[];
@@ -68,29 +70,24 @@ function generateNotificationId(): string {
 }
 
 export function NotificationProvider({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname();
   const [notifications, setNotifications] = useState<AcademicNotification[]>([]);
   const [toast, setToast] = useState<AcademicNotification | null>(null);
-  const [isLoaded, setIsLoaded] = useState(false);
 
-  // Load from repo
+  // Load from repo if user is authenticated (not on public auth pages)
   useEffect(() => {
+    if (pathname === '/login') return;
+
     let mounted = true;
     listNotifications().then((loaded) => {
       if (mounted) {
         setNotifications(loaded);
-        setIsLoaded(true);
       }
     });
     return () => {
       mounted = false;
     };
-  }, []);
-
-  // Save via repo when changed
-  useEffect(() => {
-    if (!isLoaded) return;
-    saveNotifications(notifications);
-  }, [notifications, isLoaded]);
+  }, [pathname]);
 
   // Unread count
   const unreadCount = notifications.filter((n) => !n.isRead).length;
@@ -112,10 +109,12 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
     setNotifications((prev) =>
       prev.map((n) => (n.id === id ? { ...n, isRead: true } : n))
     );
+    markNotificationReadAction(id).catch(() => {});
   }, []);
 
   const markAllAsRead = useCallback(() => {
     setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
+    markAllNotificationsReadAction().catch(() => {});
   }, []);
 
   const removeNotification = useCallback((id: string) => {

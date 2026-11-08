@@ -22,6 +22,12 @@ const nextConfig: NextConfig = {
       },
     },
   },
+  experimental: {
+    serverActions: {
+      bodySizeLimit: '200kb',
+      allowedOrigins: process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',').map(s => s.trim()) : undefined,
+    },
+  },
   async headers() {
     return [
       {
@@ -59,4 +65,3 @@ const nextConfig: NextConfig = {
 };
 
 export default nextConfig;
-

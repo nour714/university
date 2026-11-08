@@ -8,7 +8,6 @@ import {
   User, 
   Eye, 
   EyeOff, 
-  Sparkles, 
   ArrowLeft, 
   CheckCircle2, 
   AlertCircle, 
@@ -93,32 +92,12 @@ export function LoginForm() {
       }
 
       if (res.mustChangePassword) {
-        router.push('/login?changePassword=true');
+        router.push('/account/change-password');
       } else {
         router.push('/');
       }
     } catch {
       setErrorMessage('حدث خطأ في الاتصال بالخادم. يرجى إعادة المحاولة.');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleQuickDemoLogin = async () => {
-    setIdentifier('20230814');
-    setPassword('Student@2026');
-    setErrorMessage('');
-    setIsLoading(true);
-
-    try {
-      const res = await loginAction({ identifier: '20230814', password: 'Student@2026' });
-      if (!res.success) {
-        setErrorMessage(res.error);
-        return;
-      }
-      router.push('/');
-    } catch {
-      setErrorMessage('تعذر تسجيل الدخول السريع.');
     } finally {
       setIsLoading(false);
     }
@@ -359,19 +338,6 @@ export function LoginForm() {
                 )}
               </button>
             </form>
-
-            {/* Quick Demo Login Option */}
-            <div className="mt-2.5 pt-2 border-t border-slate-100">
-              <button
-                type="button"
-                onClick={handleQuickDemoLogin}
-                disabled={isLoading}
-                className="w-full py-1.5 sm:py-2 px-3 rounded-xl bg-slate-50 hover:bg-blue-50/70 border border-slate-200/80 text-slate-700 hover:text-blue-700 text-xs font-bold flex items-center justify-center gap-2 transition-all cursor-pointer active:scale-[0.99]"
-              >
-                <Sparkles className="w-3.5 h-3.5 text-amber-500 shrink-0" />
-                <span>دخول تجريبي سريع بحساب الطالب عبد الرحمن خالد</span>
-              </button>
-            </div>
           </div>
 
           {/* Footer Assistance */}

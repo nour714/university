@@ -1,20 +1,30 @@
 import 'server-only';
 import crypto from 'node:crypto';
 import { appSql } from '@/lib/db/app.server';
+import { env } from '@/lib/env';
 
-const PEPPER = process.env.CODE_PEPPER || 'rate_limit_default_salt';
+export type RateLimitBucket =
+  | 'login'
+  | 'redeem'
+  | 'ticket'
+  | 'api'
+  | 'password_change'
+  | 'download';
 
 /**
- * Atomic sliding-window rate limiter using Postgres academic_private.rate_limits
+ * Atomic sliding-window rate limiter using Postgres academic_private.rate_limits.
+ * Obscures identifiers and IPs with an HMAC keyed by APP_SECRET.
  */
 export async function checkRateLimit(
   rawIdentifier: string,
-  bucket: 'login' | 'redeem' | 'ticket' | 'api',
+  bucket: RateLimitBucket,
   maxRequests: number,
   windowSeconds: number
 ): Promise<{ allowed: boolean; remaining: number }> {
-  // Hash the identifier to obscure raw IPs and student IDs in the rate limit table
-  const key = crypto.createHmac('sha256', PEPPER).update(rawIdentifier).digest('hex');
+  const key = crypto
+    .createHmac('sha256', env.APP_SECRET)
+    .update(rawIdentifier)
+    .digest('hex');
 
   const [row] = await appSql`
     INSERT INTO academic_private.rate_limits (key, bucket, window_start, count)

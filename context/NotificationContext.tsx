@@ -73,15 +73,22 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
   const pathname = usePathname();
   const [notifications, setNotifications] = useState<AcademicNotification[]>([]);
   const [toast, setToast] = useState<AcademicNotification | null>(null);
+  const isLoadedRef = React.useRef(false);
 
-  // Load from repo if user is authenticated (not on public auth pages)
+  // Load from repo once when authenticated (reset on logout)
   useEffect(() => {
-    if (pathname === '/login') return;
+    if (pathname === '/login') {
+      isLoadedRef.current = false;
+      return;
+    }
+
+    if (isLoadedRef.current) return;
 
     let mounted = true;
     listNotifications().then((loaded) => {
       if (mounted) {
         setNotifications(loaded);
+        isLoadedRef.current = true;
       }
     });
     return () => {

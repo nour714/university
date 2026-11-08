@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useMemo } from 'react';
+import Link from 'next/link';
 import { CourseContentItem, ContentType } from '@/types/course';
 import { matchesSearch } from '@/lib/normalizeArabic';
 import { isSafeExternalUrl } from '@/lib/safeUrl';
@@ -14,17 +15,20 @@ import {
   Clock, 
   FolderSearch,
   Calendar,
-  Eye
+  Eye,
+  Lock,
+  KeyRound
 } from 'lucide-react';
 
 interface CourseContentBrowserProps {
   items: CourseContentItem[];
   courseCode: string;
+  isLocked?: boolean;
 }
 
 type TabType = 'all' | ContentType;
 
-export function CourseContentBrowser({ items, courseCode }: CourseContentBrowserProps) {
+export function CourseContentBrowser({ items, courseCode, isLocked }: CourseContentBrowserProps) {
   const [activeTab, setActiveTab] = useState<TabType>('all');
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -60,6 +64,33 @@ export function CourseContentBrowser({ items, courseCode }: CourseContentBrowser
       return true;
     });
   }, [items, activeTab, searchQuery]);
+
+  if (isLocked) {
+    return (
+      <div className="bg-white rounded-2xl sm:rounded-3xl p-6 sm:p-10 border border-slate-200/90 shadow-sm text-center max-w-lg mx-auto space-y-4 my-6 animate-fadeIn" dir="rtl">
+        <div className="w-14 h-14 rounded-2xl bg-amber-50 text-amber-600 border border-amber-200 flex items-center justify-center mx-auto shadow-xs">
+          <Lock className="w-7 h-7" />
+        </div>
+        <div className="space-y-2">
+          <h3 className="text-base sm:text-lg font-extrabold text-slate-900">
+            محتوى المقرر مقفل
+          </h3>
+          <p className="text-xs sm:text-sm text-slate-500 leading-relaxed max-w-sm mx-auto">
+            أنت غير مسجل في مقرر ({courseCode}) حالياً. لتفعيل المقرر والوصول إلى كافة المحاضرات والمواد التعليمية والاختبارات، يرجى إدخال كود الاشتراك الأكاديمي.
+          </p>
+        </div>
+        <div className="pt-2">
+          <Link
+            href="/codes"
+            className="inline-flex items-center justify-center gap-2 h-11 px-6 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs sm:text-sm shadow-md shadow-blue-600/20 transition-all cursor-pointer active:scale-95"
+          >
+            <KeyRound className="w-4 h-4" />
+            <span>الانتقال لصفحة تفعيل الأكواد</span>
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   // Helper for item type icon & badge
   const getItemIcon = (type: ContentType) => {
@@ -299,9 +330,9 @@ export function CourseContentBrowser({ items, courseCode }: CourseContentBrowser
               {/* Left Side: Direct Action Buttons */}
               <div className="flex items-center gap-2 shrink-0 pt-2 md:pt-0 border-t md:border-t-0 border-slate-100">
                 {/* View / Open Button */}
-                {isSafeExternalUrl(item.url) ? (
+                {isSafeExternalUrl(item.downloadUrl || item.url) ? (
                   <a
-                    href={item.url}
+                    href={item.downloadUrl || item.url}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex-1 md:flex-initial inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl border border-blue-500 text-blue-600 bg-blue-50/50 hover:bg-blue-600 hover:text-white text-xs font-bold transition-all shadow-2xs cursor-pointer active:scale-95"

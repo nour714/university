@@ -1,7 +1,8 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
+import { connection } from 'next/server';
+import { requireAuth } from '@/server/auth/requireAuth';
 import { getCourseById } from '@/server/courses/service';
-import { COURSES_DATA } from '@/data/courses';
 import { CourseContentBrowser } from '@/components/course-detail/CourseContentBrowser';
 import { ArrowRight, User } from 'lucide-react';
 
@@ -11,19 +12,9 @@ interface CourseDetailPageProps {
   }>;
 }
 
-// Allow blocking route for params access in Next.js 16
-export const instant = false;
-
-// Generate static routes for all courses for blazing fast Edge SSG performance
-export function generateStaticParams() {
-  return COURSES_DATA.map((course) => ({
-    id: course.id,
-  }));
-}
-
 export async function generateMetadata({ params }: CourseDetailPageProps) {
   const { id } = await params;
-  const course = (await getCourseById(id)) || COURSES_DATA.find((c) => c.id === id);
+  const course = await getCourseById(id);
   if (!course) return { title: 'المقرر غير موجود | كلية الذكاء الاصطناعي' };
 
   return {
@@ -33,8 +24,11 @@ export async function generateMetadata({ params }: CourseDetailPageProps) {
 }
 
 export default async function CourseDetailPage({ params }: CourseDetailPageProps) {
+  await connection();
+  const student = await requireAuth();
   const { id } = await params;
-  const course = (await getCourseById(id)) || COURSES_DATA.find((c) => c.id === id);
+
+  const course = await getCourseById(id, student.accountId);
 
   if (!course) {
     notFound();
@@ -111,10 +105,11 @@ export default async function CourseDetailPage({ params }: CourseDetailPageProps
         <div className="absolute -left-8 -bottom-8 w-48 h-48 rounded-full bg-blue-500/15 blur-2xl pointer-events-none" />
       </div>
 
-      {/* Interactive Content Browser (Tabs + In-Course Search + Google Drive Table) */}
+      {/* Interactive Content Browser (with locked state support) */}
       <CourseContentBrowser
         items={course.content}
         courseCode={course.code}
+        isLocked={course.locked}
       />
     </div>
   );

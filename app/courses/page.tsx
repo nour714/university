@@ -1,5 +1,5 @@
 import { listCourses } from '@/server/courses/service';
-import { COURSES_DATA } from '@/data/courses';
+import { requireAuth } from '@/server/auth/requireAuth';
 import { CoursesCatalog } from '@/components/courses/CoursesCatalog';
 import { Sparkles } from 'lucide-react';
 
@@ -9,8 +9,8 @@ export const metadata = {
 };
 
 export default async function CoursesPage() {
-  const dbCourses = await listCourses();
-  const courses = dbCourses.length > 0 ? dbCourses : COURSES_DATA;
+  const student = await requireAuth();
+  const courses = await listCourses(student.accountId);
 
   return (
     <div className="space-y-3 sm:space-y-4">
@@ -33,7 +33,7 @@ export default async function CoursesPage() {
         <div className="absolute -left-10 -bottom-10 w-48 h-48 rounded-full bg-blue-500/10 blur-2xl pointer-events-none" />
       </div>
 
-      {/* Dynamic Search & Grid (Rock-solid on Mobile & Desktop) */}
+      {/* Dynamic Search & Grid */}
       <CoursesCatalog courses={courses} />
     </div>
   );

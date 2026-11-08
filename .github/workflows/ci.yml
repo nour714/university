@@ -1,0 +1,59 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+
+    env:
+      NODE_ENV: test
+      DATABASE_URL_OWNER: postgres://postgres:postgres@localhost:5434/postgres?sslmode=disable
+      DATABASE_URL_APP: postgres://academic_app:app_pass_test@localhost:5434/postgres?sslmode=disable
+      DATABASE_URL_GRADER: postgres://academic_grader:grader_pass_test@localhost:5434/postgres?sslmode=disable
+      APP_SECRET: ci_test_app_secret_at_least_32_characters_long_abcdef
+      CODE_PEPPER: ci_test_code_pepper_at_least_32_characters_long_abcdef
+      CRON_SECRET: ci_test_cron_secret_at_least_32_characters_long_abcdef
+      DB_SSL: disable
+      DB_POOL_MAX: 5
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run Gitleaks secrets detection
+        uses: gitleaks/gitleaks-action@v2
+        continue-on-error: true
+
+      - name: Repo Hygiene & Secrets Scan
+        run: npx vitest run test/hygiene.test.ts
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Type check
+        run: npx tsc --noEmit
+
+      - name: Next.js Production Build
+        run: npm run build
+
+      - name: Run Vitest Automated Test Suite
+        run: npm test
+
+      - name: Run Mutation Checks (14 Deliberate Breakages)
+        run: npm run test:mutations

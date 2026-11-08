@@ -6,7 +6,12 @@
     "dev": "next dev -p 5500",
     "build": "next build",
     "start": "next start -p 5500",
-    "lint": "eslint"
+    "lint": "eslint",
+    "test": "vitest run",
+    "test:permissions": "tsx scripts/test-permissions.ts",
+    "test:mutations": "tsx scripts/mutation-check.ts",
+    "migrate": "tsx scripts/migrate.ts",
+    "seed": "tsx scripts/seed-data.ts"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1164.0",
@@ -22,12 +27,15 @@
   },
   "devDependencies": {
     "@tailwindcss/turbopack": "^4",
-    "@types/node": "^20",
+    "@types/node": "^22.20.5",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "embedded-postgres": "^16.15.0-beta.19",
     "eslint": "^9",
     "eslint-config-next": "16.4.4",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "tsx": "^4.23.15",
+    "typescript": "^5",
+    "vitest": "^5.1.0"
   }
 }

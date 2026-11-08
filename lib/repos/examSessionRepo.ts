@@ -1,4 +1,5 @@
 import { ExamSessionStorageSchema, ExamAnswersSchema } from '@/lib/schemas';
+import { saveExamAnswersAction } from '@/app/exams/actions';
 
 export interface StoredExamSession {
   startedAt: number;
@@ -143,6 +144,11 @@ export function saveAnswers(
     }
 
     localStorage.setItem(key, JSON.stringify(session));
+
+    // Asynchronously synchronize answers to authoritative PostgreSQL database session
+    saveExamAnswersAction(examId, validAnswers.data).catch(() => {
+      // Handled silently to not block user interaction
+    });
   } catch {
     // Ignore storage errors
   }

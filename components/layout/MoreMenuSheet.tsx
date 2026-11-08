@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { useNotifications } from '@/context/NotificationContext';
 import { clearSession } from '@/lib/repos/sessionRepo';
+import { logoutAction } from '@/app/auth/actions';
 import { CURRENT_STUDENT } from '@/data/student';
 
 interface MoreMenuSheetProps {
@@ -53,15 +54,17 @@ export function MoreMenuSheet({ isOpen, onClose }: MoreMenuSheetProps) {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isOpen, onClose]);
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     setLogoutLoading(true);
-    setTimeout(() => {
+    try {
+      await logoutAction();
+    } finally {
       clearSession();
       resetAll();
       setLogoutLoading(false);
       onClose();
       router.push('/login');
-    }, 500);
+    }
   };
 
   if (!mounted || !isOpen) return null;

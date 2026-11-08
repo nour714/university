@@ -25,6 +25,7 @@ import {
   ChevronLeft
 } from 'lucide-react';
 import { useNotifications } from '@/context/NotificationContext';
+import { submitSupportTicketAction } from '@/app/settings/actions';
 import { CURRENT_STUDENT } from '@/data/student';
 import { CustomSelect, SelectOption } from '@/components/ui/CustomSelect';
 
@@ -117,30 +118,31 @@ export function SettingsView() {
     }, 800);
   };
 
-  const handleSupportSubmit = (e: React.FormEvent) => {
+  const handleSupportSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!supportMessage.trim()) return;
 
-    // TODO(backend): ticket generation and submission must be handled by an API route and stored in a database.
-    const generatedTicketId = typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
-      ? crypto.randomUUID().slice(0, 6).toUpperCase()
-      : Math.floor(100000 + Math.random() * 900000).toString();
-
     setSupportLoading(true);
 
-    setTimeout(() => {
-      setTicketId(generatedTicketId);
-      setSupportLoading(false);
-      setSupportSuccess(true);
-      setSupportMessage('');
+    try {
+      const res = await submitSupportTicketAction('technical', 'طلب دعم فني من بوابة الإعدادات', supportMessage);
+      if (res.success && res.ticketNo) {
+        setTicketId(res.ticketNo);
+        setSupportSuccess(true);
+        setSupportMessage('');
 
-      addNotification({
-        title: 'تم استلام طلب الدعم الفني',
-        message: 'تم إرسال تذكرتك إلى وحدة الدعم الأكاديمي والتقني، وسيقوم مسؤول الدعم بمراجعتها والتواصل معك عبر المنصة.',
-        type: 'announcement',
-        priority: 'normal',
-      });
-    }, 700);
+        addNotification({
+          title: 'تم استلام طلب الدعم الفني',
+          message: `تم إرسال تذكرتك برقم ${res.ticketNo} إلى وحدة الدعم الأكاديمي والتقني.`,
+          type: 'announcement',
+          priority: 'normal',
+        });
+      }
+    } catch {
+      // Fallback
+    } finally {
+      setSupportLoading(false);
+    }
   };
 
   const handleCopyEmail = async () => {

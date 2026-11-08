@@ -1,3 +1,4 @@
+import { listCourses } from '@/server/courses/service';
 import { COURSES_DATA } from '@/data/courses';
 import { CoursesCatalog } from '@/components/courses/CoursesCatalog';
 import { Sparkles } from 'lucide-react';
@@ -7,7 +8,10 @@ export const metadata = {
   description: 'استكشف المقررات الدراسية، المحاضرات، التمارين، والوسائط لكل الأقسام والمستويات.',
 };
 
-export default function CoursesPage() {
+export default async function CoursesPage() {
+  const dbCourses = await listCourses();
+  const courses = dbCourses.length > 0 ? dbCourses : COURSES_DATA;
+
   return (
     <div className="space-y-3 sm:space-y-4">
       {/* Page Hero Header: Compact & Sleek */}
@@ -30,7 +34,7 @@ export default function CoursesPage() {
       </div>
 
       {/* Dynamic Search & Grid (Rock-solid on Mobile & Desktop) */}
-      <CoursesCatalog courses={COURSES_DATA} />
+      <CoursesCatalog courses={courses} />
     </div>
   );
 }

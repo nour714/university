@@ -1,8 +1,9 @@
 import { notFound, redirect } from 'next/navigation';
 import { connection } from 'next/server';
+import { requireAuth } from '@/server/auth/requireAuth';
+import { getPublicExamById } from '@/server/exams/service';
 import { RAW_EXAMS_DATA } from '@/data/exams';
 import { ExamContainer } from '@/components/exams/ExamContainer';
-import { gradeAnswers } from '@/lib/exams/grading.server';
 import { getExamStatus } from '@/lib/exams/status';
 import { GradeResult } from '@/types/exam';
 
@@ -26,7 +27,7 @@ export function generateStaticParams() {
 
 export async function generateMetadata({ params }: ExamDetailPageProps) {
   const { id } = await params;
-  const exam = RAW_EXAMS_DATA.find((e) => e.id === id);
+  const exam = (await getPublicExamById(id)) || RAW_EXAMS_DATA.find((e) => e.id === id);
   if (!exam) return { title: 'الاختبار غير موجود | كلية الذكاء الاصطناعي' };
 
   return {
@@ -36,9 +37,12 @@ export async function generateMetadata({ params }: ExamDetailPageProps) {
 }
 
 export default async function ExamDetailPage({ params, searchParams }: ExamDetailPageProps) {
+  const student = await requireAuth();
   const { id } = await params;
   const resolvedSearchParams = await searchParams;
-  const exam = RAW_EXAMS_DATA.find((e) => e.id === id);
+
+  const dbExam = await getPublicExamById(id, student.accountId);
+  const exam = dbExam || RAW_EXAMS_DATA.find((e) => e.id === id);
 
   if (!exam) {
     notFound();
@@ -65,7 +69,16 @@ export default async function ExamDetailPage({ params, searchParams }: ExamDetai
 
   let initialResult: GradeResult | undefined;
   if (currentStatus === 'completed' && exam.submission) {
-    initialResult = gradeAnswers(exam.id, exam.submission.answers) ?? undefined;
+    initialResult = {
+      score: exam.submission.score,
+      totalMarks: exam.submission.totalMarks,
+      percentage: exam.submission.percentage,
+      passed: exam.submission.passed,
+      correctCount: 0,
+      wrongCount: 0,
+      unansweredCount: 0,
+      perQuestion: {},
+    };
   }
 
   const initialView = currentStatus === 'completed' || resolvedSearchParams?.view === 'result' ? 'result' : 'session';

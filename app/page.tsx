@@ -1,4 +1,6 @@
 import type { Metadata } from 'next';
+import { requireAuth } from '@/server/auth/requireAuth';
+import { getStudentProfile } from '@/server/students/service';
 import { CURRENT_STUDENT } from '@/data/student';
 import { StudentHero } from '@/components/home/StudentHero';
 import { StudentStatsGrid } from '@/components/home/StudentStatsGrid';
@@ -9,17 +11,20 @@ export const metadata: Metadata = {
   description: 'لوحة التحكم الأكاديمية للطالب - استعراض المعدل التراكمي، الساعات المسجلة، المستوى، وعدد المقرارات.',
 };
 
-export default function HomePage() {
+export default async function HomePage() {
+  const authStudent = await requireAuth();
+  const profile = (await getStudentProfile(authStudent.accountId)) || CURRENT_STUDENT;
+
   return (
     <div className="space-y-6 sm:space-y-8 animate-fadeIn pb-4">
       {/* 1. Student Hero Profile Banner */}
-      <StudentHero student={CURRENT_STUDENT} />
+      <StudentHero student={profile} />
 
       {/* 2. Four Bento KPI Stat Cards */}
-      <StudentStatsGrid student={CURRENT_STUDENT} />
+      <StudentStatsGrid student={profile} />
 
       {/* 3. Quick Action Access Card to Courses Library */}
-      <QuickCoursesAction coursesCount={CURRENT_STUDENT.coursesCount} />
+      <QuickCoursesAction coursesCount={profile.coursesCount} />
     </div>
   );
 }

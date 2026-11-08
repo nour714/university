@@ -1,4 +1,11 @@
-export type NotificationType = 'lecture' | 'exam' | 'material' | 'announcement';
+export type NotificationType =
+  | 'lecture'
+  | 'course'
+  | 'exam'
+  | 'material'
+  | 'announcement'
+  | 'system'
+  | 'security';
 
 export interface AcademicNotification {
   id: string;
@@ -14,4 +21,3 @@ export interface AcademicNotification {
   priority?: 'normal' | 'urgent';
   actionUrl?: string;
 }
-

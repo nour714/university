@@ -1,5 +1,5 @@
 import { Award, GraduationCap, Clock, BookOpen, TrendingUp, CheckCircle2 } from 'lucide-react';
-import { StudentProfile } from '@/data/student';
+import { StudentProfile } from '@/types/student';
 
 interface StudentStatsGridProps {
   student: StudentProfile;

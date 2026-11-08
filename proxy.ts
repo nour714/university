@@ -10,10 +10,10 @@ const PUBLIC_PATHS = ['/login', '/favicon.ico'];
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // 1. Skip static assets, images, and internal Next.js requests
+  // 1. Skip static assets, images, API routes, and internal Next.js requests
   if (
     pathname.startsWith('/_next') ||
-    pathname.startsWith('/api/cron') ||
+    pathname.startsWith('/api/') ||
     pathname.includes('.')
   ) {
     return NextResponse.next();

@@ -32,6 +32,13 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+!.env.example
+
+# private seed credentials and exam keys
+seed/private/
+*.test-data
+.pg-test-data/
+.pg-vitest-data/
 
 # vercel
 .vercel

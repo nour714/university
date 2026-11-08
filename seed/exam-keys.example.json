@@ -1,0 +1,9 @@
+{
+  "exam-ai301-midterm": {
+    "q1": { "option": "PLACEHOLDER_OPTION_ID", "note": "Placeholder explanation" },
+    "q2": { "option": "PLACEHOLDER_OPTION_ID", "note": "Placeholder explanation" }
+  },
+  "exam-ai305-quiz": {
+    "q_dl_1": { "option": "PLACEHOLDER_OPTION_ID", "note": "Placeholder explanation" }
+  }
+}

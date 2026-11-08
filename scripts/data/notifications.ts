@@ -1,0 +1,42 @@
+export const INITIAL_NOTIFICATIONS = [
+  {
+    title: 'محاضرة جديدة: الشبكات العصبية الالتفافية (CNN)',
+    message: 'تم رفع تسجيل وفيديو المحاضرة 03 في مقرر التعلم العميق والشبكات العصبية.',
+    type: 'course' as const,
+    isRead: false,
+    priority: 'urgent' as const,
+    actionUrl: '/courses/ai-302',
+  },
+  {
+    title: 'تحديد موعد الميدتيرم: تعلم الآلة المتقدم',
+    message: 'أعلن أ.د. طارق الحصري عن موعد الاختبار النصفي لمقرر AI301 يوم الأحد القادم.',
+    type: 'exam' as const,
+    isRead: false,
+    priority: 'urgent' as const,
+    actionUrl: '/courses/ai-301',
+  },
+  {
+    title: 'تحديث أمني: يرجى التحقق من أجهزة تسجيل الدخول',
+    message: 'تم تسجيل دخول جديد لحسابك من متصفح غير معروف. يرجى مراجعة إعدادات الأمان.',
+    type: 'security' as const,
+    isRead: false,
+    priority: 'urgent' as const,
+    actionUrl: '/settings',
+  },
+  {
+    title: 'انطلاق الهاكاثون السنوي للذكاء الاصطناعي 2026',
+    message: 'تعلن كلية الذكاء الاصطناعي عن فتح باب التسجيل في مسابقة الابتكار السنوية.',
+    type: 'announcement' as const,
+    isRead: true,
+    priority: 'normal' as const,
+    actionUrl: '/courses',
+  },
+  {
+    title: 'تنبيه نظام: أعمال صيانة دورية للمنصة',
+    message: 'سيتم إجراء صيانة مجدولة لقواعد البيانات يوم الجمعة من الساعة 2 إلى 4 صباحاً.',
+    type: 'system' as const,
+    isRead: true,
+    priority: 'normal' as const,
+    actionUrl: '/settings',
+  },
+];

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { Exam, GradeResult } from '@/types/exam';
 import { ExamSession } from '@/components/exams/ExamSession';
 import { ExamResultView } from '@/components/exams/ExamResultView';
@@ -30,6 +30,9 @@ export function ExamContainer({ exam, initialView, initialResult }: ExamContaine
     return `${h}:${m}`;
   });
 
+  // Single-flight guard (Finding E4): prevents multiple concurrent submit attempts
+  const isSubmittingRef = useRef<boolean>(false);
+
   const submitWithRetry = async (
     answersToSubmit: Record<string, string>,
     isAuto: boolean,
@@ -39,7 +42,7 @@ export function ExamContainer({ exam, initialView, initialResult }: ExamContaine
       const res = await gradeExam(exam.id, answersToSubmit);
       if ('error' in res) {
         if (isAuto && retriesLeft > 1) {
-          await new Promise((resolve) => setTimeout(resolve, 600));
+          await new Promise((resolve) => setTimeout(resolve, 800 * (4 - retriesLeft)));
           return submitWithRetry(answersToSubmit, isAuto, retriesLeft - 1);
         }
         setSubmitError(res.error || 'تعذر تسليم الاختبار، يرجى المحاولة مرة أخرى.');
@@ -58,7 +61,7 @@ export function ExamContainer({ exam, initialView, initialResult }: ExamContaine
       return true;
     } catch {
       if (isAuto && retriesLeft > 1) {
-        await new Promise((resolve) => setTimeout(resolve, 600));
+        await new Promise((resolve) => setTimeout(resolve, 800 * (4 - retriesLeft)));
         return submitWithRetry(answersToSubmit, isAuto, retriesLeft - 1);
       }
       setSubmitError('حدث خطأ في الاتصال بالخادم، يرجى إعادة المحاولة.');
@@ -70,12 +73,18 @@ export function ExamContainer({ exam, initialView, initialResult }: ExamContaine
     answersToSubmit: Record<string, string>,
     isAuto: boolean = false
   ) => {
+    if (isSubmittingRef.current) {
+      return;
+    }
+    isSubmittingRef.current = true;
     setIsSubmitting(true);
     setSubmitError(null);
+
     try {
       await submitWithRetry(answersToSubmit, isAuto, isAuto ? 3 : 1);
     } finally {
       setIsSubmitting(false);
+      isSubmittingRef.current = false;
     }
   };
 

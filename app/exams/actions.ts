@@ -5,10 +5,12 @@ import { GradeResult } from '@/types/exam';
 import { ExamSubmissionActionSchema, ExamAnswersSchema } from '@/lib/schemas';
 import { requireAuth } from '@/server/auth/requireAuth';
 import { submitAndGradeExam } from '@/server/exams/submit';
-import { startOrResumeExamSession, saveExamAnswers } from '@/server/exams/service';
+import { startOrResumeExamSession, saveExamAnswers, getExamResult } from '@/server/exams/service';
+import { toSafeErrorMessage } from '@/lib/errors';
 
 /**
  * Starts or resumes an exam session securely on the database.
+ * Returns authoritative endAt, serverNow, answers, and sanitized questions.
  */
 export async function startOrResumeExamSessionAction(examId: string) {
   const student = await requireAuth();
@@ -49,7 +51,15 @@ export async function gradeExam(
     const result = await submitAndGradeExam(validExamId, student.accountId, validAnswers);
     return result;
   } catch (err: unknown) {
-    const message = err instanceof Error ? err.message : 'تعذر تسليم الاختبار، يرجى المحاولة مرة أخرى.';
+    const message = toSafeErrorMessage(err, 'تعذر تسليم الاختبار، يرجى المحاولة مرة أخرى.');
     return { error: message };
   }
+}
+
+/**
+ * Retrieves student exam results safely with lazy auto-grading of expired sessions.
+ */
+export async function getExamResultAction(examId: string): Promise<GradeResult | null> {
+  const student = await requireAuth();
+  return await getExamResult(examId, student.accountId);
 }

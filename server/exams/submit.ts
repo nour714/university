@@ -1,6 +1,9 @@
+'use server';
+
 import 'server-only';
 import { graderSql } from '@/lib/db/grader.server';
 import { GradeResult } from '@/types/exam';
+import { AppError } from '@/lib/errors';
 
 /**
  * EXCLUSIVE grading module.
@@ -13,24 +16,69 @@ export async function submitAndGradeExam(
   isAutoSubmitted: boolean = false
 ): Promise<GradeResult> {
   return await graderSql.begin(async (tx) => {
-    // 1. Lock the session row FOR UPDATE
+    // 1. Fetch exam questions metadata to sanitize any incoming answers
+    const questionRows = await tx`
+      SELECT id, number, points, options
+      FROM public.academic_exam_questions
+      WHERE exam_id = ${examId}
+      ORDER BY number ASC
+    `;
+
+    if (!questionRows || questionRows.length === 0) {
+      throw new AppError('exam_not_found', 'بيانات الاختبار غير متوفرة أو لم يتم العثور على الأسئلة.');
+    }
+
+    // Build lookup of valid questions and valid options
+    const validQuestions = new Map<string, Set<string>>();
+    for (const q of questionRows) {
+      const opts = Array.isArray(q.options) ? q.options : JSON.parse(q.options || '[]');
+      const optSet = new Set<string>(opts.map((o: { id: string }) => String(o.id)));
+      validQuestions.set(q.id, optSet);
+    }
+
+    // Sanitize incoming answers: only allow valid question IDs and valid option IDs
+    const sanitizedIncoming: Record<string, string> = {};
+    if (incomingAnswers && typeof incomingAnswers === 'object') {
+      for (const [qId, optId] of Object.entries(incomingAnswers)) {
+        const allowedOpts = validQuestions.get(qId);
+        if (allowedOpts && typeof optId === 'string' && allowedOpts.has(optId)) {
+          sanitizedIncoming[qId] = optId;
+        }
+      }
+    }
+
+    // 2. Lock the session row FOR UPDATE and get authoritative DB now()
     const [session] = await tx`
-      SELECT id, end_at, answers, submitted
+      SELECT id, end_at, answers, submitted, now() AS db_now
       FROM public.academic_exam_sessions
       WHERE student_id = ${studentAccountId} AND exam_id = ${examId}
       FOR UPDATE
     `;
 
     if (!session) {
-      throw new Error('لم يتم العثور على جلسة اختبار نشطة لهذا الطالب.');
+      throw new AppError('session_not_found', 'لم يتم العثور على جلسة اختبار نشطة لهذا الطالب.');
     }
 
-    // 2. If already submitted, return existing submission idempotently
+    const [exam] = await tx`
+      SELECT id, title, total_marks, passing_marks, end_date
+      FROM public.academic_exams
+      WHERE id = ${examId}
+    `;
+
+    if (!exam) {
+      throw new AppError('exam_not_found', 'بيانات الاختبار غير متوفرة.');
+    }
+
+    // 3. If already submitted, return existing submission idempotently
     if (session.submitted) {
       const [existing] = await tx`
-        SELECT score, total_marks, percentage, passed, correct_count, wrong_count, unanswered_count
-        FROM public.academic_exam_submissions
-        WHERE student_id = ${studentAccountId} AND exam_id = ${examId}
+        SELECT 
+          s.score, s.total_marks, s.percentage, s.passed,
+          s.correct_count, s.wrong_count, s.unanswered_count,
+          s.per_question,
+          (now() >= ${exam.end_date}) AS is_revealed
+        FROM public.academic_exam_submissions s
+        WHERE s.student_id = ${studentAccountId} AND s.exam_id = ${examId}
       `;
       if (existing) {
         return {
@@ -41,37 +89,36 @@ export async function submitAndGradeExam(
           correctCount: existing.correct_count,
           wrongCount: existing.wrong_count,
           unansweredCount: existing.unanswered_count,
-          perQuestion: {},
+          perQuestion: existing.is_revealed
+            ? ((typeof existing.per_question === 'string' ? JSON.parse(existing.per_question) : existing.per_question) || {})
+            : {},
         };
       }
     }
 
-    const now = new Date();
+    const dbNow = new Date(session.db_now);
     const endAt = new Date(session.end_at);
+    // Allow 10 seconds network grace period from DB clock
+    const isWithinGracePeriod = dbNow.getTime() <= endAt.getTime() + 10000;
 
-    // 3. Save incoming answers only if submitted within valid time
-    let effectiveAnswers: Record<string, string> = session.answers || {};
-    if (incomingAnswers && now.getTime() <= endAt.getTime() + 10000) { // allow 10s grace period for latency
-      effectiveAnswers = { ...effectiveAnswers, ...incomingAnswers };
+    let effectiveAnswers: Record<string, string> =
+      (typeof session.answers === 'string' ? JSON.parse(session.answers) : session.answers) || {};
+    let autoSubmitFlag = isAutoSubmitted;
+
+    if (isWithinGracePeriod) {
+      effectiveAnswers = { ...effectiveAnswers, ...sanitizedIncoming };
       await tx`
         UPDATE public.academic_exam_sessions
            SET answers = ${JSON.stringify(effectiveAnswers)}::jsonb,
                updated_at = now()
          WHERE id = ${session.id}
       `;
+    } else {
+      // Past deadline: ignore incoming payload and mark as auto-submitted
+      autoSubmitFlag = true;
     }
 
-    // 4. Fetch questions and answer keys from private schema
-    const [exam] = await tx`
-      SELECT id, title, total_marks, passing_marks, end_date
-      FROM public.academic_exams
-      WHERE id = ${examId}
-    `;
-
-    if (!exam) {
-      throw new Error('بيانات الاختبار غير متوفرة.');
-    }
-
+    // 4. Fetch answer keys from private schema
     const questionsWithKeys = await tx`
       SELECT 
         q.id AS question_id,
@@ -82,6 +129,14 @@ export async function submitAndGradeExam(
       WHERE q.exam_id = ${examId}
       ORDER BY q.number ASC
     `;
+
+    // Fail closed: if questions count doesn't match keys count, do not silently mis-grade
+    if (questionRows.length !== questionsWithKeys.length) {
+      throw new AppError(
+        'exam_not_configured',
+        'الامتحان غير مكتمل الإعداد أو لم يتم إدخال مفتاح الإجابة كاملاً. يرجى مراجعة إدارة الكنترول.'
+      );
+    }
 
     let totalScore = 0;
     let correctCount = 0;
@@ -105,10 +160,10 @@ export async function submitAndGradeExam(
     }
 
     const totalMarks = exam.total_marks;
-    const percentage = Math.round((totalScore / totalMarks) * 100);
+    const percentage = totalMarks > 0 ? Math.round((totalScore / totalMarks) * 100) : 0;
     const passed = totalScore >= exam.passing_marks;
 
-    // 5. Insert final submission record (strictly single attempt)
+    // 5. Insert final submission record (including answers and per_question jsonb)
     await tx`
       INSERT INTO public.academic_exam_submissions (
         student_id,
@@ -120,7 +175,9 @@ export async function submitAndGradeExam(
         correct_count,
         wrong_count,
         unanswered_count,
-        auto_submitted
+        auto_submitted,
+        answers,
+        per_question
       ) VALUES (
         ${studentAccountId},
         ${examId},
@@ -131,7 +188,9 @@ export async function submitAndGradeExam(
         ${correctCount},
         ${wrongCount},
         ${unansweredCount},
-        ${isAutoSubmitted}
+        ${autoSubmitFlag},
+        ${JSON.stringify(effectiveAnswers)}::jsonb,
+        ${JSON.stringify(perQuestion)}::jsonb
       )
       ON CONFLICT (student_id, exam_id) DO NOTHING;
     `;
@@ -144,14 +203,22 @@ export async function submitAndGradeExam(
        WHERE id = ${session.id}
     `;
 
-    // 7. Audit log
-    await tx`
-      INSERT INTO academic_private.audit_log (actor, action, details)
-      VALUES (${studentAccountId}, 'EXAM_SUBMITTED', ${JSON.stringify({ exam_id: examId, score: totalScore, passed })}::jsonb)
-    `;
+    // 7. Audit log (academic_grader has INSERT grant on audit_log from migration 002)
+    try {
+      await tx`
+        INSERT INTO academic_private.audit_log (actor, action, details)
+        VALUES (
+          ${studentAccountId},
+          'EXAM_SUBMITTED',
+          ${JSON.stringify({ exam_id: examId, score: totalScore, passed, auto_submitted: autoSubmitFlag })}::jsonb
+        )
+      `;
+    } catch (auditErr) {
+      console.error('Audit log failed inside submitAndGradeExam:', auditErr);
+    }
 
-    // 8. If exam official window hasn't ended yet, suppress perQuestion details to prevent leak
-    const isExamWindowClosed = now.getTime() >= new Date(exam.end_date).getTime();
+    // 8. Delayed reveal: reveal perQuestion only after the exam official end_date
+    const isExamWindowClosed = dbNow.getTime() >= new Date(exam.end_date).getTime();
 
     return {
       score: totalScore,

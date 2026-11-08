@@ -1,12 +1,9 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { Exam } from '@/types/exam';
-import { 
-  startOrResumeSession, 
-  saveAnswers, 
-  SessionState 
-} from '@/lib/repos/examSessionRepo';
+import Link from 'next/link';
+import { Exam, ExamQuestion } from '@/types/exam';
+import { startOrResumeExamSessionAction, saveExamAnswersAction } from '@/app/exams/actions';
 import { 
   Clock, 
   AlertTriangle, 
@@ -17,7 +14,8 @@ import {
   Send, 
   BookOpen, 
   ShieldCheck, 
-  Info
+  Info,
+  ArrowRight
 } from 'lucide-react';
 
 interface ExamSessionProps {
@@ -33,57 +31,105 @@ export function ExamSession({
   submitError,
   onFinishExam,
 }: ExamSessionProps) {
-  // Session state from hardened repo
-  const [sessionState] = useState<SessionState>(() => {
-    return startOrResumeSession(exam.id, exam.durationMinutes);
-  });
+  const [questions, setQuestions] = useState<ExamQuestion[]>(exam.questions || []);
+  const [isLoading, setIsLoading] = useState<boolean>(!exam.questions || exam.questions.length === 0);
+  const [sessionError, setSessionError] = useState<string | null>(null);
 
-  const [endTime] = useState<number>(() => {
-    if (sessionState.status === 'active') {
-      return sessionState.endAt;
-    }
-    return Date.now();
-  });
-
-  const getRemainingSeconds = useCallback(() => {
-    return Math.max(0, Math.ceil((endTime - Date.now()) / 1000));
-  }, [endTime]);
+  const [endTime, setEndTime] = useState<number>(0);
+  const clockOffsetRef = useRef<number>(0);
+  const autoSubmittedRef = useRef<boolean>(false);
 
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [answers, setAnswers] = useState<Record<string, string>>(() => sessionState.answers);
+  const [answers, setAnswers] = useState<Record<string, string>>({});
   const [flagged, setFlagged] = useState<Set<string>>(new Set());
-  const [timeRemaining, setTimeRemaining] = useState<number>(() => getRemainingSeconds());
+  const [timeRemaining, setTimeRemaining] = useState<number>(0);
   const [showSubmitModal, setShowSubmitModal] = useState(false);
   const questionWorkspaceRef = useRef<HTMLDivElement>(null);
 
-  const currentQuestion = exam.questions[currentIndex];
-
-  // If session was already expired or submitted upon load, auto-transition immediately
+  // Initialize or resume session strictly through server action (Finding E1)
   useEffect(() => {
-    if (sessionState.status === 'expired') {
-      onFinishExam(sessionState.answers, true);
-    } else if (sessionState.status === 'submitted') {
-      onFinishExam(sessionState.answers, false);
-    }
-  }, [sessionState, onFinishExam]);
+    let isMounted = true;
 
-  // Auto-submit handler (called when countdown hits zero)
+    async function initSession() {
+      try {
+        const res = await startOrResumeExamSessionAction(exam.id);
+        if (!isMounted) return;
+
+        if (res.status === 'submitted') {
+          onFinishExam(res.submission ? {} : {}, false);
+          return;
+        }
+
+        if (res.status === 'expired') {
+          onFinishExam(res.answers || {}, true);
+          return;
+        }
+
+        if (res.status === 'active') {
+          if (res.questions && res.questions.length > 0) {
+            setQuestions(res.questions);
+          }
+          if (res.answers) {
+            setAnswers(res.answers);
+          }
+          clockOffsetRef.current = res.serverNow - Date.now();
+          setEndTime(res.endAt);
+          const initialRemaining = Math.max(0, Math.ceil((res.endAt - res.serverNow) / 1000));
+          setTimeRemaining(initialRemaining);
+          setIsLoading(false);
+          return;
+        }
+
+        if (res.status === 'error') {
+          if (res.reason === 'not_enrolled') {
+            setSessionError('غير مصرح لك بدخول هذا الاختبار، يجب التسجيل وتفعيل كود المقرر أولاً.');
+          } else if (res.reason === 'exam_not_started') {
+            setSessionError('موعد الاختبار لم يبدأ بعد.');
+          } else if (res.reason === 'exam_ended') {
+            setSessionError('انتهى الموعد الرسمي للاختبار.');
+          } else {
+            setSessionError('تعذر بدء جلسة الاختبار.');
+          }
+          setIsLoading(false);
+        }
+      } catch {
+        if (!isMounted) return;
+        setSessionError('حدث خطأ في الاتصال بالخادم أثناء تهيئة الاختبار.');
+        setIsLoading(false);
+      }
+    }
+
+    initSession();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [exam.id, onFinishExam]);
+
+  // Auto-submit handler (called when countdown hits zero) - single-flight protected (Finding E4)
   const handleAutoSubmit = useCallback(() => {
+    if (autoSubmittedRef.current) return;
+    autoSubmittedRef.current = true;
     onFinishExam(answers, true);
   }, [answers, onFinishExam]);
 
-  // Manual submit handler (called when student confirms modal)
+  // Manual submit handler
   const handleManualSubmit = () => {
+    autoSubmittedRef.current = true;
     onFinishExam(answers, false);
   };
 
-  // Real-time Countdown timer effect (resilient to tab switching & background suspension)
+  // Real-time authoritative Countdown timer
   useEffect(() => {
+    if (isLoading || !endTime) return;
+
     const updateCountdown = () => {
-      const remaining = Math.max(0, Math.ceil((endTime - Date.now()) / 1000));
+      const nowAuthoritative = Date.now() + clockOffsetRef.current;
+      const remaining = Math.max(0, Math.ceil((endTime - nowAuthoritative) / 1000));
       setTimeRemaining(remaining);
 
-      if (remaining <= 0) {
+      if (remaining <= 0 && !autoSubmittedRef.current) {
+        autoSubmittedRef.current = true;
         handleAutoSubmit();
       }
     };
@@ -103,16 +149,17 @@ export function ExamSession({
       document.removeEventListener('visibilitychange', handleVisibilityOrFocus);
       window.removeEventListener('focus', handleVisibilityOrFocus);
     };
-  }, [endTime, handleAutoSubmit]);
+  }, [endTime, isLoading, handleAutoSubmit]);
 
-  // Handle option select with persistent backup via repo
+  // Handle option select with persistent server auto-save
   const handleSelectOption = (optionId: string) => {
+    if (!currentQuestion) return;
     setAnswers((prev) => {
       const next = {
         ...prev,
         [currentQuestion.id]: optionId,
       };
-      saveAnswers(exam.id, next);
+      saveExamAnswersAction(exam.id, next).catch(() => {});
       return next;
     });
   };
@@ -144,13 +191,48 @@ export function ExamSession({
     return `${pad(mins)}:${pad(secs)}`;
   };
 
+  // Loading Screen
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-slate-900 text-slate-100 flex flex-col justify-center items-center p-4" dir="rtl">
+        <div className="w-10 h-10 border-3 border-blue-500/30 border-t-blue-500 rounded-full animate-spin mb-4" />
+        <p className="text-sm font-bold text-slate-200">جارٍ تهيئة جلسة الاختبار والتحقق من الوقت المعتمد...</p>
+        <p className="text-xs text-slate-400 mt-1">يتم التواصل مع خوادم الكلية لتأمين الامتحان</p>
+      </div>
+    );
+  }
+
+  // Error Screen
+  if (sessionError) {
+    return (
+      <div className="min-h-screen bg-slate-900 text-slate-100 flex flex-col justify-center items-center p-4" dir="rtl">
+        <div className="max-w-md w-full bg-slate-800 rounded-2xl p-6 text-center border border-slate-700 shadow-xl">
+          <div className="w-12 h-12 rounded-xl bg-rose-500/20 text-rose-400 border border-rose-500/30 flex items-center justify-center mx-auto mb-3">
+            <AlertTriangle className="w-6 h-6" />
+          </div>
+          <h2 className="text-base font-bold text-white mb-2">تعذر الدخول إلى الاختبار</h2>
+          <p className="text-xs text-slate-300 mb-6">{sessionError}</p>
+          <Link
+            href="/exams"
+            className="inline-flex items-center justify-center gap-2 h-11 px-5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold transition-all"
+          >
+            <ArrowRight className="w-4 h-4" />
+            <span>العودة لقائمة الاختبارات</span>
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  const currentQuestion = questions[currentIndex];
+
   // Warning thresholds
   const isDangerTime = timeRemaining <= 60; // under 1 minute
   const isWarningTime = timeRemaining <= 300 && !isDangerTime; // under 5 minutes
 
   // Calculated metrics
   const answeredCount = Object.keys(answers).length;
-  const unansweredCount = exam.questions.length - answeredCount;
+  const unansweredCount = Math.max(0, questions.length - answeredCount);
   const flaggedCount = flagged.size;
 
   return (
@@ -219,13 +301,13 @@ export function ExamSession({
             <h3 className="text-xs sm:text-sm font-bold text-white mb-3 flex items-center justify-between">
               <span>خريطة الأسئلة (Questions Map)</span>
               <span className="text-[11px] sm:text-xs text-slate-400 font-normal">
-                {answeredCount}/{exam.questions.length} مُجاب
+                {answeredCount}/{questions.length} مُجاب
               </span>
             </h3>
 
             {/* Grid of question buttons */}
             <div className="grid grid-cols-5 sm:grid-cols-6 lg:grid-cols-4 gap-2 mb-4">
-              {exam.questions.map((q, idx) => {
+              {questions.map((q, idx) => {
                 const isCurrent = idx === currentIndex;
                 const isAnswered = !!answers[q.id];
                 const isFlagged = flagged.has(q.id);
@@ -312,7 +394,7 @@ export function ExamSession({
                   {currentQuestion.number}
                 </span>
                 <span className="text-xs text-slate-300 font-bold font-sans">
-                  Question {currentIndex + 1} of {exam.questions.length}
+                  Question {currentIndex + 1} of {questions.length}
                 </span>
                 <span className="text-[11px] sm:text-xs font-bold px-2 py-0.5 rounded-md bg-slate-800 text-blue-300 border border-slate-700 font-mono">
                   {currentQuestion.points} Pts
@@ -426,7 +508,7 @@ export function ExamSession({
               <span className="sm:hidden">Previous</span>
             </button>
 
-            {currentIndex === exam.questions.length - 1 ? (
+            {currentIndex === questions.length - 1 ? (
               <button
                 type="button"
                 onClick={() => setShowSubmitModal(true)}
@@ -438,7 +520,7 @@ export function ExamSession({
             ) : (
               <button
                 type="button"
-                onClick={() => setCurrentIndex((prev) => Math.min(exam.questions.length - 1, prev + 1))}
+                onClick={() => setCurrentIndex((prev) => Math.min(questions.length - 1, prev + 1))}
                 className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 px-3.5 sm:px-5 py-2.5 min-h-[44px] rounded-xl text-xs sm:text-sm font-bold bg-blue-600 hover:bg-blue-500 text-white transition-all shadow-md active:scale-95 cursor-pointer"
               >
                 <span className="hidden sm:inline">Next Question</span>
@@ -468,7 +550,7 @@ export function ExamSession({
             <div className="bg-slate-950/70 rounded-2xl p-4 border border-slate-800 space-y-2.5 text-xs">
               <div className="flex items-center justify-between">
                 <span className="text-slate-400">الأسئلة المجاب عنها:</span>
-                <strong className="text-emerald-400 font-mono text-sm">{answeredCount} من {exam.questions.length}</strong>
+                <strong className="text-emerald-400 font-mono text-sm">{answeredCount} من {questions.length}</strong>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-slate-400">أسئلة متبقية دون إجابة:</span>

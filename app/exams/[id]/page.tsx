@@ -1,8 +1,7 @@
 import { notFound, redirect } from 'next/navigation';
 import { connection } from 'next/server';
 import { requireAuth } from '@/server/auth/requireAuth';
-import { getPublicExamById } from '@/server/exams/service';
-import { RAW_EXAMS_DATA } from '@/data/exams';
+import { getPublicExamById, getExamResult } from '@/server/exams/service';
 import { ExamContainer } from '@/components/exams/ExamContainer';
 import { getExamStatus } from '@/lib/exams/status';
 import { GradeResult } from '@/types/exam';
@@ -16,18 +15,9 @@ interface ExamDetailPageProps {
   }>;
 }
 
-// Allow dynamic params access in Next.js 16
-export const instant = false;
-
-export function generateStaticParams() {
-  return RAW_EXAMS_DATA.map((exam) => ({
-    id: exam.id,
-  }));
-}
-
 export async function generateMetadata({ params }: ExamDetailPageProps) {
   const { id } = await params;
-  const exam = (await getPublicExamById(id)) || RAW_EXAMS_DATA.find((e) => e.id === id);
+  const exam = await getPublicExamById(id);
   if (!exam) return { title: 'الاختبار غير موجود | كلية الذكاء الاصطناعي' };
 
   return {
@@ -41,11 +31,15 @@ export default async function ExamDetailPage({ params, searchParams }: ExamDetai
   const { id } = await params;
   const resolvedSearchParams = await searchParams;
 
-  const dbExam = await getPublicExamById(id, student.accountId);
-  const exam = dbExam || RAW_EXAMS_DATA.find((e) => e.id === id);
+  const exam = await getPublicExamById(id, student.accountId);
 
   if (!exam) {
     notFound();
+  }
+
+  // Enforce enrollment check (Finding E1)
+  if (!exam.isEnrolled) {
+    redirect('/exams');
   }
 
   // Defer rendering until request time to read authoritative current time under Next.js 16 cacheComponents
@@ -67,18 +61,13 @@ export default async function ExamDetailPage({ params, searchParams }: ExamDetai
     }
   }
 
+  // Finding E2: fetch real stored submission metrics instead of hard-coded zeros
   let initialResult: GradeResult | undefined;
-  if (currentStatus === 'completed' && exam.submission) {
-    initialResult = {
-      score: exam.submission.score,
-      totalMarks: exam.submission.totalMarks,
-      percentage: exam.submission.percentage,
-      passed: exam.submission.passed,
-      correctCount: 0,
-      wrongCount: 0,
-      unansweredCount: 0,
-      perQuestion: {},
-    };
+  if (currentStatus === 'completed' || exam.submission || resolvedSearchParams?.view === 'result') {
+    const storedResult = await getExamResult(id, student.accountId);
+    if (storedResult) {
+      initialResult = storedResult;
+    }
   }
 
   const initialView = currentStatus === 'completed' || resolvedSearchParams?.view === 'result' ? 'result' : 'session';

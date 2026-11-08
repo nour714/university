@@ -1,5 +1,5 @@
 import { AcademicNotification } from '@/types/notification';
-import { listNotificationsAction, markAllNotificationsReadAction } from '@/app/notifications/actions';
+import { listNotificationsAction } from '@/app/notifications/actions';
 
 export async function listNotifications(): Promise<AcademicNotification[]> {
   try {
@@ -9,13 +9,7 @@ export async function listNotifications(): Promise<AcademicNotification[]> {
   }
 }
 
-export async function saveNotifications(list: AcademicNotification[]): Promise<void> {
-  const hasUnread = list.some((n) => !n.isRead);
-  if (!hasUnread) {
-    try {
-      await markAllNotificationsReadAction();
-    } catch {
-      // Ignore background error
-    }
-  }
+export async function saveNotifications(_list: AcademicNotification[]): Promise<void> {
+  void _list;
+  // State is managed reactively in memory and explicit mutations trigger Server Actions.
 }

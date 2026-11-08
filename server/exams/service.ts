@@ -1,4 +1,5 @@
 import 'server-only';
+import { cache } from 'react';
 import { appSql } from '@/lib/db/app.server';
 import { Exam, ListExam } from '@/types/exam';
 
@@ -68,7 +69,7 @@ export async function listExams(studentAccountId?: string): Promise<ListExam[]> 
   });
 }
 
-export async function getPublicExamById(examId: string, studentAccountId?: string): Promise<Exam | null> {
+export const getPublicExamById = cache(async (examId: string, studentAccountId?: string): Promise<Exam | null> => {
   const [e] = await appSql`
     SELECT 
       e.id,
@@ -153,7 +154,7 @@ export async function getPublicExamById(examId: string, studentAccountId?: strin
     questions,
     submission,
   };
-}
+});
 
 /**
  * Atomic Exam Session Startup / Resumption (Recipe 4.2)

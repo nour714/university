@@ -13,14 +13,11 @@ if (!connectionString) {
 
 export const appSql =
   globalForDb.appSql ||
-  postgres(connectionString, {
+  (globalForDb.appSql = postgres(connectionString, {
     prepare: false, // Required for Supavisor transaction mode
+    fetch_types: false, // Prevents pg_catalog type introspection query on connection init
     max: 2,         // Kept low for serverless multiplexing
     idle_timeout: 20,
     connect_timeout: 10,
     ssl: 'require',
-  });
-
-if (process.env.NODE_ENV !== 'production') {
-  globalForDb.appSql = appSql;
-}
+  }));

@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
 import { requireAuth } from '@/server/auth/requireAuth';
-import { getStudentProfile } from '@/server/students/service';
 import { CURRENT_STUDENT } from '@/data/student';
 import { StudentHero } from '@/components/home/StudentHero';
 import { StudentStatsGrid } from '@/components/home/StudentStatsGrid';
@@ -13,7 +12,7 @@ export const metadata: Metadata = {
 
 export default async function HomePage() {
   const authStudent = await requireAuth();
-  const profile = (await getStudentProfile(authStudent.accountId)) || CURRENT_STUDENT;
+  const profile = authStudent.studentProfile || CURRENT_STUDENT;
 
   return (
     <div className="space-y-6 sm:space-y-8 animate-fadeIn pb-4">

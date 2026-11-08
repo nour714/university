@@ -1,6 +1,8 @@
 import 'server-only';
 import crypto from 'node:crypto';
+import { cache } from 'react';
 import { appSql } from '@/lib/db/app.server';
+import { StudentProfile } from '@/data/student';
 
 export interface AuthenticatedStudent {
   accountId: string;
@@ -16,6 +18,7 @@ export interface AuthenticatedStudent {
     maxGpa: number;
     avatarUrl: string | null;
   };
+  studentProfile: StudentProfile;
 }
 
 /**
@@ -51,10 +54,10 @@ export async function createSession(
 }
 
 /**
- * Validates a raw session token against the database.
- * Sliding window: extends idle_expires_at by 30 minutes on every valid access.
+ * Validates a raw session token against the database with React per-request memoization.
+ * Sliding window: extends idle_expires_at by 30 minutes when > 5 minutes have elapsed.
  */
-export async function validateSession(rawToken: string): Promise<AuthenticatedStudent | null> {
+export const validateSession = cache(async (rawToken: string): Promise<AuthenticatedStudent | null> => {
   if (!rawToken || typeof rawToken !== 'string' || rawToken.length < 32) {
     return null;
   }
@@ -65,6 +68,7 @@ export async function validateSession(rawToken: string): Promise<AuthenticatedSt
     SELECT 
       s.id AS session_id,
       s.account_id,
+      s.last_seen_at,
       a.national_id,
       a.must_change_password,
       a.is_active,
@@ -76,7 +80,8 @@ export async function validateSession(rawToken: string): Promise<AuthenticatedSt
       p.level,
       p.current_gpa,
       p.max_gpa,
-      p.avatar_url
+      p.avatar_url,
+      (SELECT count(*) FROM public.academic_student_codes sc WHERE sc.student_id = p.id AND sc.status = 'active') AS courses_count
     FROM public.academic_sessions s
     JOIN public.academic_accounts a ON a.id = s.account_id
     LEFT JOIN public.academic_profiles p ON p.id = s.account_id
@@ -92,18 +97,46 @@ export async function validateSession(rawToken: string): Promise<AuthenticatedSt
     return null;
   }
 
-  // Sliding idle window update
-  await appSql`
-    UPDATE public.academic_sessions
-       SET last_seen_at = now(),
-           idle_expires_at = LEAST(now() + interval '30 minutes', absolute_expires_at)
-     WHERE id = ${row.session_id}
-  `;
+  // Sliding idle window update: only write to DB if > 5 minutes elapsed since last update
+  // Eliminates blocking write transactions and table locks on frequent page navigations
+  const lastSeenMs = row.last_seen_at ? new Date(row.last_seen_at).getTime() : 0;
+  if (Date.now() - lastSeenMs > 5 * 60 * 1000) {
+    await appSql`
+      UPDATE public.academic_sessions
+         SET last_seen_at = now(),
+             idle_expires_at = LEAST(now() + interval '30 minutes', absolute_expires_at)
+       WHERE id = ${row.session_id}
+    `;
+  }
+
+  const gpa = Number(row.current_gpa) || 3.84;
+  let gpaRating = 'امتياز مع مرتبة الشرف';
+  if (gpa < 2.0) gpaRating = 'مقبول';
+  else if (gpa < 3.0) gpaRating = 'جيد';
+  else if (gpa < 3.5) gpaRating = 'جيد جداً';
+
+  const studentProfile: StudentProfile = {
+    id: row.account_id,
+    fullName: row.full_name || 'طالب أكاديمي',
+    academicId: row.student_code || row.national_id,
+    department: row.department || 'الذكاء الاصطناعي العام',
+    faculty: 'كلية الذكاء الاصطناعي',
+    level: row.level || 'المستوى الثالث',
+    levelNumber: 3,
+    gpa,
+    maxGpa: Number(row.max_gpa) || 4.0,
+    gpaRating,
+    registeredHours: 18,
+    coursesCount: Number(row.courses_count) || 6,
+    academicYear: '2026/2027',
+    semester: 'الفصل الدراسي الأول',
+    status: 'منتظم',
+  };
 
   return {
     accountId: row.account_id,
     nationalId: row.national_id,
-    mustChangePassword: row.must_change_password,
+    mustChangePassword: Boolean(row.must_change_password),
     profile: {
       fullName: row.full_name || 'طالب جامعي',
       email: row.email || '',
@@ -114,8 +147,9 @@ export async function validateSession(rawToken: string): Promise<AuthenticatedSt
       maxGpa: Number(row.max_gpa) || 4.0,
       avatarUrl: row.avatar_url || null,
     },
+    studentProfile,
   };
-}
+});
 
 /**
  * Revokes an individual session upon logout.

@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
+import { getCourseById } from '@/server/courses/service';
 import { COURSES_DATA } from '@/data/courses';
 import { CourseContentBrowser } from '@/components/course-detail/CourseContentBrowser';
 import { ArrowRight, User } from 'lucide-react';
@@ -22,7 +23,7 @@ export function generateStaticParams() {
 
 export async function generateMetadata({ params }: CourseDetailPageProps) {
   const { id } = await params;
-  const course = COURSES_DATA.find((c) => c.id === id);
+  const course = (await getCourseById(id)) || COURSES_DATA.find((c) => c.id === id);
   if (!course) return { title: 'المقرر غير موجود | كلية الذكاء الاصطناعي' };
 
   return {
@@ -33,7 +34,7 @@ export async function generateMetadata({ params }: CourseDetailPageProps) {
 
 export default async function CourseDetailPage({ params }: CourseDetailPageProps) {
   const { id } = await params;
-  const course = COURSES_DATA.find((c) => c.id === id);
+  const course = (await getCourseById(id)) || COURSES_DATA.find((c) => c.id === id);
 
   if (!course) {
     notFound();

@@ -21,7 +21,7 @@ import {
   Check
 } from 'lucide-react';
 import { useNotifications } from '@/context/NotificationContext';
-import { CURRENT_STUDENT } from '@/data/student';
+import { loginAction } from '@/app/auth/actions';
 import { AuthCinematicShowcase } from '@/components/auth/AuthCinematicShowcase';
 
 const ISSUE_TYPES = [
@@ -69,7 +69,7 @@ export function LoginForm() {
     }, 600);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMessage('');
 
@@ -85,22 +85,43 @@ export function LoginForm() {
 
     setIsLoading(true);
 
-    setTimeout(() => {
+    try {
+      const res = await loginAction({ identifier, password });
+      if (!res.success) {
+        setErrorMessage(res.error);
+        return;
+      }
+
+      if (res.mustChangePassword) {
+        router.push('/login?changePassword=true');
+      } else {
+        router.push('/');
+      }
+    } catch {
+      setErrorMessage('حدث خطأ في الاتصال بالخادم. يرجى إعادة المحاولة.');
+    } finally {
       setIsLoading(false);
-      router.push('/');
-    }, 850);
+    }
   };
 
-  const handleQuickDemoLogin = () => {
-    setIdentifier(CURRENT_STUDENT.academicId);
-    setPassword('student@2026');
+  const handleQuickDemoLogin = async () => {
+    setIdentifier('20230814');
+    setPassword('Student@2026');
     setErrorMessage('');
     setIsLoading(true);
 
-    setTimeout(() => {
-      setIsLoading(false);
+    try {
+      const res = await loginAction({ identifier: '20230814', password: 'Student@2026' });
+      if (!res.success) {
+        setErrorMessage(res.error);
+        return;
+      }
       router.push('/');
-    }, 700);
+    } catch {
+      setErrorMessage('تعذر تسجيل الدخول السريع.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   // Support seamless pull-to-refresh on mobile browsers & webviews

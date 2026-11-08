@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { useNotifications } from '@/context/NotificationContext';
 import { clearSession } from '@/lib/repos/sessionRepo';
+import { logoutAction } from '@/app/auth/actions';
 
 export function Sidebar({ currentPath }: { currentPath?: string }) {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -255,7 +256,8 @@ export function Sidebar({ currentPath }: { currentPath?: string }) {
           {/* Logout button (smooth width between 40px when expanded and full 48px when collapsed) */}
           <button
             type="button"
-            onClick={() => {
+            onClick={async () => {
+              await logoutAction();
               clearSession();
               resetAll();
               router.push('/login');

@@ -1,4 +1,6 @@
 import type { Metadata } from 'next';
+import { listExams } from '@/server/exams/service';
+import { requireAuth } from '@/server/auth/requireAuth';
 import { RAW_EXAMS_DATA } from '@/data/exams';
 import { ExamsDashboard } from '@/components/exams/ExamsDashboard';
 import { Exam, ListExam } from '@/types/exam';
@@ -14,12 +16,14 @@ function toListExam(exam: Exam): ListExam {
   return copy as ListExam;
 }
 
-export default function ExamsPage() {
-  const listExams = RAW_EXAMS_DATA.map(toListExam);
+export default async function ExamsPage() {
+  const student = await requireAuth();
+  const dbExams = await listExams(student.accountId);
+  const listExamsData = dbExams.length > 0 ? dbExams : RAW_EXAMS_DATA.map(toListExam);
 
   return (
     <div className="animate-fadeIn">
-      <ExamsDashboard initialExams={listExams} />
+      <ExamsDashboard initialExams={listExamsData} />
     </div>
   );
 }

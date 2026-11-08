@@ -297,3 +297,126 @@ GRANT SELECT ON public.academic_exam_questions TO academic_grader;
 GRANT SELECT, UPDATE ON public.academic_exam_sessions TO academic_grader;
 GRANT INSERT, SELECT ON public.academic_exam_submissions TO academic_grader;
 GRANT SELECT ON academic_private.exam_keys TO academic_grader;
+
+
+-- Migration: 002_fix_roles_grants_rls.sql
+-- ORDER NOTE: 001 contains GRANTs to academic_app / academic_grader and FAILS if those roles do not
+-- exist yet. On a fresh database run section "0. Roles" of this file FIRST, then 001, then the rest.
+-- (Better: move section 0 into the top of 001 in your repo.)
+--
+-- Fixes found while testing 001 on a real PostgreSQL:
+--   1. 001 enables RLS but creates NO policy, so non-owner roles read 0 rows and cannot write.
+--      => explicit policies for academic_app / academic_grader (no BYPASSRLS needed).
+--   2. academic_grader had no INSERT on academic_private.audit_log, so submitAndGradeExam()
+--      rolled back every time ("permission denied for table audit_log").
+--   3. academic_app had GRANT ALL on every table: it could extend exam timers, forge/edit/delete
+--      submissions and TRUNCATE. => least-privilege, column-level grants.
+--   4. The roles were never created by a migration. => created here (NO passwords: set them
+--      out-of-band with  ALTER ROLE academic_app PASSWORD '...';  and never commit them).
+--
+-- Result: only the grader can mark a session submitted and write results; the app cannot.
+
+-- ---------------------------------------------------------------------
+-- 0. Roles (idempotent, no passwords, no BYPASSRLS, not superuser)
+-- ---------------------------------------------------------------------
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'academic_app') THEN
+    CREATE ROLE academic_app LOGIN NOSUPERUSER NOCREATEDB NOCREATEROLE NOBYPASSRLS;
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'academic_grader') THEN
+    CREATE ROLE academic_grader LOGIN NOSUPERUSER NOCREATEDB NOCREATEROLE NOBYPASSRLS;
+  END IF;
+END $$;
+
+-- ---------------------------------------------------------------------
+-- 1. Start from zero
+-- ---------------------------------------------------------------------
+REVOKE ALL ON ALL TABLES    IN SCHEMA public           FROM academic_app, academic_grader;
+REVOKE ALL ON ALL SEQUENCES IN SCHEMA public           FROM academic_app, academic_grader;
+REVOKE ALL ON ALL TABLES    IN SCHEMA academic_private FROM academic_app, academic_grader;
+REVOKE ALL ON ALL SEQUENCES IN SCHEMA academic_private FROM academic_app, academic_grader;
+
+GRANT USAGE ON SCHEMA public, academic_private TO academic_app, academic_grader;
+
+-- ---------------------------------------------------------------------
+-- 2. academic_app: what the normal server actions really need
+-- ---------------------------------------------------------------------
+-- read-only reference data
+GRANT SELECT ON public.academic_courses, public.academic_course_contents,
+                public.academic_exams,   public.academic_exam_questions,
+                public.academic_profiles, public.academic_exam_submissions
+  TO academic_app;
+
+-- accounts: login bookkeeping only (no INSERT/DELETE: accounts are created by the owner/admin scripts)
+GRANT SELECT ON public.academic_accounts TO academic_app;
+GRANT UPDATE (password_hash, must_change_password, failed_login_count, locked_until,
+              password_changed_at, last_login_at, updated_at)
+  ON public.academic_accounts TO academic_app;
+
+-- sessions
+GRANT SELECT, INSERT ON public.academic_sessions TO academic_app;
+GRANT UPDATE (last_seen_at, idle_expires_at, revoked_at) ON public.academic_sessions TO academic_app;
+
+-- enrolments + notifications + tickets
+GRANT SELECT, INSERT ON public.academic_student_codes, public.academic_support_tickets TO academic_app;
+GRANT SELECT, INSERT ON public.academic_notifications TO academic_app;
+GRANT UPDATE (is_read) ON public.academic_notifications TO academic_app;
+GRANT USAGE ON SEQUENCE public.academic_ticket_no_seq TO academic_app;
+
+-- exam sessions: the app may START a session and save DRAFT answers; it can NOT mark it submitted
+-- nor change its deadline (end_at is set once, on INSERT, by the server).
+GRANT SELECT ON public.academic_exam_sessions TO academic_app;
+GRANT INSERT (student_id, exam_id, end_at) ON public.academic_exam_sessions TO academic_app;
+GRANT UPDATE (answers, updated_at)         ON public.academic_exam_sessions TO academic_app;
+
+-- private tables
+GRANT SELECT, INSERT, UPDATE, DELETE ON academic_private.rate_limits     TO academic_app;
+GRANT INSERT                          ON academic_private.audit_log       TO academic_app;
+GRANT INSERT                          ON academic_private.redeem_attempts TO academic_app;
+GRANT SELECT                          ON academic_private.redeemable_codes TO academic_app;
+GRANT UPDATE (is_redeemed, redeemed_by, redeemed_at) ON academic_private.redeemable_codes TO academic_app;
+GRANT USAGE ON SEQUENCE academic_private.audit_log_id_seq, academic_private.redeem_attempts_id_seq TO academic_app;
+-- NOTE: academic_app has NO access to academic_private.exam_keys.
+
+-- ---------------------------------------------------------------------
+-- 3. academic_grader: grade and nothing else
+-- ---------------------------------------------------------------------
+GRANT SELECT ON public.academic_exams, public.academic_exam_questions TO academic_grader;
+GRANT SELECT ON public.academic_exam_sessions TO academic_grader;
+GRANT UPDATE (answers, submitted, updated_at) ON public.academic_exam_sessions TO academic_grader;
+GRANT SELECT, INSERT ON public.academic_exam_submissions TO academic_grader;
+GRANT SELECT ON academic_private.exam_keys TO academic_grader;
+GRANT INSERT ON academic_private.audit_log TO academic_grader;                 -- fixes the failing submit
+GRANT USAGE ON SEQUENCE academic_private.audit_log_id_seq TO academic_grader;
+
+-- ---------------------------------------------------------------------
+-- 4. RLS: stays ENABLED (deny-all for anon/authenticated/PUBLIC). Only these two roles get a policy;
+--    privileges above (column level) still limit what each policy lets them do.
+-- ---------------------------------------------------------------------
+DO $$
+DECLARE r RECORD;
+BEGIN
+  FOR r IN SELECT schemaname, tablename FROM pg_tables
+            WHERE (schemaname = 'public' AND tablename LIKE 'academic\_%')
+               OR schemaname = 'academic_private'
+  LOOP
+    EXECUTE format('DROP POLICY IF EXISTS app_access ON %I.%I', r.schemaname, r.tablename);
+    EXECUTE format('CREATE POLICY app_access ON %I.%I FOR ALL TO academic_app USING (true) WITH CHECK (true)',
+                   r.schemaname, r.tablename);
+  END LOOP;
+
+  FOR r IN SELECT * FROM (VALUES
+      ('public','academic_exams'), ('public','academic_exam_questions'),
+      ('public','academic_exam_sessions'), ('public','academic_exam_submissions'),
+      ('academic_private','exam_keys'), ('academic_private','audit_log')
+    ) AS t(schemaname, tablename)
+  LOOP
+    EXECUTE format('DROP POLICY IF EXISTS grader_access ON %I.%I', r.schemaname, r.tablename);
+    EXECUTE format('CREATE POLICY grader_access ON %I.%I FOR ALL TO academic_grader USING (true) WITH CHECK (true)',
+                   r.schemaname, r.tablename);
+  END LOOP;
+END $$;
+
+-- Anything created later must not silently become readable by Supabase's built-in roles
+ALTER DEFAULT PRIVILEGES IN SCHEMA academic_private REVOKE ALL ON TABLES FROM PUBLIC, anon, authenticated;

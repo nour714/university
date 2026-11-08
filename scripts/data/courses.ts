@@ -1,6 +1,6 @@
 import { Course } from '@/types/course';
 
-const RAW_COURSES_DATA: Course[] = [
+export const RAW_COURSES_DATA: Course[] = [
   {
     id: 'ai-301',
     code: 'AI301',

@@ -1,26 +1,7 @@
-// DEMO DATA ONLY — do not commit real student data or real access codes to this repository.
-
-export interface StudentProfile {
-  id: string;
-  fullName: string;
-  academicId: string;
-  department: string;
-  faculty: string;
-  level: string;
-  levelNumber: number;
-  gpa: number;
-  maxGpa: number;
-  gpaRating: string;
-  registeredHours: number;
-  coursesCount: number;
-  academicYear: string;
-  semester: string;
-  status: string;
-}
-
-export const CURRENT_STUDENT: StudentProfile = {
+export const DEMO_STUDENT = {
   id: 'std_20230814',
   fullName: 'عبد الرحمن خالد منصور',
+  email: 'abdelrahman.khaled@university.edu.eg',
   academicId: '20230814',
   department: 'هندسة وعلوم الذكاء الاصطناعي',
   faculty: 'كلية الذكاء الاصطناعي',

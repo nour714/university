@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { requireAuth } from '@/server/auth/requireAuth';
+import { listStudentCodes } from '@/server/codes/service';
 import { CodesManager } from '@/components/codes/CodesManager';
 
 export const metadata: Metadata = {
@@ -8,6 +9,7 @@ export const metadata: Metadata = {
 };
 
 export default async function CodesPage() {
-  await requireAuth();
-  return <CodesManager />;
+  const student = await requireAuth();
+  const codes = await listStudentCodes(student.accountId);
+  return <CodesManager initialCodes={codes} />;
 }

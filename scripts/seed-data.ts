@@ -11,6 +11,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import postgres from 'postgres';
+import { z } from 'zod';
 import { hash } from '@node-rs/argon2';
 import { validateScriptDbUrl } from './env';
 import { computeCodeHash, maskCode, normalizeCode } from '../lib/security/codeHash';
@@ -22,10 +23,75 @@ import { DEMO_REDEEMABLE_CODES } from './data/codes';
 import { INITIAL_NOTIFICATIONS } from './data/notifications';
 import { DEMO_STUDENT } from './data/student';
 
-async function seed() {
+const ExamKeyEntrySchema = z.object({
+  correctOptionId: z.string().min(1, 'correctOptionId is required'),
+  explanation: z.string().default(''),
+});
+
+const ExamKeysFileSchema = z.record(
+  z.string(),
+  z.record(z.string(), ExamKeyEntrySchema)
+);
+
+export function loadAndValidateExamKeys(keysFilePath: string): Record<string, Record<string, { correctOptionId: string; explanation: string }>> {
+  let rawJson: unknown;
+  try {
+    const content = fs.readFileSync(keysFilePath, 'utf-8');
+    rawJson = JSON.parse(content);
+  } catch (err) {
+    throw new Error(`[SEED] Failed to parse JSON from ${keysFilePath}: ${err instanceof Error ? err.message : String(err)}`);
+  }
+
+  const parseResult = ExamKeysFileSchema.safeParse(rawJson);
+  if (!parseResult.success) {
+    throw new Error(`[SEED] Invalid exam keys schema in ${keysFilePath}: ${parseResult.error.message}`);
+  }
+
+  const examKeysMap = parseResult.data;
+
+  // Build lookup maps from RAW_EXAMS_DATA to validate referential integrity
+  const examMap = new Map<string, typeof RAW_EXAMS_DATA[0]>();
+  for (const e of RAW_EXAMS_DATA) {
+    examMap.set(e.id, e);
+  }
+
+  for (const [examId, questionsObj] of Object.entries(examKeysMap)) {
+    const exam = examMap.get(examId);
+    if (!exam) {
+      throw new Error(`[SEED] Exam keys file references unknown examId: "${examId}"`);
+    }
+
+    const questionMap = new Map<string, typeof exam.questions[0]>();
+    for (const q of exam.questions) {
+      questionMap.set(q.id, q);
+    }
+
+    for (const [qId, keyEntry] of Object.entries(questionsObj)) {
+      const question = questionMap.get(qId);
+      if (!question) {
+        throw new Error(`[SEED] Exam "${examId}" references unknown questionId: "${qId}"`);
+      }
+
+      if (!Array.isArray(question.options)) {
+        throw new Error(`[SEED] Question "${qId}" in exam "${examId}" must have options array`);
+      }
+
+      const validOptionIds = question.options.map((o) => o.id);
+      if (!validOptionIds.includes(keyEntry.correctOptionId)) {
+        throw new Error(
+          `[SEED] Question "${qId}" in exam "${examId}" has invalid correctOptionId "${keyEntry.correctOptionId}". Valid option IDs are: [${validOptionIds.join(', ')}]`
+        );
+      }
+    }
+  }
+
+  return examKeysMap;
+}
+
+async function seed(customOwnerUrl?: string) {
   console.log('--- Starting Database Seeding (Owner Role) ---');
 
-  const ownerUrl = process.env.DATABASE_URL_OWNER;
+  const ownerUrl = customOwnerUrl || process.env.DATABASE_URL_OWNER;
   if (!ownerUrl) {
     console.error('[ERROR] DATABASE_URL_OWNER environment variable is required for seeding.');
     process.exit(1);
@@ -39,19 +105,23 @@ async function seed() {
     process.exit(1);
   }
 
-  // Read answer keys from git-ignored private keys file if present
+  // Read answer keys from git-ignored private keys file if present, fallback to example
   let examKeysMap: Record<string, Record<string, { correctOptionId: string; explanation: string }>> = {};
   const privateKeysPath = path.join(process.cwd(), 'seed', 'private', 'exam-keys.json');
+  const exampleKeysPath = path.join(process.cwd(), 'seed', 'exam-keys.example.json');
 
-  if (fs.existsSync(privateKeysPath)) {
-    try {
-      examKeysMap = JSON.parse(fs.readFileSync(privateKeysPath, 'utf-8'));
-      console.log('[SEED] Loaded private exam answer keys from seed/private/exam-keys.json');
-    } catch (e) {
-      console.warn('[SEED] Could not parse seed/private/exam-keys.json:', e);
-    }
+  const keysPath = fs.existsSync(privateKeysPath)
+    ? privateKeysPath
+    : fs.existsSync(exampleKeysPath)
+    ? exampleKeysPath
+    : null;
+
+  if (keysPath) {
+    console.log(`[SEED] Loading and validating exam answer keys from ${keysPath}...`);
+    examKeysMap = loadAndValidateExamKeys(keysPath);
+    console.log('[SEED] Validated exam answer keys successfully.');
   } else {
-    console.log('[SEED] No seed/private/exam-keys.json found. Placeholder exam keys will be omitted or set from example.');
+    console.log('[SEED] No exam keys file found. Placeholder exam keys will be omitted.');
   }
 
   const sql = postgres(ownerUrl, {
@@ -181,15 +251,19 @@ async function seed() {
         `;
       }
 
-      // Seed initial notifications for demo student
+      // Seed initial notifications for demo student idempotently
       for (const notif of INITIAL_NOTIFICATIONS) {
         await sql`
           INSERT INTO public.academic_notifications (
-            student_id, title, message, type, is_read, action_url, action_label, priority
-          ) VALUES (
+            student_id, title, message, type, is_read, action_url, action_label
+          )
+          SELECT
             ${studentAccountId}, ${notif.title}, ${notif.message}, ${notif.type},
-            ${notif.isRead}, ${notif.actionUrl || null}, 'عرض التفاصيل', ${notif.priority || 'normal'}
-          ) ON CONFLICT DO NOTHING;
+            ${notif.isRead}, ${notif.actionUrl || null}, 'عرض التفاصيل'
+          WHERE NOT EXISTS (
+            SELECT 1 FROM public.academic_notifications
+            WHERE student_id = ${studentAccountId} AND title = ${notif.title}
+          );
         `;
       }
     } else {
@@ -238,12 +312,15 @@ async function seed() {
       `;
 
       for (const q of exam.questions) {
+        if (!Array.isArray(q.options)) {
+          throw new Error(`[SEED] Question ${q.id} in exam ${exam.id} must have options as an array`);
+        }
         await sql`
           INSERT INTO public.academic_exam_questions (
             id, exam_id, number, question_text, code_snippet, options, points
           ) VALUES (
             ${q.id}, ${exam.id}, ${q.number}, ${q.questionText},
-            ${q.codeSnippet || null}, ${JSON.stringify(q.options)}::jsonb, ${q.points}
+            ${q.codeSnippet || null}, ${sql.json(q.options)}, ${q.points}
           ) ON CONFLICT (id) DO UPDATE SET
             question_text = EXCLUDED.question_text,
             options = EXCLUDED.options;

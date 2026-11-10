@@ -13,10 +13,12 @@ describe('Codes Redemption & Concurrency Locking (Finding S1 & Concurrency)', ()
   const codeHash = computeCodeHash(cleanCode, env.CODE_PEPPER);
 
   const studentIds: string[] = [];
-  for (let i = 1; i <= 10; i++) {
+  for (let i = 1; i <= 20; i++) {
     const hex = i.toString().padStart(12, '0');
     studentIds.push(`e0000000-0000-0000-0000-${hex}`);
   }
+
+  let concurrentWinnerStudentId: string | null = null;
 
   beforeAll(async () => {
     clients = await setupTestDatabase();
@@ -59,7 +61,7 @@ describe('Codes Redemption & Concurrency Locking (Finding S1 & Concurrency)', ()
     expect(h2.equals(h3)).toBe(true);
   });
 
-  it('handles 10 simultaneous redeem attempts: exactly 1 succeeds and 9 fail', async () => {
+  it('handles 20 simultaneous redeem attempts: exactly 1 succeeds and 19 fail', async () => {
     // Seed 1 unredeemed code
     await clients.ownerSql`
       INSERT INTO academic_private.redeemable_codes (
@@ -69,7 +71,7 @@ describe('Codes Redemption & Concurrency Locking (Finding S1 & Concurrency)', ()
       ) ON CONFLICT (code_hash) DO UPDATE SET is_redeemed = false, redeemed_by = null, redeemed_at = null;
     `;
 
-    // Fire 10 simultaneous redemption requests
+    // Fire 20 simultaneous redemption requests
     const results = await Promise.all(
       studentIds.map((sid) => redeemCodeForStudent(sid, rawTestCode))
     );
@@ -78,7 +80,11 @@ describe('Codes Redemption & Concurrency Locking (Finding S1 & Concurrency)', ()
     const failures = results.filter((r) => !r.success);
 
     expect(successes).toHaveLength(1);
-    expect(failures).toHaveLength(9);
+    expect(failures).toHaveLength(19);
+
+    const winnerIndex = results.findIndex((r) => r.success);
+    expect(winnerIndex).toBeGreaterThanOrEqual(0);
+    concurrentWinnerStudentId = studentIds[winnerIndex];
 
     for (const f of failures) {
       expect(f.error).toContain('كود التفعيل غير صالح أو تم استخدامه مسبقاً');
@@ -100,7 +106,8 @@ describe('Codes Redemption & Concurrency Locking (Finding S1 & Concurrency)', ()
   });
 
   it('does not burn code if student is already enrolled in the course', async () => {
-    const winnerStudentId = studentIds[0];
+    expect(concurrentWinnerStudentId).toBeDefined();
+    const winnerStudentId = concurrentWinnerStudentId!;
     const secondRawCode = 'CS101-SECOND-CODE-2026';
     const secondHash = computeCodeHash(normalizeCode(secondRawCode), env.CODE_PEPPER);
 

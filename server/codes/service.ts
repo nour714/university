@@ -1,5 +1,3 @@
-'use server';
-
 import 'server-only';
 import { z } from 'zod';
 import { appSql } from '@/lib/db/app.server';

@@ -26,7 +26,7 @@ export function Header() {
           >
             <div className="relative w-8 h-8 sm:w-9 sm:h-9">
               <Image 
-                src="/images/logo.png" 
+                src="/logo.png" 
                 alt="شعار كلية الذكاء الاصطناعي" 
                 fill 
                 className="object-contain" 

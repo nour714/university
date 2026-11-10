@@ -21,30 +21,46 @@ import { useNotifications } from '@/context/NotificationContext';
 import { CodesSkeleton } from '@/components/skeletons/CodesSkeleton';
 import { listCodes, redeemCode } from '@/lib/repos/codesRepo';
 
-export function CodesManager() {
-  const [codes, setCodes] = useState<StudentCode[]>([]);
+interface CodesManagerProps {
+  initialCodes?: StudentCode[];
+}
+
+export function CodesManager({ initialCodes }: CodesManagerProps = {}) {
+  const [codes, setCodes] = useState<StudentCode[]>(initialCodes ?? []);
   const [inputCode, setInputCode] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState<StudentCode | null>(null);
   const [errorMessage, setErrorMessage] = useState('');
   const [copiedId, setCopiedId] = useState<string | null>(null);
-  const [isLoaded, setIsLoaded] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(initialCodes !== undefined);
 
   const { addNotification } = useNotifications();
 
-  // Load from repo
+  // Load from repo only as a fallback when initialCodes is not provided
   useEffect(() => {
+    if (initialCodes !== undefined) {
+      return;
+    }
+
     let mounted = true;
-    listCodes().then((data) => {
-      if (mounted) {
-        setCodes(data);
-        setIsLoaded(true);
-      }
-    });
+    listCodes()
+      .then((data) => {
+        if (mounted) {
+          setCodes(data);
+          setIsLoaded(true);
+        }
+      })
+      .catch((err) => {
+        console.error('Failed to list codes:', err);
+        if (mounted) {
+          setIsLoaded(true);
+        }
+      });
+
     return () => {
       mounted = false;
     };
-  }, []);
+  }, [initialCodes]);
 
 
   // Clean and format code input with dashes (XXXX - XXXX - XXXX)

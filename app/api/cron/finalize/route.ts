@@ -1,15 +1,26 @@
 import { NextResponse, connection } from 'next/server';
 import crypto from 'node:crypto';
-import { env } from '@/lib/env';
+import { getEnv } from '@/lib/env';
 import { finalizeExpiredSessions } from '@/server/exams/finalize';
 
-function verifyCronAuth(authHeader: string | null): boolean {
-  if (!env.CRON_SECRET || !authHeader) return false;
-  const expected = `Bearer ${env.CRON_SECRET}`;
+function verifyToken(authHeader: string, secret: string): boolean {
+  const expected = `Bearer ${secret}`;
   const authBuf = Buffer.from(authHeader);
   const expBuf = Buffer.from(expected);
   if (authBuf.length !== expBuf.length) return false;
   return crypto.timingSafeEqual(authBuf, expBuf);
+}
+
+function verifyCronAuth(authHeader: string | null): boolean {
+  if (!authHeader) return false;
+  const env = getEnv();
+  if (env.CRON_SECRET && verifyToken(authHeader, env.CRON_SECRET)) {
+    return true;
+  }
+  if (env.APP_SECRET && verifyToken(authHeader, env.APP_SECRET)) {
+    return true;
+  }
+  return false;
 }
 
 export async function GET(request: Request) {

@@ -32,17 +32,32 @@ const EnvSchema = z.object({
 
 export type AppEnv = z.infer<typeof EnvSchema>;
 
-function loadEnv(): AppEnv {
+let cachedEnv: AppEnv | null = null;
+
+export function getEnv(): AppEnv {
+  if (cachedEnv) {
+    return cachedEnv;
+  }
+
   const result = EnvSchema.safeParse(process.env);
   if (!result.success) {
-    const errors = result.error.issues
-      .map((issue) => `  - ${issue.path.join('.')}: ${issue.message}`)
-      .join('\n');
-    const message = `[FATAL] Invalid or missing server environment configuration:\n${errors}`;
+    const missingKeys = Array.from(
+      new Set(result.error.issues.map((issue) => issue.path.join('.')))
+    ).join(', ');
+    const message = `[FATAL] Missing or invalid server environment variables: ${missingKeys}`;
     console.error(message);
     throw new Error(message);
   }
-  return result.data;
+
+  cachedEnv = result.data;
+  return cachedEnv;
 }
 
-export const env = loadEnv();
+export const env = new Proxy({} as AppEnv, {
+  get(_target, prop: string | symbol) {
+    if (typeof prop === 'string') {
+      return getEnv()[prop as keyof AppEnv];
+    }
+    return undefined;
+  },
+});

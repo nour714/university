@@ -1,9 +1,25 @@
 {
   "exam-ai301-midterm": {
-    "q1": { "option": "PLACEHOLDER_OPTION_ID", "note": "Placeholder explanation" },
-    "q2": { "option": "PLACEHOLDER_OPTION_ID", "note": "Placeholder explanation" }
+    "q1": { "correctOptionId": "opt1_c", "explanation": "L2 regularization penalizes large weights without setting them to zero." },
+    "q2": { "correctOptionId": "opt2_a", "explanation": "ReLU prevents vanishing gradients in positive domain." },
+    "q3": { "correctOptionId": "opt3_d", "explanation": "Kernel trick computes dot products in higher dimensions implicitly." },
+    "q4": { "correctOptionId": "opt4_b", "explanation": "F1-Score and Recall handle imbalanced classes properly." },
+    "q5": { "correctOptionId": "opt5_c", "explanation": "Bagging parallel variance reduction vs Boosting sequential error correction." },
+    "q6": { "correctOptionId": "opt6_b", "explanation": "Balance between gradient stability and GPU vectorization parallelism." }
   },
   "exam-ai305-quiz": {
-    "q_dl_1": { "option": "PLACEHOLDER_OPTION_ID", "note": "Placeholder explanation" }
+    "q_dl_1": { "correctOptionId": "b", "explanation": "Weight sharing and spatial translation invariance." },
+    "q_dl_2": { "correctOptionId": "a", "explanation": "Downsamples spatial dimensions to control overfitting." },
+    "q_dl_3": { "correctOptionId": "d", "explanation": "Multi-Head Self-Attention with Positional Encoding." },
+    "q_dl_4": { "correctOptionId": "c", "explanation": "Gradient clipping stabilizes exploding gradients." },
+    "q_dl_5": { "correctOptionId": "b", "explanation": "Random deactivation prevents co-adaptation." }
+  },
+  "exam-ai302-final": {
+    "nlp_1": { "correctOptionId": "c", "explanation": "CBOW predicts target from context, Skip-gram does inverse." },
+    "nlp_2": { "correctOptionId": "d", "explanation": "Allows bidirectional context without self-leakage." }
+  },
+  "exam-cs204-practical": {
+    "cv_q1": { "correctOptionId": "opt_b", "explanation": "Gaussian filter attenuates noise before gradients." },
+    "cv_q2": { "correctOptionId": "opt_a", "explanation": "OpenCV default channel ordering is BGR." }
   }
 }

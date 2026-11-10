@@ -22,8 +22,9 @@ export function getAppSql(): postgres.Sql {
 }
 
 export const appSql = new Proxy(function () {} as unknown as postgres.Sql, {
-  apply(_target, thisArg, argArray) {
-    return Reflect.apply(getAppSql() as unknown as (...args: unknown[]) => unknown, thisArg, argArray);
+  apply(_target, _thisArg, argArray) {
+    const client = getAppSql();
+    return Reflect.apply(client as unknown as (...args: unknown[]) => unknown, client, argArray);
   },
   get(_target, prop) {
     const client = getAppSql();

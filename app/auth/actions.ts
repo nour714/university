@@ -112,7 +112,7 @@ export async function loginAction(input: unknown): Promise<LoginActionResult> {
     try {
       await appSql`
         INSERT INTO academic_private.audit_log (actor, action, details)
-        VALUES (${account.id}, 'LOGIN_FAILED', ${JSON.stringify({ ip: clientIp, userAgent: userAgent.slice(0, 200) })}::jsonb)
+        VALUES (${account.id}, 'LOGIN_FAILED', ${appSql.json({ ip: clientIp, userAgent: userAgent.slice(0, 200) })})
       `;
     } catch {
       // Non-critical audit log failure should not crash response
@@ -138,7 +138,7 @@ export async function loginAction(input: unknown): Promise<LoginActionResult> {
   try {
     await appSql`
       INSERT INTO academic_private.audit_log (actor, action, details)
-      VALUES (${account.id}, 'LOGIN_SUCCESS', ${JSON.stringify({ identifier: maskIdentifier(normId) })}::jsonb)
+      VALUES (${account.id}, 'LOGIN_SUCCESS', ${appSql.json({ identifier: maskIdentifier(normId) })})
     `;
   } catch {
     // Audit failure non-blocking
@@ -247,7 +247,7 @@ export async function changePasswordAction(
 
     await sql`
       INSERT INTO academic_private.audit_log (actor, action, details)
-      VALUES (${student.accountId}, 'PASSWORD_CHANGED', '{}'::jsonb)
+      VALUES (${student.accountId}, 'PASSWORD_CHANGED', ${sql.json({})})
     `;
   });
 

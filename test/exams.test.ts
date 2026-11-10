@@ -150,8 +150,10 @@ describe('Exams Architecture & Grading Verification (Findings E1, E2)', () => {
 
       expect(submission).toBeDefined();
       expect(Number(submission.score)).toBe(10);
-      const savedAnswers = typeof submission.answers === 'string' ? JSON.parse(submission.answers) : submission.answers;
-      const savedPerQuestion = typeof submission.per_question === 'string' ? JSON.parse(submission.per_question) : submission.per_question;
+      expect(typeof submission.answers).toBe('object');
+      expect(typeof submission.per_question).toBe('object');
+      const savedAnswers = submission.answers;
+      const savedPerQuestion = submission.per_question;
       expect(savedAnswers[testQ1Id]).toBe('opt-a');
       expect(savedAnswers[testQ2Id]).toBe('opt-no');
       expect(savedAnswers['fake-question-id']).toBeUndefined();

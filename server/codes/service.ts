@@ -117,11 +117,11 @@ export async function redeemCodeForStudent(
         VALUES (
           ${studentAccountId},
           'CODE_REDEEMED',
-          ${JSON.stringify({
+          ${tx.json({
             code_id: rc.id,
             course_id: rc.course_id,
             masked_code: rc.masked_code,
-          })}::jsonb
+          })}
         )
       `;
 

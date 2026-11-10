@@ -54,11 +54,11 @@ export async function finalizeExpiredSessions(limit = 200): Promise<FinalizeSumm
           VALUES (
             ${s.student_id},
             'FINALIZE_FAILED',
-            ${JSON.stringify({
+            ${graderSql.json({
               session_id: s.id,
               exam_id: s.exam_id,
               error: err instanceof Error ? err.message : String(err),
-            })}::jsonb
+            })}
           )
         `;
       } catch (logErr) {

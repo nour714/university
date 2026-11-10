@@ -85,7 +85,7 @@ export async function GET(request: Request) {
       try {
         await appSql`
           INSERT INTO academic_private.audit_log (actor, action, details)
-          VALUES (${student.accountId}, 'FILE_DOWNLOADED', ${JSON.stringify({ content_id: content.id, course_id: content.courseId })}::jsonb)
+          VALUES (${student.accountId}, 'FILE_DOWNLOADED', ${appSql.json({ content_id: content.id, course_id: content.courseId })})
         `;
       } catch {
         // Non-blocking audit

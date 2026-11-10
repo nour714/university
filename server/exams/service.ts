@@ -272,7 +272,7 @@ export async function startOrResumeExamSession(examId: string, studentAccountId:
     number: q.number,
     questionText: q.question_text,
     codeSnippet: q.code_snippet || undefined,
-    options: (Array.isArray(q.options) ? q.options : JSON.parse(q.options || '[]')) as { id: string; text: string }[],
+    options: (q.options || []) as { id: string; text: string }[],
     points: q.points,
   }));
 
@@ -307,7 +307,7 @@ export async function saveExamAnswers(
 ): Promise<boolean> {
   const [res] = await appSql`
     UPDATE public.academic_exam_sessions
-       SET answers = ${JSON.stringify(sanitizedAnswers)}::jsonb,
+       SET answers = ${appSql.json(sanitizedAnswers)},
            updated_at = now()
      WHERE student_id = ${studentAccountId}
        AND exam_id = ${examId}

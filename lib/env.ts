@@ -39,21 +39,7 @@ export function getEnv(): AppEnv {
     return cachedEnv;
   }
 
-  const candidateSecret = process.env.APP_SECRET?.trim();
-  const candidatePepper = process.env.CODE_PEPPER?.trim();
-  const effectiveAppSecret =
-    candidateSecret && candidateSecret.length >= 32
-      ? candidateSecret
-      : candidatePepper && candidatePepper.length >= 32
-      ? candidatePepper
-      : (candidateSecret || candidatePepper || '');
-
-  const rawEnv = {
-    ...process.env,
-    APP_SECRET: effectiveAppSecret,
-  };
-
-  const result = EnvSchema.safeParse(rawEnv);
+  const result = EnvSchema.safeParse(process.env);
   if (!result.success) {
     const missingKeys = result.error.issues
       .map((issue) => `${issue.path.join('.')}: ${issue.message}`)
@@ -63,10 +49,7 @@ export function getEnv(): AppEnv {
     throw new Error(message);
   }
 
-  cachedEnv = {
-    ...result.data,
-    APP_SECRET: effectiveAppSecret,
-  };
+  cachedEnv = result.data;
   return cachedEnv;
 }
 

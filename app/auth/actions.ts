@@ -31,10 +31,11 @@ export type LoginActionResult =
 const GENERIC_LOGIN_ERROR = 'الرقم القومي أو كلمة المرور غير صحيحة، أو تم تقييد المحاولات مؤقتاً';
 
 export async function loginAction(input: unknown): Promise<LoginActionResult> {
-  const parsed = LoginSchema.safeParse(input);
-  if (!parsed.success) {
-    return { success: false, error: GENERIC_LOGIN_ERROR };
-  }
+  try {
+    const parsed = LoginSchema.safeParse(input);
+    if (!parsed.success) {
+      return { success: false, error: GENERIC_LOGIN_ERROR };
+    }
 
   const { identifier: rawIdentifier, password, turnstileToken } = parsed.data;
   const normId = normalizeIdentifier(rawIdentifier);
@@ -143,7 +144,11 @@ export async function loginAction(input: unknown): Promise<LoginActionResult> {
     // Audit failure non-blocking
   }
 
-  return { success: true, mustChangePassword: account.must_change_password };
+    return { success: true, mustChangePassword: account.must_change_password };
+  } catch (err) {
+    console.error('[loginAction error]:', err);
+    return { success: false, error: 'حدث خطأ غير متوقع أثناء تسجيل الدخول. يرجى المحاولة مرة أخرى.' };
+  }
 }
 
 export async function logoutAction(): Promise<{ success: boolean }> {

@@ -39,7 +39,12 @@ export function getEnv(): AppEnv {
     return cachedEnv;
   }
 
-  const result = EnvSchema.safeParse(process.env);
+  const rawEnv = {
+    ...process.env,
+    APP_SECRET: process.env.APP_SECRET || process.env.CODE_PEPPER,
+  };
+
+  const result = EnvSchema.safeParse(rawEnv);
   if (!result.success) {
     const missingKeys = Array.from(
       new Set(result.error.issues.map((issue) => issue.path.join('.')))
@@ -49,7 +54,10 @@ export function getEnv(): AppEnv {
     throw new Error(message);
   }
 
-  cachedEnv = result.data;
+  cachedEnv = {
+    ...result.data,
+    APP_SECRET: result.data.APP_SECRET || result.data.CODE_PEPPER || '',
+  };
   return cachedEnv;
 }
 

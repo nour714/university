@@ -21,29 +21,35 @@ export async function checkRateLimit(
   maxRequests: number,
   windowSeconds: number
 ): Promise<{ allowed: boolean; remaining: number }> {
-  const key = crypto
-    .createHmac('sha256', env.APP_SECRET)
-    .update(rawIdentifier)
-    .digest('hex');
+  try {
+    const key = crypto
+      .createHmac('sha256', env.APP_SECRET)
+      .update(rawIdentifier)
+      .digest('hex');
 
-  const [row] = await appSql`
-    INSERT INTO academic_private.rate_limits (key, bucket, window_start, count)
-    VALUES (${key}, ${bucket}, now(), 1)
-    ON CONFLICT (key, bucket) DO UPDATE
-    SET count = CASE 
-          WHEN academic_private.rate_limits.window_start + (${windowSeconds} * interval '1 second') < now() THEN 1
-          ELSE academic_private.rate_limits.count + 1
-        END,
-        window_start = CASE 
-          WHEN academic_private.rate_limits.window_start + (${windowSeconds} * interval '1 second') < now() THEN now()
-          ELSE academic_private.rate_limits.window_start
-        END
-    RETURNING count;
-  `;
+    const [row] = await appSql`
+      INSERT INTO academic_private.rate_limits (key, bucket, window_start, count)
+      VALUES (${key}, ${bucket}, now(), 1)
+      ON CONFLICT (key, bucket) DO UPDATE
+      SET count = CASE 
+            WHEN academic_private.rate_limits.window_start + (${windowSeconds} * interval '1 second') < now() THEN 1
+            ELSE academic_private.rate_limits.count + 1
+          END,
+          window_start = CASE 
+            WHEN academic_private.rate_limits.window_start + (${windowSeconds} * interval '1 second') < now() THEN now()
+            ELSE academic_private.rate_limits.window_start
+          END
+      RETURNING count;
+    `;
 
-  const currentCount = Number(row.count);
-  const allowed = currentCount <= maxRequests;
-  const remaining = Math.max(0, maxRequests - currentCount);
+    const currentCount = Number(row?.count || 1);
+    const allowed = currentCount <= maxRequests;
+    const remaining = Math.max(0, maxRequests - currentCount);
 
-  return { allowed, remaining };
+    return { allowed, remaining };
+  } catch (err) {
+    console.error('[checkRateLimit warning]:', err);
+    // Fail-open on transient rate-limiting errors to prevent blocking legitimate students
+    return { allowed: true, remaining: maxRequests };
+  }
 }

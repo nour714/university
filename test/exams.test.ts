@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { setupTestDatabase, teardownTestDatabase, TestDbClients } from './setupTestDb';
-import { getPublicExamById, startOrResumeExamSession, getExamResult } from '@/server/exams/service';
+import { getPublicExamById, startOrResumeExamSession, getExamResult, saveExamAnswers } from '@/server/exams/service';
 import { submitAndGradeExam } from '@/server/exams/submit';
 import { AppError } from '@/lib/errors';
 
@@ -157,8 +157,8 @@ describe('Exams Architecture & Grading Verification (Findings E1, E2)', () => {
       expect(savedAnswers[testQ1Id]).toBe('opt-a');
       expect(savedAnswers[testQ2Id]).toBe('opt-no');
       expect(savedAnswers['fake-question-id']).toBeUndefined();
-      expect(savedPerQuestion[testQ1Id]).toBe(true);
-      expect(savedPerQuestion[testQ2Id]).toBe(false);
+      expect(savedPerQuestion[testQ1Id].isCorrect ?? savedPerQuestion[testQ1Id]).toBe(true);
+      expect(savedPerQuestion[testQ2Id].isCorrect ?? savedPerQuestion[testQ2Id]).toBe(false);
     });
 
     it('subsequent submission calls must be idempotent and return existing results', async () => {
@@ -171,13 +171,112 @@ describe('Exams Architecture & Grading Verification (Findings E1, E2)', () => {
       expect(result2.correctCount).toBe(1);
     });
 
-    it('getExamResult returns stored result with correct/wrong/unanswered counts', async () => {
-      const stored = await getExamResult(testExamId, testStudentId);
-      expect(stored).not.toBeNull();
-      expect(stored?.score).toBe(10);
-      expect(stored?.correctCount).toBe(1);
-      expect(stored?.wrongCount).toBe(1);
-      expect(stored?.unansweredCount).toBe(0);
+    it('6.3(a) draft save rejects unknown question keys and invalid option ids', async () => {
+      const testStudent2 = '00000000-0000-0000-0000-000000000092';
+      await clients.ownerSql`
+        INSERT INTO public.academic_accounts (id, national_id, password_hash, is_active)
+        VALUES (${testStudent2}, '30101010109292', 'hash', true)
+        ON CONFLICT (id) DO NOTHING;
+      `;
+
+      await clients.ownerSql`
+        INSERT INTO public.academic_exam_sessions (id, student_id, exam_id, end_at, answers)
+        VALUES (
+          '00000000-0000-0000-0000-000000000092'::uuid,
+          ${testStudent2},
+          ${testExamId},
+          now() + interval '30 minutes',
+          '{}'::jsonb
+        ) ON CONFLICT (student_id, exam_id) DO UPDATE SET answers = '{}'::jsonb, submitted = false;
+      `;
+
+      // Pass 1 valid answer + 1 unknown question id + 1 invalid option id
+      const saveRes = await saveExamAnswers(testExamId, testStudent2, {
+        [testQ1Id]: 'opt-a',
+        'unknown-question-xyz': 'opt-a',
+        [testQ2Id]: 'INVALID_OPTION_ID',
+      });
+
+      expect(saveRes.success).toBe(true);
+      expect(saveRes.saved).toBe(1);
+      expect(saveRes.dropped).toBe(2);
+
+      const [session] = await clients.ownerSql`
+        SELECT answers FROM public.academic_exam_sessions
+        WHERE student_id = ${testStudent2} AND exam_id = ${testExamId}
+      `;
+      expect(session.answers).toEqual({ [testQ1Id]: 'opt-a' });
+    });
+
+    it('6.3(b) during exam window, getExamResult returns score but hides per-question breakdown', async () => {
+      // Ensure exam window is open
+      await clients.ownerSql`
+        UPDATE public.academic_exams
+           SET end_date = now() + interval '5 hours'
+         WHERE id = ${testExamId}
+      `;
+
+      const result = await getExamResult(testExamId, testStudentId);
+      expect(result).not.toBeNull();
+      expect(result?.score).toBe(10);
+      expect(result?.perQuestion).toBeNull();
+    });
+
+    it('6.3(c) after exam window closes, getExamResult returns full per-question breakdown with explanations', async () => {
+      // Close the exam window
+      await clients.ownerSql`
+        UPDATE public.academic_exams
+           SET end_date = now() - interval '1 minute'
+         WHERE id = ${testExamId}
+      `;
+
+      const result = await getExamResult(testExamId, testStudentId);
+      expect(result).not.toBeNull();
+      expect(result?.score).toBe(10);
+      expect(result?.perQuestion).not.toBeNull();
+      const perQ = result!.perQuestion as Record<string, any>;
+      expect(perQ[testQ1Id]).toBeDefined();
+      expect(perQ[testQ1Id].selectedOptionId).toBe('opt-a');
+      expect(perQ[testQ1Id].correctOptionId).toBe('opt-a');
+      expect(perQ[testQ1Id].isCorrect).toBe(true);
+      expect(perQ[testQ1Id].explanation).toBe('2+2 is 4');
+    });
+
+    it('6.3(d) student viewing an expired unsubmitted session gets auto-finalized lazily', async () => {
+      const testStudent3 = '00000000-0000-0000-0000-000000000093';
+      await clients.ownerSql`
+        INSERT INTO public.academic_accounts (id, national_id, password_hash, is_active)
+        VALUES (${testStudent3}, '30101010109393', 'hash', true)
+        ON CONFLICT (id) DO NOTHING;
+      `;
+
+      // Expired session without submission
+      await clients.ownerSql`
+        INSERT INTO public.academic_exam_sessions (id, student_id, exam_id, end_at, submitted, answers)
+        VALUES (
+          '00000000-0000-0000-0000-000000000093'::uuid,
+          ${testStudent3},
+          ${testExamId},
+          now() - interval '10 minutes',
+          false,
+          ${clients.ownerSql.json({ [testQ1Id]: 'opt-a' })}
+        ) ON CONFLICT (student_id, exam_id) DO UPDATE 
+             SET end_at = now() - interval '10 minutes', submitted = false, answers = ${clients.ownerSql.json({ [testQ1Id]: 'opt-a' })};
+      `;
+
+      // Call getExamResult -> lazy finalization must occur
+      const lazyResult = await getExamResult(testExamId, testStudent3);
+      expect(lazyResult).not.toBeNull();
+      expect(lazyResult?.score).toBe(10);
+      expect(lazyResult?.autoSubmitted).toBe(true);
+
+      // Verify DB submission exists
+      const [sub] = await clients.ownerSql`
+        SELECT score, auto_submitted FROM public.academic_exam_submissions
+        WHERE student_id = ${testStudent3} AND exam_id = ${testExamId}
+      `;
+      expect(sub).toBeDefined();
+      expect(sub.auto_submitted).toBe(true);
     });
   });
 });

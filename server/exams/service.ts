@@ -295,14 +295,64 @@ export async function startOrResumeExamSession(examId: string, studentAccountId:
   };
 }
 
+export interface SaveExamAnswersResult {
+  success: boolean;
+  saved: number;
+  dropped: number;
+}
+
 /**
  * Periodically saves current selected answers safely to the database.
+ * Sanitizes input at draft save time: drops unknown questions and invalid options.
  */
 export async function saveExamAnswers(
   examId: string,
   studentAccountId: string,
-  sanitizedAnswers: Record<string, string>
-): Promise<boolean> {
+  rawAnswers: Record<string, string>
+): Promise<SaveExamAnswersResult> {
+  // 1. Fetch valid questions and options for this exam
+  const questionRows = await appSql`
+    SELECT id, options
+    FROM public.academic_exam_questions
+    WHERE exam_id = ${examId}
+  `;
+
+  const validQuestions = new Map<string, Set<string>>();
+  for (const q of questionRows) {
+    const opts = (Array.isArray(q.options) ? q.options : []) as { id: string }[];
+    validQuestions.set(q.id, new Set(opts.map((o) => String(o.id))));
+  }
+
+  // 2. Sanitize and validate draft answers
+  const sanitizedAnswers: Record<string, string> = {};
+  let savedCount = 0;
+  let droppedCount = 0;
+
+  const entries = Object.entries(rawAnswers || {});
+  const cappedEntries = entries.slice(0, 50);
+  droppedCount += entries.length - cappedEntries.length;
+
+  for (const [qId, optId] of cappedEntries) {
+    if (typeof qId !== 'string' || typeof optId !== 'string') {
+      droppedCount++;
+      continue;
+    }
+    const cleanOptId = optId.trim();
+    if (cleanOptId.length === 0 || cleanOptId.length > 20) {
+      droppedCount++;
+      continue;
+    }
+
+    const allowedOpts = validQuestions.get(qId);
+    if (!allowedOpts || !allowedOpts.has(cleanOptId)) {
+      droppedCount++;
+      continue;
+    }
+
+    sanitizedAnswers[qId] = cleanOptId;
+    savedCount++;
+  }
+
   const [res] = await appSql`
     UPDATE public.academic_exam_sessions
        SET answers = ${appSql.json(sanitizedAnswers)},
@@ -314,11 +364,16 @@ export async function saveExamAnswers(
     RETURNING id;
   `;
 
-  return Boolean(res?.id);
+  return {
+    success: Boolean(res?.id),
+    saved: savedCount,
+    dropped: droppedCount,
+  };
 }
 
 /**
  * Retrieves full exam result for a student with lazy finalization if session expired.
+ * Enforces delayed reveal: hides perQuestion until now() >= exam.end_date.
  */
 export async function getExamResult(
   examId: string,
@@ -336,6 +391,7 @@ export async function getExamResult(
       s.correct_count,
       s.wrong_count,
       s.unanswered_count,
+      s.auto_submitted,
       s.per_question,
       (now() >= e.end_date) AS is_revealed
     FROM public.academic_exam_submissions s
@@ -350,11 +406,12 @@ export async function getExamResult(
     totalMarks: Number(row.total_marks),
     percentage: Number(row.percentage),
     passed: Boolean(row.passed),
-    correctCount: row.correct_count,
-    wrongCount: row.wrong_count,
-    unansweredCount: row.unanswered_count,
+    correctCount: Number(row.correct_count || 0),
+    wrongCount: Number(row.wrong_count || 0),
+    unansweredCount: Number(row.unanswered_count || 0),
+    autoSubmitted: Boolean(row.auto_submitted),
     perQuestion: row.is_revealed
-      ? ((typeof row.per_question === 'string' ? JSON.parse(row.per_question) : row.per_question) || {})
-      : {},
+      ? (row.per_question || {})
+      : null,
   };
 }

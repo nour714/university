@@ -3,7 +3,13 @@ import path from 'node:path';
 import postgres from 'postgres';
 import { validateScriptDbUrl } from './env';
 
-export async function runMigrations(customOwnerUrl?: string) {
+export interface MigrateOptions {
+  baseline?: string;
+  dryRun?: boolean;
+  status?: boolean;
+}
+
+export async function runMigrations(customOwnerUrl?: string, options: MigrateOptions = {}) {
   const dbUrl = customOwnerUrl || process.env.DATABASE_URL_OWNER;
   if (!dbUrl) {
     throw new Error('[MIGRATE] DATABASE_URL_OWNER environment variable is required.');
@@ -31,15 +37,70 @@ export async function runMigrations(customOwnerUrl?: string) {
       .readdirSync(migrationsDir)
       .filter((f) => f.endsWith('.sql'))
       .sort();
+    const filesSet = new Set(files);
 
     const appliedRows = await sql`
-      SELECT version FROM public.schema_migrations
+      SELECT version, applied_at FROM public.schema_migrations ORDER BY version
     `;
-    const appliedSet = new Set(appliedRows.map((r) => r.version));
+    const appliedMap = new Map<string, Date>(appliedRows.map((r) => [r.version, r.applied_at]));
 
+    // Safety check: refuse to run if database has records of migrations missing on disk
+    for (const appliedVer of appliedMap.keys()) {
+      if (!filesSet.has(appliedVer)) {
+        throw new Error(
+          `[MIGRATE ERROR] Migration recorded in database is missing on disk: ${appliedVer}`
+        );
+      }
+    }
+
+    // Status check
+    if (options.status) {
+      console.log('\n--- Migration Status ---');
+      for (const file of files) {
+        const appliedAt = appliedMap.get(file);
+        console.log(`[${appliedAt ? 'APPLIED' : 'PENDING'}] ${file}${appliedAt ? ` (at ${appliedAt.toISOString()})` : ''}`);
+      }
+      console.log('------------------------\n');
+      return;
+    }
+
+    // Baseline option: mark migrations up to specified version as applied without executing them
+    if (options.baseline) {
+      const targetVersion = options.baseline;
+      const targetFile = files.find((f) => f === targetVersion || f.startsWith(targetVersion));
+      if (!targetFile) {
+        throw new Error(`[MIGRATE ERROR] Baseline target version "${targetVersion}" not found on disk.`);
+      }
+
+      console.log(`[MIGRATE] Baselining migrations up to ${targetFile}...`);
+      const baselineFiles = files.filter((f) => f <= targetFile);
+      for (const bf of baselineFiles) {
+        if (!appliedMap.has(bf)) {
+          if (options.dryRun) {
+            console.log(`[DRY-RUN] Would baseline: ${bf}`);
+          } else {
+            await sql`
+              INSERT INTO public.schema_migrations (version) VALUES (${bf})
+              ON CONFLICT (version) DO NOTHING;
+            `;
+            console.log(`[MIGRATE] Baselined: ${bf}`);
+            appliedMap.set(bf, new Date());
+          }
+        }
+      }
+      console.log(`[MIGRATE] Baselined successfully up to ${targetFile}.`);
+      return;
+    }
+
+    // Apply pending migrations
     for (const file of files) {
-      if (appliedSet.has(file)) {
+      if (appliedMap.has(file)) {
         console.log(`[MIGRATE] Skipping ${file} (already applied)`);
+        continue;
+      }
+
+      if (options.dryRun) {
+        console.log(`[DRY-RUN] Would apply migration: ${file}`);
         continue;
       }
 
@@ -55,14 +116,31 @@ export async function runMigrations(customOwnerUrl?: string) {
       console.log(`[MIGRATE] Applied ${file} successfully.`);
     }
 
-    console.log('[MIGRATE] All migrations applied successfully.');
+    console.log(options.dryRun ? '[DRY-RUN] Dry-run plan completed.' : '[MIGRATE] All migrations applied successfully.');
   } finally {
     await sql.end();
   }
 }
 
+function parseCliArgs(): MigrateOptions {
+  const args = process.argv.slice(2);
+  const options: MigrateOptions = {};
+
+  for (let i = 0; i < args.length; i++) {
+    if (args[i] === '--dry-run') {
+      options.dryRun = true;
+    } else if (args[i] === '--status') {
+      options.status = true;
+    } else if (args[i] === '--baseline') {
+      options.baseline = args[++i];
+    }
+  }
+  return options;
+}
+
 if (process.argv[1] && process.argv[1].endsWith('migrate.ts')) {
-  runMigrations().catch((err) => {
+  const opts = parseCliArgs();
+  runMigrations(undefined, opts).catch((err) => {
     console.error('[MIGRATE ERROR]', err);
     process.exit(1);
   });

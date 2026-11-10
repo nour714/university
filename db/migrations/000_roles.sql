@@ -21,3 +21,7 @@ BEGIN
     CREATE ROLE academic_grader WITH LOGIN NOSUPERUSER NOCREATEDB NOCREATEROLE NOBYPASSRLS;
   END IF;
 END $$;
+
+-- Always demote roles to enforce least privilege even if previously created with higher privileges
+ALTER ROLE academic_app NOSUPERUSER NOCREATEDB NOCREATEROLE NOBYPASSRLS;
+ALTER ROLE academic_grader NOSUPERUSER NOCREATEDB NOCREATEROLE NOBYPASSRLS;

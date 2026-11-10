@@ -39,16 +39,25 @@ export function getEnv(): AppEnv {
     return cachedEnv;
   }
 
+  const candidateSecret = process.env.APP_SECRET?.trim();
+  const candidatePepper = process.env.CODE_PEPPER?.trim();
+  const effectiveAppSecret =
+    candidateSecret && candidateSecret.length >= 32
+      ? candidateSecret
+      : candidatePepper && candidatePepper.length >= 32
+      ? candidatePepper
+      : (candidateSecret || candidatePepper || '');
+
   const rawEnv = {
     ...process.env,
-    APP_SECRET: process.env.APP_SECRET || process.env.CODE_PEPPER,
+    APP_SECRET: effectiveAppSecret,
   };
 
   const result = EnvSchema.safeParse(rawEnv);
   if (!result.success) {
-    const missingKeys = Array.from(
-      new Set(result.error.issues.map((issue) => issue.path.join('.')))
-    ).join(', ');
+    const missingKeys = result.error.issues
+      .map((issue) => `${issue.path.join('.')}: ${issue.message}`)
+      .join('; ');
     const message = `[FATAL] Missing or invalid server environment variables: ${missingKeys}`;
     console.error(message);
     throw new Error(message);
@@ -56,7 +65,7 @@ export function getEnv(): AppEnv {
 
   cachedEnv = {
     ...result.data,
-    APP_SECRET: result.data.APP_SECRET || result.data.CODE_PEPPER || '',
+    APP_SECRET: effectiveAppSecret,
   };
   return cachedEnv;
 }

@@ -18,8 +18,9 @@ export function getGraderSql(): postgres.Sql {
       prepare: false, // Required for Supavisor transaction mode
       fetch_types: false, // Prevents pg_catalog type introspection query on connection init
       max: env.DB_POOL_MAX,
-      idle_timeout: 20,
-      connect_timeout: 10,
+      idle_timeout: 10,
+      connect_timeout: 5,
+      max_lifetime: 60 * 5, // Connection recycling for serverless talking to Supavisor
       ssl: env.DB_SSL === 'require' ? 'require' : false,
     });
   }

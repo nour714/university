@@ -3,6 +3,8 @@ import crypto from 'node:crypto';
 import { getEnv } from '@/lib/env';
 import { finalizeExpiredSessions } from '@/server/exams/finalize';
 
+export const maxDuration = 30;
+
 function verifyToken(authHeader: string, secret: string): boolean {
   const expected = `Bearer ${secret}`;
   const authBuf = Buffer.from(authHeader);

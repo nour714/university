@@ -7,6 +7,8 @@ import { requireAuth } from '@/server/auth/requireAuth';
 import { checkRateLimit } from '@/server/security/rateLimit';
 import { resolveContentDownload } from '@/server/courses/service';
 
+export const maxDuration = 30;
+
 function getR2Client(): S3Client | null {
   if (!env.R2_ACCOUNT_ID || !env.R2_ACCESS_KEY_ID || !env.R2_SECRET_ACCESS_KEY) {
     return null;

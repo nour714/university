@@ -5,6 +5,8 @@ import { validateSession } from '@/server/auth/session';
 import { appSql } from '@/lib/db/app.server';
 import { NotificationType } from '@/types/notification';
 
+export const maxDuration = 30;
+
 export async function GET() {
   const token = await getSessionCookie();
   if (!token) {

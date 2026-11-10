@@ -1,4 +1,6 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
+import fs from 'node:fs';
+import path from 'node:path';
 import postgres from 'postgres';
 import { setupTestDatabase, teardownTestDatabase, TestDbClients } from './setupTestDb';
 import { runMigrations } from '@/scripts/migrate';
@@ -61,8 +63,8 @@ describe('TASK 3 — Migration Runner, Roles & Least Privilege (F3, F9)', () => 
       expect(c0.count).toBe(0);
 
       // Simulate existing database that already ran 000 and 001 manually
-      const rolesSql = require('node:fs').readFileSync(require('node:path').join(process.cwd(), 'db/migrations/000_roles.sql'), 'utf-8');
-      const initialSchemaSql = require('node:fs').readFileSync(require('node:path').join(process.cwd(), 'db/migrations/001_initial_schema.sql'), 'utf-8');
+      const rolesSql = fs.readFileSync(path.join(process.cwd(), 'db/migrations/000_roles.sql'), 'utf-8');
+      const initialSchemaSql = fs.readFileSync(path.join(process.cwd(), 'db/migrations/001_initial_schema.sql'), 'utf-8');
       await db.unsafe(rolesSql);
       await db.unsafe(initialSchemaSql);
 

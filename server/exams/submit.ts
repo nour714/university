@@ -1,6 +1,6 @@
 import 'server-only';
 import { graderSql } from '@/lib/db/grader.server';
-import { GradeResult } from '@/types/exam';
+import { GradeResult, QuestionResultDetail } from '@/types/exam';
 import { AppError } from '@/lib/errors';
 
 /**
@@ -141,7 +141,7 @@ export async function submitAndGradeExam(
     let correctCount = 0;
     let wrongCount = 0;
     let unansweredCount = 0;
-    const perQuestion: Record<string, any> = {};
+    const perQuestion: Record<string, QuestionResultDetail> = {};
 
     for (const item of questionsWithKeys) {
       const chosen = effectiveAnswers[item.question_id] || null;

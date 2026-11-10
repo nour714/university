@@ -65,6 +65,7 @@ export async function loginAction(input: unknown): Promise<LoginActionResult> {
     if (ipIdentifierFailures >= 5) {
       await verifyDummyPassword(password);
       await appSql`SELECT 1`;
+      await recordFailedAttempt(clientIp, 'login_fail_ip', 600);
       return { success: false, error: GENERIC_LOGIN_ERROR };
     }
 

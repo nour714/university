@@ -6,7 +6,7 @@ export interface PreflightResult {
   ready: boolean;
   failures: string[];
   warnings: string[];
-  info: Record<string, any>;
+  info: Record<string, unknown>;
 }
 
 export async function runPreflight(customUrl?: string): Promise<PreflightResult> {
@@ -33,7 +33,7 @@ export async function runPreflight(customUrl?: string): Promise<PreflightResult>
 
   const failures: string[] = [];
   const warnings: string[] = [];
-  const info: Record<string, any> = {};
+  const info: Record<string, unknown> = {};
 
   try {
     // 1. Database version check
@@ -57,8 +57,9 @@ export async function runPreflight(customUrl?: string): Promise<PreflightResult>
           failures.push("Role 'academic_grader' has rolbypassrls = true (must be false).");
         }
       }
-    } catch (err: any) {
-      warnings.push(`Could not inspect pg_roles (likely unprivileged connection): ${err?.message}`);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      warnings.push(`Could not inspect pg_roles (likely unprivileged connection): ${msg}`);
     }
 
     // 3. Schema & Table check
@@ -112,8 +113,9 @@ export async function runPreflight(customUrl?: string): Promise<PreflightResult>
         if (pending.length > 0) {
           failures.push(`Pending migrations on disk not applied: ${pending.join(', ')}`);
         }
-      } catch (err: any) {
-        failures.push(`Failed to read public.schema_migrations: ${err?.message}`);
+      } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : String(err);
+        failures.push(`Failed to read public.schema_migrations: ${msg}`);
       }
     }
 
@@ -167,8 +169,9 @@ export async function runPreflight(customUrl?: string): Promise<PreflightResult>
       } catch {
         // Unprivileged app role cannot SELECT audit_log (expected under least privilege)
       }
-    } catch (err: any) {
-      failures.push(`Double-encoding scan error: ${err?.message}`);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      failures.push(`Double-encoding scan error: ${msg}`);
     }
 
     // 6. Privilege check (academic_app cannot SELECT audit_log, academic_grader cannot INSERT exam_keys)

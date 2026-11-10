@@ -34,11 +34,12 @@ export async function GET() {
       },
       { status: 200 }
     );
-  } catch (err: any) {
+  } catch (err: unknown) {
+    const errorMessage = err instanceof Error ? err.message : 'Database health check failed';
     return NextResponse.json(
       {
         ok: false,
-        error: err?.message || 'Database health check failed',
+        error: errorMessage,
       },
       { status: 503 }
     );

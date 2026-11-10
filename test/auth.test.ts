@@ -122,6 +122,10 @@ describe('Auth & Session Security Tests (Finding F8 / Task 7)', () => {
         expect(res.success).toBe(false);
       }
 
+      // Verify that failed attempts were recorded in the IP rate limiter
+      const ipFailCount = await getRateLimitCount('198.51.100.1', 'login_fail_ip', 600);
+      expect(ipFailCount).toBeGreaterThanOrEqual(20);
+
       // Attacker at IP 1 is blocked by per-(identifier + IP) limiter (attempt 21 from IP 1 fails)
       const resBlocked = await loginAction({
         identifier: testNationalId,
@@ -167,26 +171,27 @@ describe('Auth & Session Security Tests (Finding F8 / Task 7)', () => {
       const existingTimes: number[] = [];
       const nonExistingTimes: number[] = [];
 
-      // 20 login attempts for existing user with wrong password
+      // Warm up JIT and database connection pool
+      await loginAction({ identifier: testNationalId, password: 'WarmupPassword123!' });
+      await loginAction({ identifier: '99900000009999', password: 'WarmupPassword123!' });
+
+      // Run 20 attempts interleaved to eliminate OS scheduling / JIT skew during multi-worker test runs
       for (let i = 1; i <= 20; i++) {
         mockClientIp = `10.150.1.${i}`;
-        const t0 = performance.now();
+        const t0Existing = performance.now();
         await loginAction({
           identifier: testNationalId,
           password: 'IncorrectPasswordForTimingTest123!',
         });
-        existingTimes.push(performance.now() - t0);
-      }
+        existingTimes.push(performance.now() - t0Existing);
 
-      // 20 login attempts for non-existing user
-      for (let i = 1; i <= 20; i++) {
         mockClientIp = `10.150.2.${i}`;
-        const t0 = performance.now();
+        const t0NonExisting = performance.now();
         await loginAction({
           identifier: `9990000000${String(i).padStart(4, '0')}`,
           password: 'IncorrectPasswordForTimingTest123!',
         });
-        nonExistingTimes.push(performance.now() - t0);
+        nonExistingTimes.push(performance.now() - t0NonExisting);
       }
 
       function median(values: number[]): number {

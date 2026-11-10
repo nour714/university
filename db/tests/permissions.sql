@@ -155,6 +155,39 @@ BEGIN
   END;
 END $$;
 
+-- 1.11 academic_app CANNOT select from audit_log (Must fail - least privilege fixup)
+DO $$
+BEGIN
+  BEGIN
+    PERFORM * FROM academic_private.audit_log;
+    RAISE EXCEPTION 'TEST FAILED: academic_app was able to select from academic_private.audit_log';
+  EXCEPTION WHEN insufficient_privilege THEN
+    -- Expected PASS
+  END;
+END $$;
+
+-- 1.12 academic_app CANNOT update academic_exam_submissions (Must fail)
+DO $$
+BEGIN
+  BEGIN
+    UPDATE public.academic_exam_submissions SET score = 100 WHERE exam_id = 'test-exam-01';
+    RAISE EXCEPTION 'TEST FAILED: academic_app was able to update academic_exam_submissions';
+  EXCEPTION WHEN insufficient_privilege THEN
+    -- Expected PASS
+  END;
+END $$;
+
+-- 1.13 academic_app CANNOT delete from academic_exam_submissions (Must fail)
+DO $$
+BEGIN
+  BEGIN
+    DELETE FROM public.academic_exam_submissions WHERE exam_id = 'test-exam-01';
+    RAISE EXCEPTION 'TEST FAILED: academic_app was able to delete from academic_exam_submissions';
+  EXCEPTION WHEN insufficient_privilege THEN
+    -- Expected PASS
+  END;
+END $$;
+
 RESET ROLE;
 
 -- ============================================================================
@@ -225,7 +258,60 @@ BEGIN
   END;
 END $$;
 
+-- 2.6 academic_grader CANNOT insert into exam_keys (Must fail)
+DO $$
+BEGIN
+  BEGIN
+    INSERT INTO academic_private.exam_keys (question_id, correct_option_id, explanation)
+    VALUES ('test-q-01', 'opt_b', 'malicious change');
+    RAISE EXCEPTION 'TEST FAILED: academic_grader was able to insert into exam_keys';
+  EXCEPTION WHEN insufficient_privilege THEN
+    -- Expected PASS
+  END;
+END $$;
+
+-- 2.7 academic_grader CANNOT update exam_keys (Must fail)
+DO $$
+BEGIN
+  BEGIN
+    UPDATE academic_private.exam_keys SET correct_option_id = 'opt_b' WHERE question_id = 'test-q-01';
+    RAISE EXCEPTION 'TEST FAILED: academic_grader was able to update exam_keys';
+  EXCEPTION WHEN insufficient_privilege THEN
+    -- Expected PASS
+  END;
+END $$;
+
+-- 2.8 academic_grader CANNOT delete from exam_keys (Must fail)
+DO $$
+BEGIN
+  BEGIN
+    DELETE FROM academic_private.exam_keys WHERE question_id = 'test-q-01';
+    RAISE EXCEPTION 'TEST FAILED: academic_grader was able to delete from exam_keys';
+  EXCEPTION WHEN insufficient_privilege THEN
+    -- Expected PASS
+  END;
+END $$;
+
 RESET ROLE;
+
+-- ============================================================================
+-- TEST 4: Verification of role attributes (NOBYPASSRLS)
+-- ============================================================================
+DO $$
+DECLARE
+  v_app_bypass boolean;
+  v_grader_bypass boolean;
+BEGIN
+  SELECT rolbypassrls INTO v_app_bypass FROM pg_roles WHERE rolname = 'academic_app';
+  IF v_app_bypass THEN
+    RAISE EXCEPTION 'TEST FAILED: academic_app has rolbypassrls = true';
+  END IF;
+
+  SELECT rolbypassrls INTO v_grader_bypass FROM pg_roles WHERE rolname = 'academic_grader';
+  IF v_grader_bypass THEN
+    RAISE EXCEPTION 'TEST FAILED: academic_grader has rolbypassrls = true';
+  END IF;
+END $$;
 
 -- ============================================================================
 -- TEST 3: anon / authenticated roles

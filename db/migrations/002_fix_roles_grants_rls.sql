@@ -159,3 +159,7 @@ CREATE POLICY p_app_redeemable_codes_select ON academic_private.redeemable_codes
 CREATE POLICY p_app_redeemable_codes_update ON academic_private.redeemable_codes FOR UPDATE TO academic_app USING (true) WITH CHECK (true);
 
 CREATE POLICY p_grader_exam_keys_select ON academic_private.exam_keys FOR SELECT TO academic_grader USING (true);
+
+-- Demote existing roles to guarantee rolbypassrls = false on existing databases
+ALTER ROLE academic_app NOSUPERUSER NOCREATEDB NOCREATEROLE NOBYPASSRLS;
+ALTER ROLE academic_grader NOSUPERUSER NOCREATEDB NOCREATEROLE NOBYPASSRLS;

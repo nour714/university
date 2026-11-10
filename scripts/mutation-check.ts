@@ -31,7 +31,7 @@ const mutations: Mutation[] = [
     id: 2,
     name: 'Delete answers/per_question JSONB from submission insert query',
     filePath: 'server/exams/submit.ts',
-    original: '${JSON.stringify(effectiveAnswers)}::jsonb,\n        ${JSON.stringify(perQuestion)}::jsonb',
+    original: '${tx.json(effectiveAnswers)},\n        ${tx.json(perQuestion)}',
     mutated: '\'{}\'::jsonb,\n        \'{}\'::jsonb',
     testCmd: 'npx vitest run test/exams.test.ts',
   },

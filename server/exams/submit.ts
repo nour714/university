@@ -31,8 +31,8 @@ export async function submitAndGradeExam(
     // Build lookup of valid questions and valid options
     const validQuestions = new Map<string, Set<string>>();
     for (const q of questionRows) {
-      const opts = Array.isArray(q.options) ? q.options : JSON.parse(q.options || '[]');
-      const optSet = new Set<string>(opts.map((o: { id: string }) => String(o.id)));
+      const opts = (Array.isArray(q.options) ? q.options : []) as { id: string }[];
+      const optSet = new Set<string>(opts.map((o) => String(o.id)));
       validQuestions.set(q.id, optSet);
     }
 
@@ -90,7 +90,7 @@ export async function submitAndGradeExam(
           wrongCount: existing.wrong_count,
           unansweredCount: existing.unanswered_count,
           perQuestion: existing.is_revealed
-            ? ((typeof existing.per_question === 'string' ? JSON.parse(existing.per_question) : existing.per_question) || {})
+            ? (existing.per_question || {})
             : {},
         };
       }
@@ -101,15 +101,14 @@ export async function submitAndGradeExam(
     // Allow 10 seconds network grace period from DB clock
     const isWithinGracePeriod = dbNow.getTime() <= endAt.getTime() + 10000;
 
-    let effectiveAnswers: Record<string, string> =
-      (typeof session.answers === 'string' ? JSON.parse(session.answers) : session.answers) || {};
+    let effectiveAnswers: Record<string, string> = session.answers || {};
     let autoSubmitFlag = isAutoSubmitted;
 
     if (isWithinGracePeriod) {
       effectiveAnswers = { ...effectiveAnswers, ...sanitizedIncoming };
       await tx`
         UPDATE public.academic_exam_sessions
-           SET answers = ${JSON.stringify(effectiveAnswers)}::jsonb,
+           SET answers = ${tx.json(effectiveAnswers)},
                updated_at = now()
          WHERE id = ${session.id}
       `;
@@ -189,8 +188,8 @@ export async function submitAndGradeExam(
         ${wrongCount},
         ${unansweredCount},
         ${autoSubmitFlag},
-        ${JSON.stringify(effectiveAnswers)}::jsonb,
-        ${JSON.stringify(perQuestion)}::jsonb
+        ${tx.json(effectiveAnswers)},
+        ${tx.json(perQuestion)}
       )
       ON CONFLICT (student_id, exam_id) DO NOTHING;
     `;
@@ -210,7 +209,7 @@ export async function submitAndGradeExam(
         VALUES (
           ${studentAccountId},
           'EXAM_SUBMITTED',
-          ${JSON.stringify({ exam_id: examId, score: totalScore, passed, auto_submitted: autoSubmitFlag })}::jsonb
+          ${tx.json({ exam_id: examId, score: totalScore, passed, auto_submitted: autoSubmitFlag })}
         )
       `;
     } catch (auditErr) {

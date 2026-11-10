@@ -1,4 +1,5 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
+import fs from 'node:fs';
 import path from 'node:path';
 import postgres from 'postgres';
 import { setupTestDatabase, teardownTestDatabase, TestDbClients } from './setupTestDb';
@@ -74,7 +75,6 @@ describe('TASK 2 — Seed and Example Files (F2)', () => {
 
   it('fails loudly if an exam key file references an invalid option ID or unknown question ID', () => {
     const invalidOptionFile = path.join(process.cwd(), 'test', 'fixtures', 'invalid-option.json');
-    const fs = require('node:fs');
     fs.mkdirSync(path.dirname(invalidOptionFile), { recursive: true });
     fs.writeFileSync(
       invalidOptionFile,

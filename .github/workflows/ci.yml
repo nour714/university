@@ -55,5 +55,5 @@ jobs:
       - name: Run Vitest Automated Test Suite
         run: npm test
 
-      - name: Run Mutation Checks (14 Deliberate Breakages)
-        run: npm run test:mutations
+      - name: Run Mutation Checks (8 Targeted Regressions)
+        run: npm run mutation-check

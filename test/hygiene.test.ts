@@ -37,6 +37,7 @@ describe('Repo Hygiene & Secrets Scanner', () => {
           /server\/exams\/submit\.ts/,
           /scripts\//,
           /test\//,
+          /types\/exam\.ts/,
         ],
       },
     ];

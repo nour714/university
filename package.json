@@ -10,6 +10,7 @@
     "test": "vitest run",
     "test:permissions": "tsx scripts/test-permissions.ts",
     "test:mutations": "tsx scripts/mutation-check.ts",
+    "mutation-check": "tsx scripts/mutation-check.ts",
     "migrate": "tsx scripts/migrate.ts",
     "seed": "tsx scripts/seed-data.ts"
   },

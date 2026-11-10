@@ -20,14 +20,17 @@ export async function startOrResumeExamSessionAction(examId: string) {
 /**
  * Periodically saves selected answers to the database session.
  */
-export async function saveExamAnswersAction(examId: string, answers: unknown): Promise<{ success: boolean }> {
+export async function saveExamAnswersAction(
+  examId: string,
+  answers: unknown
+): Promise<{ success: boolean; saved?: number; dropped?: number }> {
   const student = await requireAuth();
   const parsed = ExamAnswersSchema.safeParse(answers);
   if (!parsed.success) {
     return { success: false };
   }
-  const ok = await saveExamAnswers(examId, student.accountId, parsed.data);
-  return { success: ok };
+  const res = await saveExamAnswers(examId, student.accountId, parsed.data);
+  return { success: res.success, saved: res.saved, dropped: res.dropped };
 }
 
 /**

@@ -16,6 +16,14 @@ export interface ExamQuestion {
   points: number;
 }
 
+export interface QuestionResultDetail {
+  selectedOptionId?: string | null;
+  correctOptionId?: string;
+  isCorrect: boolean;
+  points: number;
+  explanation?: string;
+}
+
 export interface GradeResult {
   score: number;
   totalMarks: number;
@@ -24,7 +32,8 @@ export interface GradeResult {
   correctCount: number;
   wrongCount: number;
   unansweredCount: number;
-  perQuestion: Record<string, boolean>;
+  autoSubmitted?: boolean;
+  perQuestion: Record<string, boolean | QuestionResultDetail> | null;
 }
 
 export interface Exam {

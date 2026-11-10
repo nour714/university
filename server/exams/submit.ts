@@ -84,12 +84,13 @@ export async function submitAndGradeExam(
           totalMarks: Number(existing.total_marks),
           percentage: Number(existing.percentage),
           passed: Boolean(existing.passed),
-          correctCount: existing.correct_count,
-          wrongCount: existing.wrong_count,
-          unansweredCount: existing.unanswered_count,
+          correctCount: Number(existing.correct_count || 0),
+          wrongCount: Number(existing.wrong_count || 0),
+          unansweredCount: Number(existing.unanswered_count || 0),
+          autoSubmitted: Boolean(existing.auto_submitted),
           perQuestion: existing.is_revealed
             ? (existing.per_question || {})
-            : {},
+            : null,
         };
       }
     }
@@ -120,7 +121,8 @@ export async function submitAndGradeExam(
       SELECT 
         q.id AS question_id,
         q.points,
-        k.correct_option_id
+        k.correct_option_id,
+        k.explanation
       FROM public.academic_exam_questions q
       JOIN academic_private.exam_keys k ON k.question_id = q.id
       WHERE q.exam_id = ${examId}
@@ -139,21 +141,26 @@ export async function submitAndGradeExam(
     let correctCount = 0;
     let wrongCount = 0;
     let unansweredCount = 0;
-    const perQuestion: Record<string, boolean> = {};
+    const perQuestion: Record<string, any> = {};
 
     for (const item of questionsWithKeys) {
-      const chosen = effectiveAnswers[item.question_id];
+      const chosen = effectiveAnswers[item.question_id] || null;
+      const isCorrect = Boolean(chosen && chosen === item.correct_option_id);
       if (!chosen) {
         unansweredCount++;
-        perQuestion[item.question_id] = false;
-      } else if (chosen === item.correct_option_id) {
+      } else if (isCorrect) {
         totalScore += item.points;
         correctCount++;
-        perQuestion[item.question_id] = true;
       } else {
         wrongCount++;
-        perQuestion[item.question_id] = false;
       }
+      perQuestion[item.question_id] = {
+        selectedOptionId: chosen,
+        correctOptionId: item.correct_option_id,
+        isCorrect,
+        points: isCorrect ? item.points : 0,
+        explanation: item.explanation || '',
+      };
     }
 
     const totalMarks = exam.total_marks;
@@ -225,7 +232,8 @@ export async function submitAndGradeExam(
       correctCount,
       wrongCount,
       unansweredCount,
-      perQuestion: isExamWindowClosed ? perQuestion : {},
+      autoSubmitted: autoSubmitFlag,
+      perQuestion: isExamWindowClosed ? perQuestion : null,
     };
   });
 }

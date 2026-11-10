@@ -3,6 +3,8 @@ import { NextResponse } from 'next/server';
 import { getSessionCookie } from '@/server/auth/cookies';
 import { validateSession } from '@/server/auth/session';
 
+export const maxDuration = 30;
+
 export async function GET() {
   const token = await getSessionCookie();
   if (!token) {

@@ -137,7 +137,9 @@ describe('Auth & Session Security Tests (Finding F8 / Task 7)', () => {
       });
 
       expect(studentRes.success).toBe(true);
-      expect(studentRes.mustChangePassword).toBe(false);
+      if (studentRes.success) {
+        expect(studentRes.mustChangePassword).toBe(false);
+      }
     });
 
     it('7.3(b) 50 successful logins from the same IP (simulating a lab NAT) are NOT blocked by the IP limiter', async () => {

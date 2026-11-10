@@ -1,12 +1,33 @@
-import { describe, it, expect, beforeAll, afterAll } from 'vitest';
+import { describe, it, expect, beforeAll, afterAll, vi } from 'vitest';
 import { setupTestDatabase, teardownTestDatabase, TestDbClients } from './setupTestDb';
 import { hashPassword, verifyPassword, verifyDummyPassword } from '@/server/auth/password';
 import { createSession, validateSession, revokeSession, revokeAllAccountSessions } from '@/server/auth/session';
 import { normalizeIdentifier, maskIdentifier } from '@/lib/security/normalizeIdentifier';
 import { isCommonPassword } from '@/lib/security/commonPasswords';
-import { checkRateLimit } from '@/server/security/rateLimit';
+import { checkRateLimit, getRateLimitCount } from '@/server/security/rateLimit';
 
-describe('Auth & Session Security Tests', () => {
+let mockClientIp = '127.0.0.1';
+const mockCookies = new Map<string, any>();
+
+vi.mock('next/headers', () => ({
+  headers: async () => ({
+    get: (name: string) => {
+      const lower = name.toLowerCase();
+      if (lower === 'x-forwarded-for') return mockClientIp;
+      if (lower === 'user-agent') return 'VitestAgent';
+      return null;
+    },
+  }),
+  cookies: async () => ({
+    get: (name: string) => mockCookies.get(name),
+    set: (name: string, value: any, options: any) => mockCookies.set(name, { value, options }),
+  }),
+}));
+
+// Import loginAction after vi.mock
+import { loginAction } from '@/app/auth/actions';
+
+describe('Auth & Session Security Tests (Finding F8 / Task 7)', () => {
   let clients: TestDbClients;
   const testStudentId = 'a0000000-0000-0000-0000-000000000001';
   const testNationalId = '30101010101011';
@@ -18,7 +39,7 @@ describe('Auth & Session Security Tests', () => {
 
     const passwordHash = await hashPassword(testPassword);
 
-    // Seed test account with ownerSql
+    // Seed primary test account with ownerSql
     await clients.ownerSql`
       INSERT INTO public.academic_accounts (
         id, national_id, password_hash, must_change_password, is_active
@@ -34,13 +55,37 @@ describe('Auth & Session Security Tests', () => {
         ${testStudentId}, ${testStudentCode}, 'طالب اختبار تجريبي', 'student@test.edu.eg', 'الذكاء الاصطناعي', 'المستوى الأول', 1
       ) ON CONFLICT (id) DO NOTHING;
     `;
+
+    // Seed 50 lab accounts for NAT simulation test 7.3(b)
+    for (let i = 1; i <= 50; i++) {
+      const padded = String(i).padStart(4, '0');
+      const labId = `c0000000-0000-0000-0000-${String(i).padStart(12, '0')}`;
+      const labNatId = `3020202020${padded}`;
+      const labCode = `2027${padded}`;
+
+      await clients.ownerSql`
+        INSERT INTO public.academic_accounts (
+          id, national_id, password_hash, must_change_password, is_active
+        ) VALUES (
+          ${labId}, ${labNatId}, ${passwordHash}, false, true
+        ) ON CONFLICT (id) DO NOTHING;
+      `;
+
+      await clients.ownerSql`
+        INSERT INTO public.academic_profiles (
+          id, student_code, full_name, email, department, level, level_number
+        ) VALUES (
+          ${labId}, ${labCode}, ${'طالب مختبر ' + i}, ${`lab${i}@test.edu.eg`}, 'الذكاء الاصطناعي', 'المستوى الأول', 1
+        ) ON CONFLICT (id) DO NOTHING;
+      `;
+    }
   }, 60000);
 
   afterAll(async () => {
     await teardownTestDatabase();
   });
 
-  describe('User Enumeration & Lockout Oracle Resistance (Finding A2)', () => {
+  describe('User Enumeration & Lockout Oracle Resistance (Finding A2, F8)', () => {
     it('should return identical error message and timing safety for non-existing vs wrong password on existing account', async () => {
       // 1. Non-existing account check
       const [nonExisting] = await clients.appSql`
@@ -66,47 +111,94 @@ describe('Auth & Session Security Tests', () => {
       expect(GENERIC_ERROR).toBe('الرقم القومي أو كلمة المرور غير صحيحة، أو تم تقييد المحاولات مؤقتاً');
     });
 
-    it('should atomically increment failed counter and lock account without changing public response', async () => {
-      // Perform 5 failed attempts atomically
-      for (let i = 0; i < 5; i++) {
-        await clients.appSql`
-          UPDATE public.academic_accounts
-             SET failed_login_count = failed_login_count + 1,
-                 locked_until = CASE
-                   WHEN failed_login_count + 1 >= 10 THEN now() + interval '5 minutes'
-                   WHEN failed_login_count + 1 >= 5 THEN now() + interval '1 minute'
-                   ELSE NULL
-                 END
-           WHERE id = ${testStudentId}
-        `;
+    it('7.3(a) Attacker from IP 1 fails 20 logins on student national ID; student logs in successfully on 21st attempt from IP 2', async () => {
+      // IP 1: Attacker attempts 20 logins with wrong password on student national ID
+      mockClientIp = '198.51.100.1';
+      for (let attempt = 1; attempt <= 20; attempt++) {
+        const res = await loginAction({
+          identifier: testNationalId,
+          password: 'AttackerWrongPassword!',
+        });
+        expect(res.success).toBe(false);
       }
 
-      const [lockedAccount] = await clients.appSql`
-        SELECT failed_login_count, locked_until FROM public.academic_accounts
-        WHERE id = ${testStudentId}
-      `;
+      // Attacker at IP 1 is blocked by per-(identifier + IP) limiter (attempt 21 from IP 1 fails)
+      const resBlocked = await loginAction({
+        identifier: testNationalId,
+        password: testPassword, // Even with correct password, IP 1 is blocked!
+      });
+      expect(resBlocked.success).toBe(false);
 
-      expect(lockedAccount.failed_login_count).toBeGreaterThanOrEqual(5);
-      expect(lockedAccount.locked_until).not.toBeNull();
-      expect(new Date(lockedAccount.locked_until).getTime()).toBeGreaterThan(Date.now());
+      // IP 2: Legitimate student logs in from another IP on attempt 21
+      mockClientIp = '198.51.100.2';
+      const studentRes = await loginAction({
+        identifier: testNationalId,
+        password: testPassword,
+      });
+
+      expect(studentRes.success).toBe(true);
+      expect(studentRes.mustChangePassword).toBe(false);
     });
 
-    it('should reset failed_login_count to 0 on successful authentication', async () => {
-      await clients.appSql`
-        UPDATE public.academic_accounts
-           SET failed_login_count = 0,
-               locked_until = NULL,
-               last_login_at = now()
-         WHERE id = ${testStudentId}
-      `;
+    it('7.3(b) 50 successful logins from the same IP (simulating a lab NAT) are NOT blocked by the IP limiter', async () => {
+      // Simulate 50 students in a campus computer lab sharing NAT IP 203.0.113.50
+      mockClientIp = '203.0.113.50';
 
-      const [resetAccount] = await clients.appSql`
-        SELECT failed_login_count, locked_until FROM public.academic_accounts
-        WHERE id = ${testStudentId}
-      `;
+      for (let i = 1; i <= 50; i++) {
+        const padded = String(i).padStart(4, '0');
+        const labNatId = `3020202020${padded}`;
 
-      expect(resetAccount.failed_login_count).toBe(0);
-      expect(resetAccount.locked_until).toBeNull();
+        const res = await loginAction({
+          identifier: labNatId,
+          password: testPassword,
+        });
+
+        expect(res.success).toBe(true);
+      }
+
+      // Verify that 50 successful logins resulted in 0 failed attempts recorded for this IP
+      const ipFailCount = await getRateLimitCount('203.0.113.50', 'login_fail_ip', 600);
+      expect(ipFailCount).toBe(0);
+    });
+
+    it('7.3(c) 20 login attempts for non-existing user vs 20 for existing user: median timing delta is within 15 ms', async () => {
+      const existingTimes: number[] = [];
+      const nonExistingTimes: number[] = [];
+
+      // 20 login attempts for existing user with wrong password
+      for (let i = 1; i <= 20; i++) {
+        mockClientIp = `10.150.1.${i}`;
+        const t0 = performance.now();
+        await loginAction({
+          identifier: testNationalId,
+          password: 'IncorrectPasswordForTimingTest123!',
+        });
+        existingTimes.push(performance.now() - t0);
+      }
+
+      // 20 login attempts for non-existing user
+      for (let i = 1; i <= 20; i++) {
+        mockClientIp = `10.150.2.${i}`;
+        const t0 = performance.now();
+        await loginAction({
+          identifier: `9990000000${String(i).padStart(4, '0')}`,
+          password: 'IncorrectPasswordForTimingTest123!',
+        });
+        nonExistingTimes.push(performance.now() - t0);
+      }
+
+      function median(values: number[]): number {
+        const sorted = [...values].sort((a, b) => a - b);
+        const mid = Math.floor(sorted.length / 2);
+        return sorted.length % 2 !== 0 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2;
+      }
+
+      const medianExisting = median(existingTimes);
+      const medianNonExisting = median(nonExistingTimes);
+      const delta = Math.abs(medianExisting - medianNonExisting);
+
+      // Assert median delta is strictly within 15 ms
+      expect(delta).toBeLessThan(15);
     });
   });
 

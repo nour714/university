@@ -13,10 +13,16 @@ import {
 import { createSession, revokeSession, revokeAllAccountSessions } from '@/server/auth/session';
 import { setSessionCookie, clearSessionCookie, getSessionCookie } from '@/server/auth/cookies';
 import { requireAuth } from '@/server/auth/requireAuth';
-import { checkRateLimit } from '@/server/security/rateLimit';
+import {
+  checkRateLimit,
+  getRateLimitCount,
+  recordFailedAttempt,
+  resetRateLimit,
+} from '@/server/security/rateLimit';
 import { normalizeIdentifier, maskIdentifier } from '@/lib/security/normalizeIdentifier';
 import { isCommonPassword } from '@/lib/security/commonPasswords';
 import { verifyTurnstileToken } from '@/server/security/turnstile';
+import { env } from '@/lib/env';
 
 const LoginSchema = z.object({
   identifier: z.string().trim().min(3, 'يرجى إدخال الرقم القومي أو الرقم الأكاديمي').max(50),
@@ -37,112 +43,124 @@ export async function loginAction(input: unknown): Promise<LoginActionResult> {
       return { success: false, error: GENERIC_LOGIN_ERROR };
     }
 
-  const { identifier: rawIdentifier, password, turnstileToken } = parsed.data;
-  const normId = normalizeIdentifier(rawIdentifier);
+    const { identifier: rawIdentifier, password, turnstileToken } = parsed.data;
+    const normId = normalizeIdentifier(rawIdentifier);
 
-  const h = await headers();
-  const rawXForwarded = h.get('x-forwarded-for');
-  const clientIp = rawXForwarded ? rawXForwarded.split(',')[0].trim() : (h.get('x-real-ip') || '127.0.0.1');
-  const userAgent = h.get('user-agent') || 'Unknown';
+    const h = await headers();
+    const rawXForwarded = h.get('x-forwarded-for');
+    const clientIp = rawXForwarded ? rawXForwarded.split(',')[0].trim() : (h.get('x-real-ip') || '127.0.0.1');
+    const userAgent = h.get('user-agent') || 'Unknown';
 
-  // 1. Sliding window rate limiting:
-  // - Per-IP: 30 attempts per 10 minutes
-  const ipLimit = await checkRateLimit(clientIp, 'login', 30, 600);
-  if (!ipLimit.allowed) {
-    await verifyDummyPassword();
-    return { success: false, error: GENERIC_LOGIN_ERROR };
-  }
-
-  // - Per-(Identifier + IP): 5 attempts per 10 minutes
-  const ipIdentifierLimit = await checkRateLimit(`${normId}:${clientIp}`, 'login', 5, 600);
-  if (!ipIdentifierLimit.allowed) {
-    await verifyDummyPassword();
-    return { success: false, error: GENERIC_LOGIN_ERROR };
-  }
-
-  // - Per-Identifier: 20 attempts per 15 minutes
-  const idLimit = await checkRateLimit(normId, 'login', 20, 900);
-  if (!idLimit.allowed) {
-    // Require Turnstile captcha when per-identifier threshold is exceeded
-    const captchaValid = await verifyTurnstileToken(turnstileToken, clientIp);
-    if (!captchaValid) {
-      await verifyDummyPassword();
+    // 1. Sliding window rate limiting:
+    // (c) Per-IP limiter: count ONLY FAILED attempts (threshold: 100 failed attempts / 10 min)
+    const ipFailures = await getRateLimitCount(clientIp, 'login_fail_ip', 600);
+    if (ipFailures >= 100) {
+      await verifyDummyPassword(password);
+      await appSql`SELECT 1`;
       return { success: false, error: GENERIC_LOGIN_ERROR };
     }
-  }
 
-  // 2. Fetch account by national_id or student_code
-  const [account] = await appSql`
-    SELECT a.id, a.national_id, a.password_hash, a.must_change_password, a.failed_login_count, a.locked_until, a.is_active
-    FROM public.academic_accounts a
-    LEFT JOIN public.academic_profiles p ON p.id = a.id
-    WHERE a.national_id = ${normId} OR p.student_code = ${normId}
-  `;
+    // (a) Per-(Identifier + IP) limiter: 5 attempts per 10 minutes
+    const ipIdentifierFailures = await getRateLimitCount(`${normId}:${clientIp}`, 'login_ip_id', 600);
+    if (ipIdentifierFailures >= 5) {
+      await verifyDummyPassword(password);
+      await appSql`SELECT 1`;
+      return { success: false, error: GENERIC_LOGIN_ERROR };
+    }
 
-  // Protect against user enumeration & timing attacks: constant-time dummy verification
-  if (!account || !account.is_active) {
-    await verifyDummyPassword();
-    return { success: false, error: GENERIC_LOGIN_ERROR };
-  }
+    // (b) Account-wide defense against distributed credential stuffing:
+    // If >= 10 failed attempts occur from ANY IP within 10 min, require Turnstile captcha token.
+    // If Turnstile is not configured in env, fall back to per-(identifier + IP) limiter only.
+    const idFailures = await getRateLimitCount(normId, 'login_fail_id', 600);
+    if (idFailures >= 10 && env.TURNSTILE_SECRET_KEY) {
+      const captchaValid = await verifyTurnstileToken(turnstileToken, clientIp);
+      if (!captchaValid) {
+        await verifyDummyPassword(password);
+        await appSql`SELECT 1`;
+        return { success: false, error: GENERIC_LOGIN_ERROR };
+      }
+    }
 
-  // Account lockout check (locked for temporary window)
-  if (account.locked_until && new Date(account.locked_until).getTime() > Date.now()) {
-    await verifyDummyPassword();
-    return { success: false, error: GENERIC_LOGIN_ERROR };
-  }
+    // 2. Fetch account by national_id or student_code
+    const [account] = await appSql`
+      SELECT a.id, a.national_id, a.password_hash, a.must_change_password, a.failed_login_count, a.locked_until, a.is_active
+      FROM public.academic_accounts a
+      LEFT JOIN public.academic_profiles p ON p.id = a.id
+      WHERE a.national_id = ${normId} OR p.student_code = ${normId}
+    `;
 
-  // Verify password with argon2id
-  const isValidPassword = await verifyPassword(password, account.password_hash);
+    // 3. User enumeration & timing attack mitigation:
+    // If account not found or inactive, execute dummy verify and match DB write path
+    if (!account || !account.is_active) {
+      await verifyDummyPassword(password);
+      await recordFailedAttempt(clientIp, 'login_fail_ip', 600);
+      await recordFailedAttempt(`${normId}:${clientIp}`, 'login_ip_id', 600);
+      await recordFailedAttempt(normId, 'login_fail_id', 600);
+      try {
+        await appSql`
+          INSERT INTO academic_private.audit_log (actor, action, details)
+          VALUES (NULL, 'LOGIN_FAILED', ${appSql.json({ ip: clientIp, userAgent: userAgent.slice(0, 200) })})
+        `;
+      } catch {
+        // Non-blocking
+      }
+      return { success: false, error: GENERIC_LOGIN_ERROR };
+    }
 
-  if (!isValidPassword) {
-    // Atomic failure counter & progressive lock:
-    // 5+ failures -> 1 minute lock
-    // 10+ failures -> 5 minutes lock
+    // If account has an explicit admin lockout
+    if (account.locked_until && new Date(account.locked_until).getTime() > Date.now()) {
+      await verifyDummyPassword(password);
+      await appSql`SELECT 1`;
+      return { success: false, error: GENERIC_LOGIN_ERROR };
+    }
+
+    // Verify password with argon2id
+    const isValidPassword = await verifyPassword(password, account.password_hash);
+
+    if (!isValidPassword) {
+      // Record failed attempts in limiters (without locking account globally in academic_accounts)
+      await recordFailedAttempt(clientIp, 'login_fail_ip', 600);
+      await recordFailedAttempt(`${normId}:${clientIp}`, 'login_ip_id', 600);
+      await recordFailedAttempt(normId, 'login_fail_id', 600);
+
+      try {
+        await appSql`
+          INSERT INTO academic_private.audit_log (actor, action, details)
+          VALUES (${account.id}, 'LOGIN_FAILED', ${appSql.json({ ip: clientIp, userAgent: userAgent.slice(0, 200) })})
+        `;
+      } catch {
+        // Non-blocking
+      }
+
+      return { success: false, error: GENERIC_LOGIN_ERROR };
+    }
+
+    // On successful login: reset failed attempt trackers for this student & IP
+    await resetRateLimit(`${normId}:${clientIp}`, 'login_ip_id');
+    await resetRateLimit(normId, 'login_fail_id');
+
+    // Update last_login
     await appSql`
       UPDATE public.academic_accounts
-         SET failed_login_count = failed_login_count + 1,
-             locked_until = CASE
-               WHEN failed_login_count + 1 >= 10 THEN now() + interval '5 minutes'
-               WHEN failed_login_count + 1 >= 5 THEN now() + interval '1 minute'
-               ELSE NULL
-             END
+         SET failed_login_count = 0,
+             locked_until = NULL,
+             last_login_at = now()
        WHERE id = ${account.id}
     `;
 
+    // Create opaque 256-bit session with IP & UA metadata
+    const token = await createSession(account.id, { ip: clientIp, userAgent });
+    await setSessionCookie(token);
+
+    // Record audit log with masked identifier
     try {
       await appSql`
         INSERT INTO academic_private.audit_log (actor, action, details)
-        VALUES (${account.id}, 'LOGIN_FAILED', ${appSql.json({ ip: clientIp, userAgent: userAgent.slice(0, 200) })})
+        VALUES (${account.id}, 'LOGIN_SUCCESS', ${appSql.json({ identifier: maskIdentifier(normId) })})
       `;
     } catch {
-      // Non-critical audit log failure should not crash response
+      // Audit failure non-blocking
     }
-
-    return { success: false, error: GENERIC_LOGIN_ERROR };
-  }
-
-  // Reset failure count & update last_login
-  await appSql`
-    UPDATE public.academic_accounts
-       SET failed_login_count = 0,
-           locked_until = NULL,
-           last_login_at = now()
-     WHERE id = ${account.id}
-  `;
-
-  // Create opaque 256-bit session with IP & UA metadata
-  const token = await createSession(account.id, { ip: clientIp, userAgent });
-  await setSessionCookie(token);
-
-  // Record audit log with masked identifier
-  try {
-    await appSql`
-      INSERT INTO academic_private.audit_log (actor, action, details)
-      VALUES (${account.id}, 'LOGIN_SUCCESS', ${appSql.json({ identifier: maskIdentifier(normId) })})
-    `;
-  } catch {
-    // Audit failure non-blocking
-  }
 
     return { success: true, mustChangePassword: account.must_change_password };
   } catch (err) {

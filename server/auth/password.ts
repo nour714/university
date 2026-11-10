@@ -30,9 +30,9 @@ export async function verifyPassword(password: string, passwordHash: string): Pr
 /**
  * Perform a dummy verification to defend against timing attacks when user is not found.
  */
-export async function verifyDummyPassword(): Promise<void> {
+export async function verifyDummyPassword(password: string = 'dummy_attempt_for_timing_safety'): Promise<void> {
   try {
-    await verify(DUMMY_HASH, 'dummy_attempt_for_timing_safety');
+    await verify(DUMMY_HASH, password);
   } catch {
     // Ignore error
   }

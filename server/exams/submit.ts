@@ -1,5 +1,3 @@
-'use server';
-
 import 'server-only';
 import { graderSql } from '@/lib/db/grader.server';
 import { GradeResult } from '@/types/exam';

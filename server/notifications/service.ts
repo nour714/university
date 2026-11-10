@@ -1,5 +1,3 @@
-'use server';
-
 import 'server-only';
 import { appSql } from '@/lib/db/app.server';
 import { AcademicNotification, NotificationType } from '@/types/notification';

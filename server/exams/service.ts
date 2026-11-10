@@ -1,5 +1,3 @@
-'use server';
-
 import 'server-only';
 import { cache } from 'react';
 import { appSql } from '@/lib/db/app.server';

@@ -147,8 +147,7 @@ export async function loginAction(input: unknown): Promise<LoginActionResult> {
     return { success: true, mustChangePassword: account.must_change_password };
   } catch (err) {
     console.error('[loginAction error]:', err);
-    const msg = err instanceof Error ? `${err.name}: ${err.message}` : String(err);
-    return { success: false, error: `حدث خطأ: ${msg}` };
+    return { success: false, error: 'حدث خطأ غير متوقع أثناء تسجيل الدخول. يرجى المحاولة مرة أخرى لاحقاً.' };
   }
 }
 

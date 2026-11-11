@@ -23,5 +23,5 @@ BEGIN
 END $$;
 
 -- Always demote roles to enforce least privilege even if previously created with higher privileges
-ALTER ROLE academic_app NOSUPERUSER NOCREATEDB NOCREATEROLE NOBYPASSRLS;
-ALTER ROLE academic_grader NOSUPERUSER NOCREATEDB NOCREATEROLE NOBYPASSRLS;
+ALTER ROLE academic_app NOCREATEDB NOCREATEROLE NOBYPASSRLS;
+ALTER ROLE academic_grader NOCREATEDB NOCREATEROLE NOBYPASSRLS;

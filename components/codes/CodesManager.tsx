@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { 
   KeyRound, 
   Unlock, 
@@ -14,18 +15,21 @@ import {
   BookOpen, 
   ShieldCheck, 
   Receipt,
-  User
+  User,
+  Inbox
 } from 'lucide-react';
 import { StudentCode } from '@/types/code';
 import { useNotifications } from '@/context/NotificationContext';
 import { CodesSkeleton } from '@/components/skeletons/CodesSkeleton';
-import { listCodes, redeemCode } from '@/lib/repos/codesRepo';
+import { listCodes } from '@/lib/repos/codesRepo';
+import { redeemCodeAction } from '@/app/codes/actions';
 
 interface CodesManagerProps {
   initialCodes?: StudentCode[];
 }
 
 export function CodesManager({ initialCodes }: CodesManagerProps = {}) {
+  const router = useRouter();
   const [codes, setCodes] = useState<StudentCode[]>(initialCodes ?? []);
   const [inputCode, setInputCode] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -99,23 +103,15 @@ export function CodesManager({ initialCodes }: CodesManagerProps = {}) {
     setIsLoading(true);
 
     try {
-      // Simulate validation delay
-      await new Promise((resolve) => setTimeout(resolve, 450));
-      const res = await redeemCode(inputCode);
+      const res = await redeemCodeAction(inputCode);
 
-      if (!res.ok) {
-        if (res.reason === 'already_redeemed') {
-          setErrorMessage('هذا الكود تم تفعيله مسبقاً في حسابك، المقرر متاح بالفعل في مكتبتك.');
-        } else if (res.reason === 'incomplete') {
-          setErrorMessage('كود الوصول غير مكتمل، تأكد من إدخال كافة حروف وأرقام الكود.');
-        } else {
-          setErrorMessage('كود الوصول غير صحيح، تأكد من صحة الرمز المدخل.');
-        }
+      if (!res.success || !res.data) {
+        setErrorMessage(res.error || 'كود الوصول غير صحيح أو تم استخدامه مسبقاً.');
         return;
       }
 
-      const newCode = res.code;
-      setCodes((prev) => [newCode, ...prev]);
+      const newCode = res.data;
+      setCodes((prev) => [newCode, ...prev.filter((c) => c.id !== newCode.id)]);
       setSuccessMessage(newCode);
       setInputCode('');
 
@@ -130,6 +126,11 @@ export function CodesManager({ initialCodes }: CodesManagerProps = {}) {
         actionUrl: `/courses/${newCode.courseId}`,
         priority: 'urgent',
       });
+
+      // Refresh server components
+      router.refresh();
+    } catch {
+      setErrorMessage('حدث خطأ في الاتصال بالخادم، يرجى إعادة المحاولة.');
     } finally {
       setIsLoading(false);
     }
@@ -319,85 +320,99 @@ export function CodesManager({ initialCodes }: CodesManagerProps = {}) {
           </span>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
-          {codes.map((item) => (
-            <div
-              key={item.id}
-              className="bg-white rounded-xl sm:rounded-2xl border border-slate-200/90 hover:border-blue-300 p-4 shadow-2xs hover:shadow-md transition-all duration-200 flex flex-col justify-between"
-            >
-              <div>
-                {/* Header Badge */}
-                <div className="flex items-center justify-between gap-2 mb-2.5">
-                  <span className="px-2.5 py-0.5 rounded-lg bg-blue-50 text-blue-700 border border-blue-200/70 text-xs font-bold">
-                    {item.courseCode}
-                  </span>
-                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200/70 text-[10px] font-bold">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                    مفعل ونشط
-                  </span>
-                </div>
-
-                {/* Course Title */}
-                <h4 className="text-sm font-extrabold text-slate-900 leading-snug mb-1 line-clamp-1">
-                  {item.courseName}
-                </h4>
-
-                {/* Doctor */}
-                <div className="flex items-center gap-1.5 text-xs text-slate-500 mb-3">
-                  <User className="w-3.5 h-3.5 text-slate-400" />
-                  <span>{item.doctorName}</span>
-                </div>
-
-                {/* Code Box with Copy */}
-                <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200/80 mb-3 flex items-center justify-between gap-2">
-                  <div className="min-w-0">
-                    <p className="text-[10px] text-slate-400 font-medium">كود التفعيل:</p>
-                    <p className="text-xs font-mono font-bold text-slate-800 tracking-wider truncate">
-                      {item.code}
-                    </p>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => handleCopyCode(item.id, item.code)}
-                    className="p-1.5 rounded-lg bg-white hover:bg-blue-50 text-slate-600 hover:text-blue-700 border border-slate-200 shadow-2xs transition-all active:scale-95 cursor-pointer"
-                    title={copiedId === item.id ? 'تم نسخ الكود بنجاح' : 'نسخ الكود'}
-                    aria-label={copiedId === item.id ? 'تم نسخ الكود بنجاح' : 'نسخ كود التفعيل'}
-                  >
-                    {copiedId === item.id ? (
-                      <Check className="w-3.5 h-3.5 text-emerald-600" />
-                    ) : (
-                      <Copy className="w-3.5 h-3.5" />
-                    )}
-                    <span className="sr-only" aria-live="polite">
-                      {copiedId === item.id ? 'تم نسخ الكود بنجاح' : ''}
-                    </span>
-                  </button>
-                </div>
-
-                {/* Meta details */}
-                <div className="space-y-1 text-[11px] text-slate-500 mb-3">
-                  <div className="flex items-center justify-between">
-                    <span>رقم الإيصال:</span>
-                    <span className="font-mono font-bold text-slate-700">{item.receiptNumber}</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span>تاريخ التفعيل:</span>
-                    <span>{item.activatedAt}</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Action Button */}
-              <Link
-                href={`/courses/${item.courseId}`}
-                className="w-full inline-flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-slate-100 hover:bg-blue-600 text-slate-700 hover:text-white text-xs font-bold transition-all active:scale-98 group"
+        {codes.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+            {codes.map((item) => (
+              <div
+                key={item.id}
+                className="bg-white rounded-xl sm:rounded-2xl border border-slate-200/90 hover:border-blue-300 p-4 shadow-2xs hover:shadow-md transition-all duration-200 flex flex-col justify-between"
               >
-                <span>تصفح المحاضرات والمقرر</span>
-                <ArrowLeft className="w-3.5 h-3.5 transition-transform group-hover:-translate-x-0.5" />
-              </Link>
+                <div>
+                  {/* Header Badge */}
+                  <div className="flex items-center justify-between gap-2 mb-2.5">
+                    <span className="px-2.5 py-0.5 rounded-lg bg-blue-50 text-blue-700 border border-blue-200/70 text-xs font-bold">
+                      {item.courseCode}
+                    </span>
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200/70 text-[10px] font-bold">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                      مفعل ونشط
+                    </span>
+                  </div>
+
+                  {/* Course Title */}
+                  <h4 className="text-sm font-extrabold text-slate-900 leading-snug mb-1 line-clamp-1">
+                    {item.courseName}
+                  </h4>
+
+                  {/* Doctor */}
+                  <div className="flex items-center gap-1.5 text-xs text-slate-500 mb-3">
+                    <User className="w-3.5 h-3.5 text-slate-400" />
+                    <span>{item.doctorName}</span>
+                  </div>
+
+                  {/* Code Box with Copy */}
+                  <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200/80 mb-3 flex items-center justify-between gap-2">
+                    <div className="min-w-0">
+                      <p className="text-[10px] text-slate-400 font-medium">كود التفعيل:</p>
+                      <p className="text-xs font-mono font-bold text-slate-800 tracking-wider truncate">
+                        {item.code}
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => handleCopyCode(item.id, item.code)}
+                      className="p-1.5 rounded-lg bg-white hover:bg-blue-50 text-slate-600 hover:text-blue-700 border border-slate-200 shadow-2xs transition-all active:scale-95 cursor-pointer"
+                      title={copiedId === item.id ? 'تم نسخ الكود بنجاح' : 'نسخ الكود'}
+                      aria-label={copiedId === item.id ? 'تم نسخ الكود بنجاح' : 'نسخ كود التفعيل'}
+                    >
+                      {copiedId === item.id ? (
+                        <Check className="w-3.5 h-3.5 text-emerald-600" />
+                      ) : (
+                        <Copy className="w-3.5 h-3.5" />
+                      )}
+                      <span className="sr-only" aria-live="polite">
+                        {copiedId === item.id ? 'تم نسخ الكود بنجاح' : ''}
+                      </span>
+                    </button>
+                  </div>
+
+                  {/* Meta details */}
+                  <div className="space-y-1 text-[11px] text-slate-500 mb-3">
+                    <div className="flex items-center justify-between">
+                      <span>رقم الإيصال:</span>
+                      <span className="font-mono font-bold text-slate-700">{item.receiptNumber}</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span>تاريخ التفعيل:</span>
+                      <span>{item.activatedAt}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Action Button */}
+                <Link
+                  href={`/courses/${item.courseId}`}
+                  className="w-full inline-flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-slate-100 hover:bg-blue-600 text-slate-700 hover:text-white text-xs font-bold transition-all active:scale-98 group"
+                >
+                  <span>تصفح المحاضرات والمقرر</span>
+                  <ArrowLeft className="w-3.5 h-3.5 transition-transform group-hover:-translate-x-0.5" />
+                </Link>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="bg-white rounded-2xl p-8 sm:p-10 border border-slate-200/90 text-center max-w-md mx-auto shadow-xs animate-fadeIn">
+            <div className="w-12 h-12 rounded-2xl bg-slate-100 text-slate-500 flex items-center justify-center mx-auto mb-3">
+              <Inbox className="w-6 h-6" />
             </div>
-          ))}
-        </div>
+            <h4 className="text-sm sm:text-base font-bold text-slate-800 mb-1">
+              لا توجد أكواد مفعلة بعد
+            </h4>
+            <p className="text-xs text-slate-500 leading-relaxed">
+              لم تقم بتفعيل أي أكواد مقررات حتى الآن. استخدم النموذج أعلاه لتفعيل كود إيصال السداد وإتاحة المحاضرات والاختبارات التابعة له فوراً.
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );

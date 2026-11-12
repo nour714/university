@@ -311,9 +311,11 @@ export function SettingsView({ student: initialStudent }: { student?: StudentPro
       {/* ============================================================== */}
       {/* 2. SEGMENTED TABS SWITCHER (Thumb-friendly & Compact)          */}
       {/* ============================================================== */}
-      <div className="bg-slate-200/80 p-1 sm:p-1.5 rounded-2xl flex items-center gap-1 shadow-2xs">
+      <div role="tablist" aria-label="خيارات الإعدادات" className="bg-slate-200/80 p-1 sm:p-1.5 rounded-2xl flex items-center gap-1 shadow-2xs">
         <button
           type="button"
+          role="tab"
+          aria-selected={activeTab === 'password'}
           onClick={() => setActiveTab('password')}
           className={`flex-1 flex items-center justify-center gap-1.5 sm:gap-2 py-2.5 sm:py-3 px-3 rounded-xl text-xs sm:text-sm font-extrabold transition-all cursor-pointer ${
             activeTab === 'password'
@@ -327,6 +329,8 @@ export function SettingsView({ student: initialStudent }: { student?: StudentPro
 
         <button
           type="button"
+          role="tab"
+          aria-selected={activeTab === 'support'}
           onClick={() => setActiveTab('support')}
           className={`flex-1 flex items-center justify-center gap-1.5 sm:gap-2 py-2.5 sm:py-3 px-3 rounded-xl text-xs sm:text-sm font-extrabold transition-all cursor-pointer ${
             activeTab === 'support'
@@ -387,11 +391,12 @@ export function SettingsView({ student: initialStudent }: { student?: StudentPro
             <form onSubmit={handlePasswordSubmit} className="space-y-3.5">
               {/* Field 1: Current Password */}
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">
+                <label htmlFor="settingsCurrentPassword" className="block text-xs font-bold text-slate-700 mb-1">
                   كلمة المرور الحالية <span className="text-rose-500">*</span>
                 </label>
                 <div className="relative">
                   <input
+                    id="settingsCurrentPassword"
                     type={showCurrentPassword ? 'text' : 'password'}
                     value={currentPassword}
                     onChange={(e) => setCurrentPassword(e.target.value)}
@@ -404,6 +409,7 @@ export function SettingsView({ student: initialStudent }: { student?: StudentPro
                     onClick={() => setShowCurrentPassword(!showCurrentPassword)}
                     className="absolute inset-y-0 end-0 px-3.5 flex items-center text-slate-400 hover:text-slate-600 cursor-pointer"
                     title={showCurrentPassword ? 'إخفاء' : 'إظهار'}
+                    aria-label={showCurrentPassword ? 'إخفاء كلمة المرور الحالية' : 'إظهار كلمة المرور الحالية'}
                   >
                     {showCurrentPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
@@ -412,15 +418,16 @@ export function SettingsView({ student: initialStudent }: { student?: StudentPro
 
               {/* Field 2: New Password */}
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">
+                <label htmlFor="settingsNewPassword" className="block text-xs font-bold text-slate-700 mb-1">
                   كلمة المرور الجديدة <span className="text-rose-500">*</span>
                 </label>
                 <div className="relative">
                   <input
+                    id="settingsNewPassword"
                     type={showNewPassword ? 'text' : 'password'}
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
-                    placeholder="8 خانات على الأقل (حروف وأرقام)"
+                    placeholder="10 خانات على الأقل (حروف وأرقام)"
                     className="w-full h-11 px-3.5 pe-11 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 text-base sm:text-sm text-slate-900 transition-all outline-hidden"
                     required
                   />
@@ -429,6 +436,7 @@ export function SettingsView({ student: initialStudent }: { student?: StudentPro
                     onClick={() => setShowNewPassword(!showNewPassword)}
                     className="absolute inset-y-0 end-0 px-3.5 flex items-center text-slate-400 hover:text-slate-600 cursor-pointer"
                     title={showNewPassword ? 'إخفاء' : 'إظهار'}
+                    aria-label={showNewPassword ? 'إخفاء كلمة المرور الجديدة' : 'إظهار كلمة المرور الجديدة'}
                   >
                     {showNewPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
@@ -437,11 +445,12 @@ export function SettingsView({ student: initialStudent }: { student?: StudentPro
 
               {/* Field 3: Confirm Password */}
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">
+                <label htmlFor="settingsConfirmPassword" className="block text-xs font-bold text-slate-700 mb-1">
                   تأكيد كلمة المرور الجديدة <span className="text-rose-500">*</span>
                 </label>
                 <div className="relative">
                   <input
+                    id="settingsConfirmPassword"
                     type={showConfirmPassword ? 'text' : 'password'}
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
@@ -454,6 +463,7 @@ export function SettingsView({ student: initialStudent }: { student?: StudentPro
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                     className="absolute inset-y-0 end-0 px-3.5 flex items-center text-slate-400 hover:text-slate-600 cursor-pointer"
                     title={showConfirmPassword ? 'إخفاء' : 'إظهار'}
+                    aria-label={showConfirmPassword ? 'إخفاء تأكيد كلمة المرور' : 'إظهار تأكيد كلمة المرور'}
                   >
                     {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>

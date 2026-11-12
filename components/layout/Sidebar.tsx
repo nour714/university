@@ -17,11 +17,13 @@ import {
 import { useNotifications } from '@/context/NotificationContext';
 import { clearSession } from '@/lib/repos/sessionRepo';
 import { logoutAction } from '@/app/auth/actions';
+import { useStudentProfile } from '@/lib/hooks/useStudentProfile';
 
 export function Sidebar({ currentPath }: { currentPath?: string }) {
   const [isExpanded, setIsExpanded] = useState(false);
   const router = useRouter();
   const { resetAll } = useNotifications();
+  const { student } = useStudentProfile();
   const pathname = usePathname() || currentPath || '/';
   const isHomeActive = pathname === '/';
   const isCoursesActive = pathname.startsWith('/courses');
@@ -249,8 +251,8 @@ export function Sidebar({ currentPath }: { currentPath?: string }) {
                 : 'max-w-0 opacity-0 pointer-events-none'
             }`}
           >
-            <p className="text-xs font-bold text-white truncate">عبد الرحمن خالد</p>
-            <p className="text-[10px] text-blue-300 truncate mt-0.5">طالب • ذكاء اصطناعي</p>
+            <p className="text-xs font-bold text-white truncate">{student?.fullName || 'الملف الأكاديمي'}</p>
+            <p className="text-[10px] text-blue-300 truncate mt-0.5">{student ? `${student.level} • ${student.department}` : 'طالب جامعي'}</p>
           </div>
 
           {/* Logout button (smooth width between 40px when expanded and full 48px when collapsed) */}

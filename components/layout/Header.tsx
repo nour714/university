@@ -57,20 +57,21 @@ export function Header() {
           {/* Academic Notifications Bell */}
           <NotificationBell />
 
-          {/* Student Profile Avatar with Hover Reveal */}
+          {/* Student Profile Avatar with Hover and Focus Reveal */}
           <Link 
             href="/"
-            className="flex items-center transition-all duration-700 cursor-pointer group"
+            className="flex items-center transition-all duration-200 cursor-pointer group outline-hidden focus-visible:ring-2 focus-visible:ring-blue-500 rounded-full"
             title="الرئيسية - الملف الشخصي للطالب"
+            aria-label={`الملف الشخصي: ${fullName} - ${subtitle}`}
           >
             {/* Circular Avatar */}
-            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br from-blue-600 to-indigo-700 text-white flex items-center justify-center font-bold text-xs shadow-sm shadow-blue-600/20 group-hover:scale-105 group-hover:shadow-md group-hover:shadow-blue-600/30 transition-all duration-700 ease-out shrink-0">
+            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br from-blue-600 to-indigo-700 text-white flex items-center justify-center font-bold text-xs shadow-sm shadow-blue-600/20 group-hover:scale-105 group-hover:shadow-md group-hover:shadow-blue-600/30 group-focus-visible:scale-105 transition-all duration-200 ease-out shrink-0">
               <User className="w-4.5 h-4.5 stroke-[2.5]" />
             </div>
 
-            {/* Student Name and Academic Level - Appears in Slow Motion when hovering over the icon */}
-            <div className="text-right hidden sm:flex flex-col max-w-0 opacity-0 overflow-hidden group-hover:max-w-[280px] group-hover:opacity-100 group-hover:ms-2.5 transition-all duration-700 ease-in-out whitespace-nowrap pointer-events-none group-hover:pointer-events-auto">
-              <p className="text-xs sm:text-sm font-bold text-slate-800 group-hover:text-blue-600 transition-colors leading-tight">
+            {/* Student Name and Academic Level - Smooth responsive reveal on hover or focus */}
+            <div className="text-right hidden sm:flex flex-col max-w-0 opacity-0 overflow-hidden group-hover:max-w-[280px] group-hover:opacity-100 group-hover:ms-2.5 group-focus-within:max-w-[280px] group-focus-within:opacity-100 group-focus-within:ms-2.5 transition-all duration-200 ease-in-out whitespace-nowrap pointer-events-none group-hover:pointer-events-auto group-focus-within:pointer-events-auto">
+              <p className="text-xs sm:text-sm font-bold text-slate-800 group-hover:text-blue-600 group-focus-within:text-blue-600 transition-colors leading-tight">
                 {fullName}
               </p>
               <p className="text-[10px] text-slate-500 font-medium mt-0.5 leading-tight">

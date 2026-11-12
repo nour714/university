@@ -103,9 +103,11 @@ export function ExamsDashboard({ initialExams }: ExamsDashboardProps) {
 
         {/* Tab Filters - Optimized with smooth horizontal touch scroll for mobile */}
         <div className="pt-2 border-t border-slate-100 -mx-1 px-1">
-          <div className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto no-scrollbar scroll-smooth touch-pan-x pb-1">
+          <div role="tablist" aria-label="حالة الاختبارات الأكاديمية" className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto no-scrollbar scroll-smooth touch-pan-x pb-1">
             <button
               type="button"
+              role="tab"
+              aria-selected={activeTab === 'all'}
               onClick={() => setActiveTab('all')}
               className={`px-3 py-2 sm:px-3.5 sm:py-2 min-h-[38px] rounded-xl text-xs font-bold flex items-center gap-1.5 sm:gap-2 transition-all shrink-0 cursor-pointer ${
                 activeTab === 'all'
@@ -121,6 +123,8 @@ export function ExamsDashboard({ initialExams }: ExamsDashboardProps) {
 
             <button
               type="button"
+              role="tab"
+              aria-selected={activeTab === 'live'}
               onClick={() => setActiveTab('live')}
               className={`px-3 py-2 sm:px-3.5 sm:py-2 min-h-[38px] rounded-xl text-xs font-bold flex items-center gap-1.5 sm:gap-2 transition-all shrink-0 cursor-pointer ${
                 activeTab === 'live'
@@ -137,6 +141,8 @@ export function ExamsDashboard({ initialExams }: ExamsDashboardProps) {
 
             <button
               type="button"
+              role="tab"
+              aria-selected={activeTab === 'upcoming'}
               onClick={() => setActiveTab('upcoming')}
               className={`px-3 py-2 sm:px-3.5 sm:py-2 min-h-[38px] rounded-xl text-xs font-bold flex items-center gap-1.5 sm:gap-2 transition-all shrink-0 cursor-pointer ${
                 activeTab === 'upcoming'
@@ -153,6 +159,8 @@ export function ExamsDashboard({ initialExams }: ExamsDashboardProps) {
 
             <button
               type="button"
+              role="tab"
+              aria-selected={activeTab === 'completed'}
               onClick={() => setActiveTab('completed')}
               className={`px-3 py-2 sm:px-3.5 sm:py-2 min-h-[38px] rounded-xl text-xs font-bold flex items-center gap-1.5 sm:gap-2 transition-all shrink-0 cursor-pointer ${
                 activeTab === 'completed'

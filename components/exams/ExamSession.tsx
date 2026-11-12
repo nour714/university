@@ -432,7 +432,7 @@ export function ExamSession({
             )}
 
             {/* Options List in English (A, B, C, D in LTR) */}
-            <div className="space-y-2.5 sm:space-y-3" dir="ltr">
+            <div className="space-y-2.5 sm:space-y-3" dir="ltr" role="radiogroup" aria-label="Question options">
               {currentQuestion.options.map((option, optIdx) => {
                 const isSelected = answers[currentQuestion.id] === option.id;
                 const letter = ['A', 'B', 'C', 'D', 'E'][optIdx] || String.fromCharCode(65 + optIdx);
@@ -441,6 +441,8 @@ export function ExamSession({
                   <button
                     key={option.id}
                     type="button"
+                    role="radio"
+                    aria-checked={isSelected}
                     onClick={() => handleSelectOption(option.id)}
                     className={`w-full text-left p-3 sm:p-4 min-h-[48px] rounded-2xl border transition-all flex items-start sm:items-center justify-between gap-3 sm:gap-4 group cursor-pointer ${
                       isSelected

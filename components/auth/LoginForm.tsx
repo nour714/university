@@ -109,6 +109,11 @@ export function LoginForm() {
     let isTop = false;
 
     const handleTouchStart = (e: TouchEvent) => {
+      const target = e.target as HTMLElement | null;
+      if (target && target.closest('input, textarea, select, button, [role="dialog"]')) {
+        isTop = false;
+        return;
+      }
       if (window.scrollY <= 10) {
         startY = e.touches[0].clientY;
         isTop = true;
@@ -135,6 +140,20 @@ export function LoginForm() {
       window.removeEventListener('touchend', handleTouchEnd);
     };
   }, []);
+
+  // Handle Escape key for accessible modal dismissal
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        if (isForgotModalOpen) setIsForgotModalOpen(false);
+        if (isHelpModalOpen) setIsHelpModalOpen(false);
+      }
+    };
+    if (isForgotModalOpen || isHelpModalOpen) {
+      window.addEventListener('keydown', handleKeyDown);
+    }
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isForgotModalOpen, isHelpModalOpen]);
 
   return (
     <div className="w-full min-h-[100dvh] flex flex-col items-center justify-center bg-gradient-to-br from-[#020617] via-[#091533] to-[#04091a] p-3 sm:p-5 relative select-none">
@@ -250,11 +269,12 @@ export function LoginForm() {
             <form onSubmit={handleSubmit} className="space-y-2.5 sm:space-y-3.5">
               {/* Field 1: National ID */}
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">
+                <label htmlFor="loginIdentifier" className="block text-xs font-bold text-slate-700 mb-1">
                   الرقم القومي <span className="text-rose-500">*</span>
                 </label>
                 <div className="relative">
                   <input
+                    id="loginIdentifier"
                     type="text"
                     inputMode="numeric"
                     autoComplete="username"
@@ -271,7 +291,7 @@ export function LoginForm() {
               {/* Field 2: Password */}
               <div>
                 <div className="flex items-center justify-between mb-1">
-                  <label className="text-xs font-bold text-slate-700">
+                  <label htmlFor="loginPassword" className="text-xs font-bold text-slate-700">
                     كلمة المرور <span className="text-rose-500">*</span>
                   </label>
                   <button
@@ -284,6 +304,7 @@ export function LoginForm() {
                 </div>
                 <div className="relative">
                   <input
+                    id="loginPassword"
                     type={showPassword ? 'text' : 'password'}
                     autoComplete="current-password"
                     value={password}
@@ -298,6 +319,7 @@ export function LoginForm() {
                     onClick={() => setShowPassword(!showPassword)}
                     className="absolute end-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer p-1"
                     title={showPassword ? 'إخفاء' : 'إظهار'}
+                    aria-label={showPassword ? 'إخفاء كلمة المرور' : 'إظهار كلمة المرور'}
                   >
                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
@@ -306,8 +328,9 @@ export function LoginForm() {
 
               {/* Remember Me Checkbox */}
               <div className="flex items-center justify-between pt-0.5">
-                <label className="flex items-center gap-2 cursor-pointer select-none">
+                <label htmlFor="loginRememberMe" className="flex items-center gap-2 cursor-pointer select-none">
                   <input
+                    id="loginRememberMe"
                     type="checkbox"
                     checked={rememberMe}
                     onChange={(e) => setRememberMe(e.target.checked)}
@@ -386,13 +409,19 @@ export function LoginForm() {
       {/* FORGOT PASSWORD MODAL                                     */}
       {/* ========================================================= */}
       {isForgotModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-fadeIn">
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-fadeIn"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="forgotPasswordTitle"
+        >
           <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-200 relative animate-scaleUp">
             <button
               type="button"
               onClick={() => setIsForgotModalOpen(false)}
               className="absolute top-4 left-4 w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center transition-colors cursor-pointer"
               title="إغلاق"
+              aria-label="إغلاق نافذة استعادة كلمة المرور"
             >
               <X className="w-4 h-4" />
             </button>
@@ -401,7 +430,7 @@ export function LoginForm() {
               <Lock className="w-6 h-6" />
             </div>
 
-            <h3 className="text-lg font-bold text-slate-900 mb-1.5">
+            <h3 id="forgotPasswordTitle" className="text-lg font-bold text-slate-900 mb-1.5">
               استعادة كلمة المرور
             </h3>
             <p className="text-xs text-slate-500 leading-relaxed mb-4">
@@ -445,13 +474,19 @@ export function LoginForm() {
       {/* HELP CENTER & ISSUE REPORT MODAL                          */}
       {/* ========================================================= */}
       {isHelpModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-fadeIn">
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-fadeIn"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="helpCenterTitle"
+        >
           <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-200 relative animate-scaleUp max-h-[90vh] overflow-y-auto no-scrollbar">
             <button
               type="button"
               onClick={() => setIsHelpModalOpen(false)}
               className="absolute top-4 left-4 w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center transition-colors cursor-pointer"
               title="إغلاق"
+              aria-label="إغلاق نافذة مركز المساعدة"
             >
               <X className="w-4 h-4" />
             </button>
@@ -462,7 +497,7 @@ export function LoginForm() {
                   <HelpCircle className="w-6 h-6" />
                 </div>
 
-                <h3 className="text-lg font-bold text-slate-900 mb-1">
+                <h3 id="helpCenterTitle" className="text-lg font-bold text-slate-900 mb-1">
                   مركز المساعدة والدعم الأكاديمي
                 </h3>
                 <p className="text-xs text-slate-500 leading-relaxed mb-4">
@@ -472,10 +507,11 @@ export function LoginForm() {
                 <form onSubmit={handleHelpSubmit} className="space-y-3">
                   {/* Field: Identifier / Phone */}
                   <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-1">
+                    <label htmlFor="helpIdentifier" className="block text-xs font-bold text-slate-700 mb-1">
                       الرقم القومي أو رقم الهاتف للتواصل
                     </label>
                     <input
+                      id="helpIdentifier"
                       type="text"
                       value={helpIdentifier}
                       onChange={(e) => setHelpIdentifier(e.target.value)}
@@ -486,12 +522,15 @@ export function LoginForm() {
 
                   {/* Field: Issue Type (Custom Modern Dropdown) */}
                   <div className="relative">
-                    <label className="block text-xs font-bold text-slate-700 mb-1">
+                    <label id="issueTypeLabel" className="block text-xs font-bold text-slate-700 mb-1">
                       نوع المشكلة
                     </label>
 
                     <button
                       type="button"
+                      aria-labelledby="issueTypeLabel"
+                      aria-haspopup="listbox"
+                      aria-expanded={isIssueTypeDropdownOpen}
                       onClick={() => setIsIssueTypeDropdownOpen(!isIssueTypeDropdownOpen)}
                       className="w-full h-10 px-3.5 rounded-xl bg-slate-50 hover:bg-slate-100/70 border border-slate-200 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 text-xs text-slate-900 transition-all outline-hidden font-medium flex items-center justify-between cursor-pointer"
                     >
@@ -509,7 +548,11 @@ export function LoginForm() {
                           className="fixed inset-0 z-30" 
                           onClick={() => setIsIssueTypeDropdownOpen(false)} 
                         />
-                        <div className="absolute top-[calc(100%+4px)] right-0 left-0 z-40 bg-white rounded-2xl shadow-xl border border-slate-200/90 py-1 overflow-hidden animate-fadeIn">
+                        <div 
+                          role="listbox" 
+                          aria-labelledby="issueTypeLabel" 
+                          className="absolute top-[calc(100%+4px)] right-0 left-0 z-40 bg-white rounded-2xl shadow-xl border border-slate-200/90 py-1 overflow-hidden animate-fadeIn"
+                        >
                           {ISSUE_TYPES.map((type) => {
                             const isSelected = type.id === helpIssueType;
                             const TypeIcon = type.icon;
@@ -517,6 +560,8 @@ export function LoginForm() {
                               <button
                                 key={type.id}
                                 type="button"
+                                role="option"
+                                aria-selected={isSelected}
                                 onClick={() => {
                                   setHelpIssueType(type.id);
                                   setIsIssueTypeDropdownOpen(false);
@@ -548,10 +593,11 @@ export function LoginForm() {
 
                   {/* Field: Problem Details */}
                   <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-1">
+                    <label htmlFor="helpMessage" className="block text-xs font-bold text-slate-700 mb-1">
                       تفاصيل المشكلة <span className="text-rose-500">*</span>
                     </label>
                     <textarea
+                      id="helpMessage"
                       rows={3}
                       value={helpMessage}
                       onChange={(e) => setHelpMessage(e.target.value)}

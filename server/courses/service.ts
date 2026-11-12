@@ -75,6 +75,16 @@ export const listCourses = cache(async (studentId?: string): Promise<CourseWithE
   }
 });
 
+/**
+ * Returns only the courses in which the student has an active enrollment key.
+ * Used for "مقرراتي المفعلة" tab and quick dashboard filters.
+ */
+export const listEnrolledCourses = cache(async (studentId?: string): Promise<CourseWithEnrollment[]> => {
+  if (!studentId) return [];
+  const allCourses = await listCourses(studentId);
+  return allCourses.filter((c) => Boolean(c.enrolled));
+});
+
 export const getCourseById = cache(async (courseId: string, studentId?: string): Promise<CourseWithEnrollment | null> => {
   try {
     const [c] = await appSql`

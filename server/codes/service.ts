@@ -7,6 +7,77 @@ import { StudentCode } from '@/types/code';
 
 export const CodeInputSchema = z.string().min(8).max(35);
 
+export interface CheckEnrollmentKeyResult {
+  valid: boolean;
+  alreadyEnrolled?: boolean;
+  courseId?: string;
+  courseCode?: string;
+  courseTitle?: string;
+  doctorName?: string;
+  error?: string;
+}
+
+/**
+ * Validates whether an enrollment key is valid and unredeemed,
+ * and checks if the given student is already enrolled in the target course.
+ * Does not mutate state or burn the key.
+ */
+export async function checkEnrollmentKey(
+  rawCode: string,
+  studentAccountId?: string
+): Promise<CheckEnrollmentKeyResult> {
+  const parsed = CodeInputSchema.safeParse(rawCode);
+  if (!parsed.success) {
+    return { valid: false, error: 'تنسيق الكود غير صحيح، يرجى التأكد من كتابة الكود بشكل سليم.' };
+  }
+
+  const cleanCode = normalizeCode(rawCode);
+  const codeHash = computeCodeHash(cleanCode, env.CODE_PEPPER);
+
+  try {
+    const [rc] = await appSql`
+      SELECT rc.id, rc.course_id, rc.is_redeemed, c.code AS course_code, c.title AS course_title, c.doctor_name
+      FROM academic_private.redeemable_codes rc
+      JOIN public.academic_courses c ON c.id = rc.course_id
+      WHERE rc.code_hash = ${codeHash}
+    `;
+
+    if (!rc || rc.is_redeemed) {
+      return { valid: false, error: 'كود التفعيل غير صالح أو تم استخدامه مسبقاً.' };
+    }
+
+    if (studentAccountId) {
+      const [enrolled] = await appSql`
+        SELECT 1 FROM public.academic_student_codes
+        WHERE student_id = ${studentAccountId} AND course_id = ${rc.course_id} AND status = 'active'
+      `;
+      if (enrolled) {
+        return {
+          valid: true,
+          alreadyEnrolled: true,
+          courseId: rc.course_id,
+          courseCode: rc.course_code,
+          courseTitle: rc.course_title,
+          doctorName: rc.doctor_name,
+          error: 'أنت مسجل بالفعل في هذا المقرر الدراسي.',
+        };
+      }
+    }
+
+    return {
+      valid: true,
+      alreadyEnrolled: false,
+      courseId: rc.course_id,
+      courseCode: rc.course_code,
+      courseTitle: rc.course_title,
+      doctorName: rc.doctor_name,
+    };
+  } catch (err) {
+    console.error('checkEnrollmentKey error:', err);
+    return { valid: false, error: 'حدث خطأ أثناء التحقق من الكود.' };
+  }
+}
+
 export async function listStudentCodes(studentAccountId: string): Promise<StudentCode[]> {
   const rows = await appSql`
     SELECT 

@@ -1,9 +1,16 @@
 'use server';
 
 import 'server-only';
+import { revalidatePath } from 'next/cache';
 import { requireAuth } from '@/server/auth/requireAuth';
 import { checkRateLimit } from '@/server/security/rateLimit';
-import { listStudentCodes, redeemCodeForStudent, CodeInputSchema } from '@/server/codes/service';
+import {
+  listStudentCodes,
+  redeemCodeForStudent,
+  checkEnrollmentKey,
+  CodeInputSchema,
+  CheckEnrollmentKeyResult,
+} from '@/server/codes/service';
 import { StudentCode } from '@/types/code';
 
 export async function listStudentCodesAction(): Promise<StudentCode[]> {
@@ -11,7 +18,20 @@ export async function listStudentCodesAction(): Promise<StudentCode[]> {
   return listStudentCodes(student.accountId);
 }
 
-export async function redeemCodeAction(rawCode: string): Promise<{ success: boolean; data?: StudentCode; error?: string }> {
+export async function checkEnrollmentKeyAction(rawCode: string): Promise<CheckEnrollmentKeyResult> {
+  const student = await requireAuth();
+
+  const parsed = CodeInputSchema.safeParse(rawCode);
+  if (!parsed.success) {
+    return { valid: false, error: 'تنسيق الكود غير صحيح، يرجى التأكد من كتابة الكود بشكل سليم.' };
+  }
+
+  return checkEnrollmentKey(rawCode, student.accountId);
+}
+
+export async function redeemCodeAction(
+  rawCode: string
+): Promise<{ success: boolean; data?: StudentCode; error?: string }> {
   const student = await requireAuth();
 
   const parsed = CodeInputSchema.safeParse(rawCode);
@@ -28,5 +48,14 @@ export async function redeemCodeAction(rawCode: string): Promise<{ success: bool
     };
   }
 
-  return redeemCodeForStudent(student.accountId, rawCode);
+  const result = await redeemCodeForStudent(student.accountId, rawCode);
+  if (result.success) {
+    revalidatePath('/courses');
+    revalidatePath('/courses/[id]', 'page');
+    revalidatePath('/exams');
+    revalidatePath('/codes');
+    revalidatePath('/', 'layout');
+  }
+
+  return result;
 }

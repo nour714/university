@@ -3,6 +3,7 @@
 import 'server-only';
 import { z } from 'zod';
 import { headers } from 'next/headers';
+import { revalidatePath } from 'next/cache';
 import { appSql } from '@/lib/db/app.server';
 import {
   verifyPassword,
@@ -269,6 +270,9 @@ export async function changePasswordAction(
       VALUES (${student.accountId}, 'PASSWORD_CHANGED', ${sql.json({})})
     `;
   });
+
+  revalidatePath('/account/change-password');
+  revalidatePath('/', 'layout');
 
   return { success: true };
 }

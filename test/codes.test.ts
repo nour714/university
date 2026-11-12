@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { setupTestDatabase, teardownTestDatabase, TestDbClients } from './setupTestDb';
-import { redeemCodeForStudent } from '@/server/codes/service';
+import { redeemCodeForStudent, checkEnrollmentKey } from '@/server/codes/service';
 import { computeCodeHash, normalizeCode } from '@/lib/security/codeHash';
 import { env } from '@/lib/env';
 
@@ -133,5 +133,39 @@ describe('Codes Redemption & Concurrency Locking (Finding S1 & Concurrency)', ()
     `;
     expect(secondCodeRow.is_redeemed).toBe(false);
     expect(secondCodeRow.redeemed_by).toBeNull();
+  });
+
+  describe('checkEnrollmentKey inspection without mutation', () => {
+    it('returns valid: false for non-existing code or malformed code', async () => {
+      const malformed = await checkEnrollmentKey('short');
+      expect(malformed.valid).toBe(false);
+
+      const notFound = await checkEnrollmentKey('NON-EXISTING-KEY-999');
+      expect(notFound.valid).toBe(false);
+      expect(notFound.error).toContain('كود التفعيل غير صالح');
+    });
+
+    it('returns alreadyEnrolled: true if student already holds active key for the course', async () => {
+      const winnerStudentId = concurrentWinnerStudentId!;
+      const checkRes = await checkEnrollmentKey('CS101-SECOND-CODE-2026', winnerStudentId);
+      expect(checkRes.valid).toBe(true);
+      expect(checkRes.alreadyEnrolled).toBe(true);
+      expect(checkRes.courseTitle).toBe('مقرر الأكواد التجريبي');
+    });
+
+    it('returns alreadyEnrolled: false and course info if code is unredeemed and student not enrolled', async () => {
+      const unEnrolledStudent = studentIds[1]; // didn't win second code
+      const checkRes = await checkEnrollmentKey('CS101-SECOND-CODE-2026', unEnrolledStudent);
+      expect(checkRes.valid).toBe(true);
+      expect(checkRes.alreadyEnrolled).toBe(false);
+      expect(checkRes.courseCode).toBe('CODE101');
+      expect(checkRes.courseTitle).toBe('مقرر الأكواد التجريبي');
+    });
+
+    it('returns valid: false for already redeemed code', async () => {
+      const checkRedeemed = await checkEnrollmentKey(rawTestCode);
+      expect(checkRedeemed.valid).toBe(false);
+      expect(checkRedeemed.error).toContain('كود التفعيل غير صالح أو تم استخدامه مسبقاً');
+    });
   });
 });

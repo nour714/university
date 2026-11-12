@@ -360,13 +360,17 @@ export function CodesManager({ initialCodes }: CodesManagerProps = {}) {
                     type="button"
                     onClick={() => handleCopyCode(item.id, item.code)}
                     className="p-1.5 rounded-lg bg-white hover:bg-blue-50 text-slate-600 hover:text-blue-700 border border-slate-200 shadow-2xs transition-all active:scale-95 cursor-pointer"
-                    title="نسخ الكود"
+                    title={copiedId === item.id ? 'تم نسخ الكود بنجاح' : 'نسخ الكود'}
+                    aria-label={copiedId === item.id ? 'تم نسخ الكود بنجاح' : 'نسخ كود التفعيل'}
                   >
                     {copiedId === item.id ? (
                       <Check className="w-3.5 h-3.5 text-emerald-600" />
                     ) : (
                       <Copy className="w-3.5 h-3.5" />
                     )}
+                    <span className="sr-only" aria-live="polite">
+                      {copiedId === item.id ? 'تم نسخ الكود بنجاح' : ''}
+                    </span>
                   </button>
                 </div>
 

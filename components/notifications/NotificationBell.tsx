@@ -70,6 +70,19 @@ export function NotificationBell() {
     };
   }, [isOpen]);
 
+  // Handle Escape key to close panel
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isOpen) {
+        setIsOpen(false);
+      }
+    };
+    if (isOpen) {
+      window.addEventListener('keydown', handleKeyDown);
+    }
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen]);
+
   // Filter notifications by tab
   const filteredNotifications = notifications.filter((n) => {
     if (activeTab === 'all') return true;
@@ -156,9 +169,11 @@ export function NotificationBell() {
       </div>
 
       {/* Category Filter Tabs */}
-      <div className="flex items-center gap-1.5 px-3 py-2 border-b border-slate-100 bg-slate-50/70 shrink-0 overflow-x-auto no-scrollbar">
+      <div role="tablist" aria-label="أقسام الإشعارات" className="flex items-center gap-1.5 px-3 py-2 border-b border-slate-100 bg-slate-50/70 shrink-0 overflow-x-auto no-scrollbar">
         <button
           type="button"
+          role="tab"
+          aria-selected={activeTab === 'all'}
           onClick={() => setActiveTab('all')}
           className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer shrink-0 active:scale-95 ${
             activeTab === 'all'
@@ -170,6 +185,8 @@ export function NotificationBell() {
         </button>
         <button
           type="button"
+          role="tab"
+          aria-selected={activeTab === 'lecture'}
           onClick={() => setActiveTab('lecture')}
           className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer shrink-0 active:scale-95 ${
             activeTab === 'lecture'
@@ -181,6 +198,8 @@ export function NotificationBell() {
         </button>
         <button
           type="button"
+          role="tab"
+          aria-selected={activeTab === 'exam'}
           onClick={() => setActiveTab('exam')}
           className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer shrink-0 active:scale-95 ${
             activeTab === 'exam'
@@ -192,6 +211,8 @@ export function NotificationBell() {
         </button>
         <button
           type="button"
+          role="tab"
+          aria-selected={activeTab === 'announcement'}
           onClick={() => setActiveTab('announcement')}
           className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer shrink-0 active:scale-95 ${
             activeTab === 'announcement'
@@ -296,6 +317,8 @@ export function NotificationBell() {
       <button
         ref={buttonRef}
         type="button"
+        aria-haspopup="dialog"
+        aria-expanded={isOpen}
         onClick={() => setIsOpen((prev) => !prev)}
         className="relative w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-slate-50 hover:bg-slate-100 text-slate-700 hover:text-blue-600 flex items-center justify-center border border-slate-200/90 shadow-2xs transition-all duration-200 active:scale-95 cursor-pointer group"
         aria-label="الإشعارات الأكاديمية"
@@ -315,6 +338,8 @@ export function NotificationBell() {
       {isOpen && (
         <div
           ref={desktopPanelRef}
+          role="dialog"
+          aria-label="الإشعارات الأكاديمية"
           className="hidden sm:flex absolute left-0 top-12 z-50 w-[420px] max-h-[580px] bg-white rounded-3xl border border-slate-200/90 shadow-2xl flex-col overflow-hidden animate-fadeIn"
         >
           {renderPanelBody()}
@@ -323,7 +348,7 @@ export function NotificationBell() {
 
       {/* 2. Mobile Native Bottom Sheet via React Portal directly into document.body */}
       {mounted && isOpen && createPortal(
-        <div className="sm:hidden">
+        <div className="sm:hidden" role="dialog" aria-modal="true" aria-label="الإشعارات الأكاديمية">
           {/* Backdrop Overlay covering whole viewport */}
           <div 
             className="fixed inset-0 bg-black/60 backdrop-blur-xs z-[999] animate-fadeIn"

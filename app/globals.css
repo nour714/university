@@ -411,7 +411,14 @@ body {
   .animate-float-orb-3,
   .animate-grid-pulse,
   .animate-logo-breathe,
-  .animate-particle-float {
+  .animate-particle-float,
+  .animate-aura-spin,
+  .animate-aurora-1,
+  .animate-aurora-2,
+  .animate-neural-drift,
+  .animate-fadeIn,
+  .animate-slideIn,
+  .animate-slideUp {
     animation: none !important;
   }
 }

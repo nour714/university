@@ -119,11 +119,12 @@ export function ChangePasswordForm({ student }: ChangePasswordFormProps) {
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Current Password Field */}
           <div>
-            <label className="block text-xs font-bold text-slate-700 mb-1.5">
+            <label htmlFor="changeCurrentPassword" className="block text-xs font-bold text-slate-700 mb-1.5">
               كلمة المرور الحالية / المؤقتة <span className="text-rose-500">*</span>
             </label>
             <div className="relative">
               <input
+                id="changeCurrentPassword"
                 type={showCurrent ? 'text' : 'password'}
                 value={currentPassword}
                 onChange={(e) => setCurrentPassword(e.target.value)}
@@ -136,6 +137,8 @@ export function ChangePasswordForm({ student }: ChangePasswordFormProps) {
                 type="button"
                 onClick={() => setShowCurrent(!showCurrent)}
                 className="absolute end-3 top-3 text-slate-400 hover:text-slate-600 p-0.5 cursor-pointer"
+                title={showCurrent ? 'إخفاء' : 'إظهار'}
+                aria-label={showCurrent ? 'إخفاء كلمة المرور الحالية' : 'إظهار كلمة المرور الحالية'}
               >
                 {showCurrent ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
@@ -144,11 +147,12 @@ export function ChangePasswordForm({ student }: ChangePasswordFormProps) {
 
           {/* New Password Field */}
           <div>
-            <label className="block text-xs font-bold text-slate-700 mb-1.5">
+            <label htmlFor="changeNewPassword" className="block text-xs font-bold text-slate-700 mb-1.5">
               كلمة المرور الجديدة <span className="text-rose-500">*</span>
             </label>
             <div className="relative">
               <input
+                id="changeNewPassword"
                 type={showNew ? 'text' : 'password'}
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
@@ -161,6 +165,8 @@ export function ChangePasswordForm({ student }: ChangePasswordFormProps) {
                 type="button"
                 onClick={() => setShowNew(!showNew)}
                 className="absolute end-3 top-3 text-slate-400 hover:text-slate-600 p-0.5 cursor-pointer"
+                title={showNew ? 'إخفاء' : 'إظهار'}
+                aria-label={showNew ? 'إخفاء كلمة المرور الجديدة' : 'إظهار كلمة المرور الجديدة'}
               >
                 {showNew ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
@@ -181,11 +187,12 @@ export function ChangePasswordForm({ student }: ChangePasswordFormProps) {
 
           {/* Confirm Password Field */}
           <div>
-            <label className="block text-xs font-bold text-slate-700 mb-1.5">
+            <label htmlFor="changeConfirmPassword" className="block text-xs font-bold text-slate-700 mb-1.5">
               تأكيد كلمة المرور الجديدة <span className="text-rose-500">*</span>
             </label>
             <div className="relative">
               <input
+                id="changeConfirmPassword"
                 type={showConfirm ? 'text' : 'password'}
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
@@ -198,6 +205,8 @@ export function ChangePasswordForm({ student }: ChangePasswordFormProps) {
                 type="button"
                 onClick={() => setShowConfirm(!showConfirm)}
                 className="absolute end-3 top-3 text-slate-400 hover:text-slate-600 p-0.5 cursor-pointer"
+                title={showConfirm ? 'إخفاء' : 'إظهار'}
+                aria-label={showConfirm ? 'إخفاء تأكيد كلمة المرور' : 'إظهار تأكيد كلمة المرور'}
               >
                 {showConfirm ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>

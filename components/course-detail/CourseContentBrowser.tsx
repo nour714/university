@@ -166,9 +166,11 @@ export function CourseContentBrowser({ items, courseCode, isLocked }: CourseCont
         </div>
 
         {/* Category Tabs: Swipeable on Mobile */}
-        <div className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto no-scrollbar pb-1 pt-3 border-t border-slate-100">
+        <div role="tablist" aria-label="تصنيفات المحتوى الأكاديمي" className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto no-scrollbar pb-1 pt-3 border-t border-slate-100">
           <button
             type="button"
+            role="tab"
+            aria-selected={activeTab === 'all'}
             onClick={() => setActiveTab('all')}
             className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-3.5 py-2 rounded-xl text-xs font-bold transition-all shrink-0 ${
               activeTab === 'all'
@@ -184,6 +186,8 @@ export function CourseContentBrowser({ items, courseCode, isLocked }: CourseCont
 
           <button
             type="button"
+            role="tab"
+            aria-selected={activeTab === 'file'}
             onClick={() => setActiveTab('file')}
             className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-3.5 py-2 rounded-xl text-xs font-bold transition-all shrink-0 ${
               activeTab === 'file'
@@ -200,6 +204,8 @@ export function CourseContentBrowser({ items, courseCode, isLocked }: CourseCont
 
           <button
             type="button"
+            role="tab"
+            aria-selected={activeTab === 'video'}
             onClick={() => setActiveTab('video')}
             className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-3.5 py-2 rounded-xl text-xs font-bold transition-all shrink-0 ${
               activeTab === 'video'
@@ -216,6 +222,8 @@ export function CourseContentBrowser({ items, courseCode, isLocked }: CourseCont
 
           <button
             type="button"
+            role="tab"
+            aria-selected={activeTab === 'image'}
             onClick={() => setActiveTab('image')}
             className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-3.5 py-2 rounded-xl text-xs font-bold transition-all shrink-0 ${
               activeTab === 'image'
@@ -232,6 +240,8 @@ export function CourseContentBrowser({ items, courseCode, isLocked }: CourseCont
 
           <button
             type="button"
+            role="tab"
+            aria-selected={activeTab === 'link'}
             onClick={() => setActiveTab('link')}
             className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-3.5 py-2 rounded-xl text-xs font-bold transition-all shrink-0 ${
               activeTab === 'link'

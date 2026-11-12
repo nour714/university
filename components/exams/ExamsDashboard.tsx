@@ -1,16 +1,21 @@
 'use client';
 
 import { useState, useMemo } from 'react';
+import Link from 'next/link';
 import { ListExam, ExamStatus } from '@/types/exam';
 import { getExamStatus } from '@/lib/exams/status';
 import { ExamCard } from '@/components/exams/ExamCard';
 import { matchesSearch } from '@/lib/normalizeArabic';
+import { KeyActivationModal } from '@/components/codes/KeyActivationModal';
 import { 
   ClipboardCheck, 
   Search, 
   Clock, 
   CheckCircle2,
-  Sparkles
+  Sparkles,
+  KeyRound,
+  BookOpen,
+  X
 } from 'lucide-react';
 
 interface ExamsDashboardProps {
@@ -23,6 +28,7 @@ export function ExamsDashboard({ initialExams }: ExamsDashboardProps) {
   const exams = initialExams;
   const [activeTab, setActiveTab] = useState<TabFilter>('all');
   const [searchQuery, setSearchQuery] = useState('');
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Counts per status computed dynamically
   const counts = useMemo(() => {
@@ -72,7 +78,7 @@ export function ExamsDashboard({ initialExams }: ExamsDashboardProps) {
             الاختبارات الأكاديمية
           </h1>
           <p className="text-xs sm:text-sm text-blue-100/80 leading-relaxed">
-            متابعة مواعيد الامتحانات الدورية، الدخول للاختبارات النشطة، والاطلاع على النتائج الأكاديمية الفورية.
+            متابعة مواعيد الامتحانات الدورية، الدخول للاختبارات النشطة، والاطلاع على النتائج الأكاديمية الفورية للمقررات المفعلة.
           </p>
         </div>
         <div className="absolute -left-10 -bottom-10 w-48 h-48 rounded-full bg-blue-500/10 blur-2xl pointer-events-none" />
@@ -80,28 +86,41 @@ export function ExamsDashboard({ initialExams }: ExamsDashboardProps) {
 
       {/* 2. Search & Tab Filter Controller */}
       <div className="bg-white rounded-2xl p-3 sm:p-4 border border-slate-200/90 shadow-xs space-y-3">
-        {/* Search Input */}
-        <div className="relative">
-          <Search className="w-4 h-4 text-slate-400 absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-          <input
-            type="search"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="ابحث باسم المادة، كود المقرر، عنوان الاختبار، أو اسم الدكتور..."
-            className="w-full pr-10 pl-12 py-2.5 min-h-[42px] rounded-xl border border-slate-200 bg-slate-50/60 hover:bg-white focus:bg-white focus:border-blue-600 focus:ring-3 focus:ring-blue-600/10 text-xs sm:text-sm text-slate-900 transition-all outline-hidden font-medium"
-          />
-          {searchQuery && (
-            <button
-              type="button"
-              onClick={() => setSearchQuery('')}
-              className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400 hover:text-slate-700 px-2 py-1.5 cursor-pointer rounded-lg hover:bg-slate-100 transition-colors"
-            >
-              مسح
-            </button>
-          )}
+        {/* Search Input & Quick Key Action */}
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
+          <div className="relative flex-1">
+            <Search className="w-4 h-4 text-slate-400 absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <input
+              type="search"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="ابحث باسم المادة، كود المقرر، عنوان الاختبار، أو اسم الدكتور..."
+              className="w-full pr-10 pl-12 py-2.5 min-h-[44px] rounded-xl border border-slate-200 bg-slate-50/60 hover:bg-white focus:bg-white focus:border-blue-600 focus:ring-3 focus:ring-blue-600/10 text-xs sm:text-sm text-slate-900 transition-all outline-hidden font-medium"
+            />
+            {searchQuery && (
+              <button
+                type="button"
+                onClick={() => setSearchQuery('')}
+                className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 p-1.5 cursor-pointer rounded-lg hover:bg-slate-100 transition-colors"
+                title="مسح البحث"
+                aria-label="مسح البحث"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            )}
+          </div>
+
+          <button
+            type="button"
+            onClick={() => setIsModalOpen(true)}
+            className="inline-flex items-center justify-center gap-2 px-4 py-2.5 min-h-[44px] rounded-xl bg-blue-600 hover:bg-blue-700 active:scale-98 text-white text-xs sm:text-sm font-bold shadow-xs transition-all cursor-pointer shrink-0"
+          >
+            <KeyRound className="w-4 h-4" />
+            <span>تفعيل كود مقرر</span>
+          </button>
         </div>
 
-        {/* Tab Filters - Optimized with smooth horizontal touch scroll for mobile */}
+        {/* Tab Filters */}
         <div className="pt-2 border-t border-slate-100 -mx-1 px-1">
           <div role="tablist" aria-label="حالة الاختبارات الأكاديمية" className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto no-scrollbar scroll-smooth touch-pan-x pb-1">
             <button
@@ -109,7 +128,7 @@ export function ExamsDashboard({ initialExams }: ExamsDashboardProps) {
               role="tab"
               aria-selected={activeTab === 'all'}
               onClick={() => setActiveTab('all')}
-              className={`px-3 py-2 sm:px-3.5 sm:py-2 min-h-[38px] rounded-xl text-xs font-bold flex items-center gap-1.5 sm:gap-2 transition-all shrink-0 cursor-pointer ${
+              className={`px-3 py-2 sm:px-3.5 sm:py-2 min-h-[40px] rounded-xl text-xs font-bold flex items-center gap-1.5 sm:gap-2 transition-all shrink-0 cursor-pointer ${
                 activeTab === 'all'
                   ? 'bg-blue-600 text-white shadow-xs shadow-blue-600/20'
                   : 'bg-slate-50 text-slate-600 hover:bg-slate-100 hover:text-slate-900 border border-slate-200/70'
@@ -126,7 +145,7 @@ export function ExamsDashboard({ initialExams }: ExamsDashboardProps) {
               role="tab"
               aria-selected={activeTab === 'live'}
               onClick={() => setActiveTab('live')}
-              className={`px-3 py-2 sm:px-3.5 sm:py-2 min-h-[38px] rounded-xl text-xs font-bold flex items-center gap-1.5 sm:gap-2 transition-all shrink-0 cursor-pointer ${
+              className={`px-3 py-2 sm:px-3.5 sm:py-2 min-h-[40px] rounded-xl text-xs font-bold flex items-center gap-1.5 sm:gap-2 transition-all shrink-0 cursor-pointer ${
                 activeTab === 'live'
                   ? 'bg-emerald-600 text-white shadow-xs shadow-emerald-600/20'
                   : 'bg-slate-50 text-slate-600 hover:bg-slate-100 hover:text-slate-900 border border-slate-200/70'
@@ -144,7 +163,7 @@ export function ExamsDashboard({ initialExams }: ExamsDashboardProps) {
               role="tab"
               aria-selected={activeTab === 'upcoming'}
               onClick={() => setActiveTab('upcoming')}
-              className={`px-3 py-2 sm:px-3.5 sm:py-2 min-h-[38px] rounded-xl text-xs font-bold flex items-center gap-1.5 sm:gap-2 transition-all shrink-0 cursor-pointer ${
+              className={`px-3 py-2 sm:px-3.5 sm:py-2 min-h-[40px] rounded-xl text-xs font-bold flex items-center gap-1.5 sm:gap-2 transition-all shrink-0 cursor-pointer ${
                 activeTab === 'upcoming'
                   ? 'bg-amber-600 text-white shadow-xs shadow-amber-600/20'
                   : 'bg-slate-50 text-slate-600 hover:bg-slate-100 hover:text-slate-900 border border-slate-200/70'
@@ -162,7 +181,7 @@ export function ExamsDashboard({ initialExams }: ExamsDashboardProps) {
               role="tab"
               aria-selected={activeTab === 'completed'}
               onClick={() => setActiveTab('completed')}
-              className={`px-3 py-2 sm:px-3.5 sm:py-2 min-h-[38px] rounded-xl text-xs font-bold flex items-center gap-1.5 sm:gap-2 transition-all shrink-0 cursor-pointer ${
+              className={`px-3 py-2 sm:px-3.5 sm:py-2 min-h-[40px] rounded-xl text-xs font-bold flex items-center gap-1.5 sm:gap-2 transition-all shrink-0 cursor-pointer ${
                 activeTab === 'completed'
                   ? 'bg-blue-600 text-white shadow-xs shadow-blue-600/20'
                   : 'bg-slate-50 text-slate-600 hover:bg-slate-100 hover:text-slate-900 border border-slate-200/70'
@@ -178,16 +197,50 @@ export function ExamsDashboard({ initialExams }: ExamsDashboardProps) {
         </div>
       </div>
 
-      {/* 3. Cards Grid List */}
+      {/* 3. Cards Grid List or Informative Empty States */}
       {filteredExams.length > 0 ? (
         <div className="grid grid-cols-1 gap-3 sm:gap-4">
           {filteredExams.map((exam) => (
             <ExamCard key={exam.id} exam={exam} />
           ))}
         </div>
+      ) : exams.length === 0 ? (
+        /* Empty State when student has no exams / courses unlocked yet */
+        <div className="bg-white rounded-3xl p-6 sm:p-10 text-center border border-slate-200/90 shadow-sm max-w-lg mx-auto my-6 animate-fadeIn" dir="rtl">
+          <div className="w-16 h-16 rounded-2xl bg-amber-50 text-amber-600 border border-amber-200/90 flex items-center justify-center mx-auto mb-4 shadow-xs">
+            <KeyRound className="w-8 h-8" />
+          </div>
+
+          <h3 className="text-base sm:text-lg font-black text-slate-900 mb-2">
+            لا توجد اختبارات متاحة حالياً
+          </h3>
+
+          <p className="text-xs sm:text-sm text-slate-500 leading-relaxed mb-6 max-w-sm mx-auto">
+            ظهور الاختبارات والتقييمات الأكاديمية مرتبط بتفعيل مفاتيح المقررات الدراسية المشترك بها. عند تفعيل مفتاح المادة، ستظهر كافة الاختبارات المعتمدة التابعة لها هنا تلقائياً.
+          </p>
+
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-2.5">
+            <button
+              type="button"
+              onClick={() => setIsModalOpen(true)}
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs sm:text-sm shadow-md shadow-blue-600/20 transition-all min-h-[44px] active:scale-95 cursor-pointer"
+            >
+              <KeyRound className="w-4 h-4" />
+              <span>تفعيل كود مقرر الآن</span>
+            </button>
+
+            <Link
+              href="/courses"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs sm:text-sm transition-all min-h-[44px]"
+            >
+              <BookOpen className="w-4 h-4" />
+              <span>الانتقال لمكتبة المقررات</span>
+            </Link>
+          </div>
+        </div>
       ) : (
-        /* Empty State */
-        <div className="bg-white rounded-3xl p-6 sm:p-12 text-center border border-slate-200/90 shadow-xs max-w-md mx-auto">
+        /* Search/Filter Empty State */
+        <div className="bg-white rounded-3xl p-6 sm:p-10 text-center border border-slate-200/90 shadow-xs max-w-md mx-auto my-6 animate-fadeIn">
           <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center mx-auto mb-3.5 border border-blue-100">
             <ClipboardCheck className="w-6 h-6 sm:w-7 sm:h-7" />
           </div>
@@ -201,14 +254,18 @@ export function ExamsDashboard({ initialExams }: ExamsDashboardProps) {
               setActiveTab('all');
               setSearchQuery('');
             }}
-            className="px-4 py-2.5 min-h-[40px] rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs transition-colors cursor-pointer"
+            className="px-4 py-2.5 min-h-[42px] rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs transition-colors cursor-pointer"
           >
             عرض كافة الاختبارات
           </button>
         </div>
       )}
 
+      {/* Direct Key Activation Modal */}
+      <KeyActivationModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+      />
     </div>
   );
 }
-

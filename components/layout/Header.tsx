@@ -13,7 +13,7 @@ export function Header() {
   const subtitle = student ? `${student.level} • ${student.faculty}` : 'لوحة تحكم الطالب';
 
   return (
-    <header className="sticky top-2 sm:top-3 z-30 mx-2.5 sm:mx-6 lg:mx-8 mb-2.5 sm:mb-3 transition-all">
+    <header className="sticky top-2 sm:top-3 z-30 mx-2.5 sm:mx-6 lg:mx-8 mb-2.5 sm:mb-3 transform-gpu">
       {/* Floating Pill Container with Curved Sides */}
       <div className="bg-white/95 backdrop-blur-md rounded-[26px] sm:rounded-[30px] border border-slate-200/90 shadow-md shadow-slate-200/50 px-4 sm:px-6 py-2.5 sm:py-3.5 min-h-[60px] sm:min-h-[66px] flex items-center justify-between gap-3 sm:gap-4">
         {/* Right side: Academic Title with Official Logo */}

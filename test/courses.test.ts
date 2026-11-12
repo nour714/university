@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { setupTestDatabase, teardownTestDatabase, TestDbClients } from './setupTestDb';
-import { getCourseById, listCourses, resolveContentDownload } from '@/server/courses/service';
+import { getCourseById, listCourses, listEnrolledCourses, resolveContentDownload } from '@/server/courses/service';
 
 describe('Courses & Content Protection (Finding C1)', () => {
   let clients: TestDbClients;
@@ -106,6 +106,15 @@ describe('Courses & Content Protection (Finding C1)', () => {
       const enrolledCourse = enrolledList.find((c) => c.id === courseId);
       expect(enrolledCourse?.enrolled).toBe(true);
       expect(enrolledCourse?.locked).toBe(false);
+    });
+
+    it('listEnrolledCourses returns only enrolled courses', async () => {
+      const nonEnrolledOnly = await listEnrolledCourses(nonEnrolledStudentId);
+      expect(nonEnrolledOnly.find((c) => c.id === courseId)).toBeUndefined();
+
+      const enrolledOnly = await listEnrolledCourses(enrolledStudentId);
+      expect(enrolledOnly.find((c) => c.id === courseId)).toBeDefined();
+      expect(enrolledOnly.every((c) => c.enrolled === true)).toBe(true);
     });
   });
 

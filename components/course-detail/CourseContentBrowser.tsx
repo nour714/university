@@ -2,9 +2,12 @@
 
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { CourseContentItem, ContentType } from '@/types/course';
 import { matchesSearch } from '@/lib/normalizeArabic';
 import { isSafeExternalUrl } from '@/lib/safeUrl';
+import { redeemCodeAction } from '@/app/codes/actions';
+import { useNotifications } from '@/context/NotificationContext';
 import { 
   FileText, 
   Video, 
@@ -17,7 +20,12 @@ import {
   Calendar,
   Eye,
   Lock,
-  KeyRound
+  KeyRound,
+  Unlock,
+  CheckCircle2,
+  AlertCircle,
+  Loader2,
+  Sparkles
 } from 'lucide-react';
 
 interface CourseContentBrowserProps {
@@ -29,8 +37,66 @@ interface CourseContentBrowserProps {
 type TabType = 'all' | ContentType;
 
 export function CourseContentBrowser({ items, courseCode, isLocked }: CourseContentBrowserProps) {
+  const router = useRouter();
+  const { addNotification } = useNotifications();
+
   const [activeTab, setActiveTab] = useState<TabType>('all');
   const [searchQuery, setSearchQuery] = useState('');
+
+  // Inline activation state for locked course
+  const [activationCode, setActivationCode] = useState('');
+  const [isActivating, setIsActivating] = useState(false);
+  const [activationError, setActivationError] = useState('');
+  const [activationSuccess, setActivationSuccess] = useState<string | null>(null);
+
+  const formatCodeInput = (raw: string) => {
+    const clean = raw.replace(/[^a-zA-Z0-9]/g, '').toUpperCase().slice(0, 16);
+    const parts: string[] = [];
+    for (let i = 0; i < clean.length; i += 4) {
+      parts.push(clean.slice(i, i + 4));
+    }
+    return parts.join(' - ');
+  };
+
+  const handleInlineActivation = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setActivationError('');
+    setActivationSuccess(null);
+
+    const raw = activationCode.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+    if (!raw || raw.length < 8) {
+      setActivationError('يرجى إدخال كود التفعيل كاملاً كما هو في إيصال الدفع.');
+      return;
+    }
+
+    setIsActivating(true);
+    try {
+      const res = await redeemCodeAction(activationCode);
+      if (!res.success || !res.data) {
+        setActivationError(res.error || 'كود التفعيل غير صالح أو تم استخدامه مسبقاً.');
+        return;
+      }
+
+      setActivationSuccess(`تم تفعيل مقرر ${res.data.courseName} بنجاح! جارٍ فتح المحتوى كاملاً...`);
+      addNotification({
+        type: 'material',
+        title: `تم تفعيل المقرر بنجاح (${res.data.courseCode})`,
+        message: `تم فتح كامل المحاضرات والاختبارات لمقرر ${res.data.courseName}.`,
+        courseCode: res.data.courseCode,
+        courseName: res.data.courseName,
+        courseId: res.data.courseId,
+        actionUrl: `/courses/${res.data.courseId}`,
+        priority: 'urgent',
+      });
+
+      // Refresh server components to re-run getCourseById and display contents
+      router.refresh();
+    } catch {
+      setActivationError('حدث خطأ أثناء معالجة الكود، يرجى إعادة المحاولة.');
+    } finally {
+      setIsActivating(false);
+    }
+  };
 
   // Count items per tab
   const counts = useMemo(() => {
@@ -67,27 +133,95 @@ export function CourseContentBrowser({ items, courseCode, isLocked }: CourseCont
 
   if (isLocked) {
     return (
-      <div className="bg-white rounded-2xl sm:rounded-3xl p-6 sm:p-10 border border-slate-200/90 shadow-sm text-center max-w-lg mx-auto space-y-4 my-6 animate-fadeIn" dir="rtl">
-        <div className="w-14 h-14 rounded-2xl bg-amber-50 text-amber-600 border border-amber-200 flex items-center justify-center mx-auto shadow-xs">
-          <Lock className="w-7 h-7" />
-        </div>
-        <div className="space-y-2">
-          <h3 className="text-base sm:text-lg font-extrabold text-slate-900">
-            محتوى المقرر مقفل
+      <div className="bg-white rounded-2xl sm:rounded-3xl p-5 sm:p-8 border border-slate-200/90 shadow-sm max-w-lg mx-auto space-y-5 my-6 animate-fadeIn" dir="rtl">
+        {/* Lock Icon & Titles */}
+        <div className="text-center space-y-2">
+          <div className="w-14 h-14 rounded-2xl bg-amber-50 text-amber-600 border border-amber-200 flex items-center justify-center mx-auto shadow-xs">
+            <Lock className="w-7 h-7" />
+          </div>
+          <h3 className="text-base sm:text-lg font-black text-slate-900 tracking-tight">
+            محتوى المقرر والاختبارات مقفلة
           </h3>
           <p className="text-xs sm:text-sm text-slate-500 leading-relaxed max-w-sm mx-auto">
-            أنت غير مسجل في مقرر ({courseCode}) حالياً. لتفعيل المقرر والوصول إلى كافة المحاضرات والمواد التعليمية والاختبارات، يرجى إدخال كود الاشتراك الأكاديمي.
+            أنت غير مشترك في مقرر ({courseCode}) حالياً. لإتاحة المحاضرات وسلايدات الشرح والاختبارات التابعة له فوراً، أدخل كود التفعيل المطبوع في إيصال السداد.
           </p>
         </div>
-        <div className="pt-2">
-          <Link
-            href="/codes"
-            className="inline-flex items-center justify-center gap-2 h-11 px-6 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs sm:text-sm shadow-md shadow-blue-600/20 transition-all cursor-pointer active:scale-95"
-          >
-            <KeyRound className="w-4 h-4" />
-            <span>الانتقال لصفحة تفعيل الأكواد</span>
-          </Link>
-        </div>
+
+        {/* Success Banner */}
+        {activationSuccess && (
+          <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs sm:text-sm font-bold flex items-center gap-2 animate-fadeIn">
+            <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
+            <span>{activationSuccess}</span>
+          </div>
+        )}
+
+        {/* Inline Activation Form */}
+        {!activationSuccess && (
+          <form onSubmit={handleInlineActivation} className="space-y-3.5 bg-slate-50/70 p-4 rounded-2xl border border-slate-200/80">
+            <div>
+              <label htmlFor="courseInlineCodeInput" className="block text-xs font-bold text-slate-700 mb-1.5 text-right">
+                أدخل كود تفعيل المقرر
+              </label>
+              <div className="relative">
+                <input
+                  id="courseInlineCodeInput"
+                  type="text"
+                  value={activationCode}
+                  onChange={(e) => {
+                    setActivationError('');
+                    setActivationCode(formatCodeInput(e.target.value));
+                  }}
+                  placeholder="XXXX - XXXX - XXXX"
+                  autoComplete="off"
+                  autoCorrect="off"
+                  spellCheck={false}
+                  disabled={isActivating}
+                  className="w-full h-11 px-4 rounded-xl border border-slate-300 focus:border-blue-600 focus:ring-3 focus:ring-blue-600/10 text-xs sm:text-sm font-bold font-mono tracking-wider text-slate-900 placeholder:text-slate-300 placeholder:font-mono bg-white outline-hidden text-center disabled:opacity-60"
+                />
+              </div>
+              <p className="text-[11px] text-slate-500 mt-1.5 text-right">
+                الأحرف الصغيرة والكبيرة سواء، والشرطات اختيارية.
+              </p>
+            </div>
+
+            {/* Error Message */}
+            {activationError && (
+              <div role="alert" className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-bold flex items-center gap-2 animate-fadeIn">
+                <AlertCircle className="w-4 h-4 shrink-0" />
+                <span>{activationError}</span>
+              </div>
+            )}
+
+            {/* Action Buttons */}
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 pt-1">
+              <button
+                type="submit"
+                disabled={isActivating || !activationCode.trim()}
+                className="flex-1 inline-flex items-center justify-center gap-2 h-11 px-5 rounded-xl bg-blue-600 hover:bg-blue-700 active:scale-98 text-white font-bold text-xs sm:text-sm shadow-md shadow-blue-600/20 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isActivating ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <span>جاري التفعيل...</span>
+                  </>
+                ) : (
+                  <>
+                    <Unlock className="w-4 h-4" />
+                    <span>تفعيل هذا المقرر الآن</span>
+                  </>
+                )}
+              </button>
+
+              <Link
+                href="/codes"
+                className="inline-flex items-center justify-center gap-1.5 h-11 px-4 rounded-xl bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 font-bold text-xs transition-all cursor-pointer"
+              >
+                <KeyRound className="w-3.5 h-3.5 text-slate-500" />
+                <span>صفحة الأكواد</span>
+              </Link>
+            </div>
+          </form>
+        )}
       </div>
     );
   }

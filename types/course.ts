@@ -47,5 +47,7 @@ export interface Course {
     total: number;
   };
   content: CourseContentItem[];
+  enrolled?: boolean;
+  locked?: boolean;
 }
 

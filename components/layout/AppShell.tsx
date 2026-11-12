@@ -8,7 +8,7 @@ import { NotificationToast } from '@/components/notifications/NotificationToast'
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const isAuthPage = pathname === '/login';
+  const isAuthPage = pathname === '/login' || pathname === '/account/change-password';
   const isExamSession = pathname?.startsWith('/exams/') && pathname !== '/exams';
 
   // Standalone Full-Screen Pages (Auth & Distraction-Free Exam Hall)

@@ -23,10 +23,10 @@ export function BottomNav() {
   return (
     <nav 
       aria-label="شريط التنقل السفلي للموبايل"
-      className="fixed bottom-3.5 inset-x-3 max-w-md mx-auto z-40 lg:hidden"
+      className="fixed bottom-3.5 inset-x-3 max-w-md mx-auto z-40 lg:hidden transform-gpu"
     >
       {/* Floating Pill with Curved Sides - 5 Equal Grid Columns for Absolute Dead Center */}
-      <div className="bg-[#172554]/95 backdrop-blur-xl border border-blue-900/80 rounded-full px-2 py-1.5 shadow-2xl shadow-blue-950/70 grid grid-cols-5 items-center">
+      <div className="bg-[#172554]/95 backdrop-blur-md border border-blue-900/80 rounded-full px-2 py-1.5 shadow-2xl shadow-blue-950/70 grid grid-cols-5 items-center">
         
         {/* 1. Courses Library Button */}
         <div className="flex items-center justify-center">

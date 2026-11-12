@@ -349,7 +349,7 @@ export function SettingsView({ student: initialStudent }: { student?: StudentPro
       {activeTab === 'password' && (
         <div className="space-y-3 sm:space-y-6">
           {/* Main Password Form Card */}
-          <div className="bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-7 border border-slate-200/90 shadow-2xs">
+          <div className="bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-7 border border-slate-200/90 shadow-2xs isolate transform-gpu">
             <div className="flex items-center gap-3 pb-3 mb-4 border-b border-slate-100">
               <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
                 <KeyRound className="w-4.5 h-4.5 sm:w-5 sm:h-5" />
@@ -401,7 +401,7 @@ export function SettingsView({ student: initialStudent }: { student?: StudentPro
                     value={currentPassword}
                     onChange={(e) => setCurrentPassword(e.target.value)}
                     placeholder="أدخل كلمة المرور الحالية"
-                    className="w-full h-11 px-3.5 pe-11 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 text-base sm:text-sm text-slate-900 transition-all outline-hidden"
+                    className="w-full h-11 px-3.5 pe-11 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 text-base sm:text-sm text-slate-900 transition-colors outline-none"
                     required
                   />
                   <button
@@ -428,7 +428,7 @@ export function SettingsView({ student: initialStudent }: { student?: StudentPro
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
                     placeholder="10 خانات على الأقل (حروف وأرقام)"
-                    className="w-full h-11 px-3.5 pe-11 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 text-base sm:text-sm text-slate-900 transition-all outline-hidden"
+                    className="w-full h-11 px-3.5 pe-11 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 text-base sm:text-sm text-slate-900 transition-colors outline-none"
                     required
                   />
                   <button
@@ -455,7 +455,7 @@ export function SettingsView({ student: initialStudent }: { student?: StudentPro
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     placeholder="أعد كتابة كلمة المرور الجديدة"
-                    className="w-full h-11 px-3.5 pe-11 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 text-base sm:text-sm text-slate-900 transition-all outline-hidden"
+                    className="w-full h-11 px-3.5 pe-11 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 text-base sm:text-sm text-slate-900 transition-colors outline-none"
                     required
                   />
                   <button
@@ -613,7 +613,7 @@ export function SettingsView({ student: initialStudent }: { student?: StudentPro
           </div>
 
           {/* Ticket Submission Form */}
-          <div className="bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-6 border border-slate-200/90 shadow-2xs">
+          <div className="bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-6 border border-slate-200/90 shadow-2xs isolate transform-gpu">
             <div className="flex items-center gap-2.5 pb-3 mb-3.5 border-b border-slate-100">
               <div className="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
                 <Send className="w-4 h-4" />
@@ -679,7 +679,7 @@ export function SettingsView({ student: initialStudent }: { student?: StudentPro
                   value={supportMessage}
                   onChange={(e) => setSupportMessage(e.target.value)}
                   placeholder="اكتب رسالتك أو رقم المادة..."
-                  className="w-full p-3 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 text-base sm:text-sm text-slate-900 transition-all outline-hidden resize-none"
+                  className="w-full p-3 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 text-base sm:text-sm text-slate-900 transition-colors outline-none resize-none appearance-none"
                   required
                 />
               </div>
@@ -687,7 +687,7 @@ export function SettingsView({ student: initialStudent }: { student?: StudentPro
               <button
                 type="submit"
                 disabled={supportLoading || !supportMessage.trim()}
-                className="w-full h-11 rounded-xl bg-blue-600 hover:bg-blue-700 active:scale-[0.99] text-white font-extrabold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-md shadow-blue-600/30 transition-all cursor-pointer disabled:opacity-60"
+                className="w-full h-11 rounded-xl bg-blue-600 hover:bg-blue-700 active:scale-[0.99] text-white font-extrabold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-md shadow-blue-600/30 transition-transform cursor-pointer disabled:opacity-60"
               >
                 {supportLoading ? (
                   <>

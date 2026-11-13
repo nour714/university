@@ -21,7 +21,7 @@ import { RAW_COURSES_DATA } from './data/courses';
 import { RAW_EXAMS_DATA } from './data/exams';
 import { DEMO_REDEEMABLE_CODES } from './data/codes';
 import { INITIAL_NOTIFICATIONS } from './data/notifications';
-import { DEMO_STUDENT } from './data/student';
+import { DEMO_STUDENT, SEED_STUDENTS } from './data/student';
 
 const ExamKeyEntrySchema = z.object({
   correctOptionId: z.string().min(1, 'correctOptionId is required'),
@@ -190,84 +190,105 @@ async function seed(customOwnerUrl?: string) {
       `;
     }
 
-    // 2. Demo Student Account (Conditional, Non-Production only, must_change_password = true)
-    let studentAccountId: string | null = null;
+    // 2. Student Accounts (Conditional, Non-Production only, must_change_password = true)
     const isProd = process.env.NODE_ENV === 'production';
-    const demoPassword = process.env.SEED_DEMO_PASSWORD;
+    const defaultSeedPassword = process.env.SEED_DEMO_PASSWORD || 'Student@2026';
 
-    if (!isProd && demoPassword) {
-      console.log('[SEED] Seeding demo student account with must_change_password=true...');
-      const passwordHash = await hash(demoPassword, {
+    if (!isProd && defaultSeedPassword) {
+      console.log(`[SEED] Seeding ${SEED_STUDENTS.length} student accounts with must_change_password=true...`);
+      const passwordHash = await hash(defaultSeedPassword, {
         memoryCost: 19456,
         timeCost: 2,
         outputLen: 32,
         parallelism: 1,
       });
 
-      const demoNationalId = DEMO_STUDENT.academicId.padEnd(14, '0');
-
-      const [acc] = await sql`
-        INSERT INTO public.academic_accounts (
-          national_id, password_hash, must_change_password, is_active
-        ) VALUES (
-          ${demoNationalId}, ${passwordHash}, true, true
-        ) ON CONFLICT (national_id) DO UPDATE SET
-          password_hash = EXCLUDED.password_hash,
-          must_change_password = true,
-          is_active = true
-        RETURNING id;
-      `;
-      studentAccountId = acc.id;
-
-      await sql`
-        INSERT INTO public.academic_profiles (
-          id, full_name, email, student_code, department, level, current_gpa, max_gpa,
-          faculty, level_number, registered_hours, academic_year, semester
-        ) VALUES (
-          ${studentAccountId}, ${DEMO_STUDENT.fullName}, ${DEMO_STUDENT.email},
-          ${DEMO_STUDENT.academicId}, ${DEMO_STUDENT.department}, ${DEMO_STUDENT.level},
-          ${DEMO_STUDENT.gpa}, ${DEMO_STUDENT.maxGpa},
-          ${DEMO_STUDENT.faculty}, ${DEMO_STUDENT.levelNumber}, ${DEMO_STUDENT.registeredHours},
-          ${DEMO_STUDENT.academicYear}, ${DEMO_STUDENT.semester}
-        ) ON CONFLICT (id) DO UPDATE SET
-          full_name = EXCLUDED.full_name,
-          student_code = EXCLUDED.student_code,
-          faculty = EXCLUDED.faculty,
-          level_number = EXCLUDED.level_number,
-          registered_hours = EXCLUDED.registered_hours,
-          academic_year = EXCLUDED.academic_year,
-          semester = EXCLUDED.semester;
-      `;
-
-      // Enroll demo student in the first two courses
-      for (const courseId of ['ai-301', 'ai-305']) {
-        await sql`
-          INSERT INTO public.academic_student_codes (
-            student_id, course_id, code, receipt_number, semester, status
+      for (const student of SEED_STUDENTS) {
+        const [acc] = await sql`
+          INSERT INTO public.academic_accounts (
+            national_id, password_hash, must_change_password, is_active
           ) VALUES (
-            ${studentAccountId}, ${courseId}, ${'CODE-' + courseId.toUpperCase() + '-DEMO'},
-            'REC-DEMO-2026', 'الفصل الدراسي الأول', 'active'
-          ) ON CONFLICT (student_id, course_id) DO NOTHING;
+            ${student.nationalId}, ${passwordHash}, true, true
+          ) ON CONFLICT (national_id) DO UPDATE SET
+            password_hash = EXCLUDED.password_hash,
+            must_change_password = true,
+            is_active = true
+          RETURNING id;
         `;
-      }
+        const studentAccountId = acc.id;
 
-      // Seed initial notifications for demo student idempotently
-      for (const notif of INITIAL_NOTIFICATIONS) {
         await sql`
-          INSERT INTO public.academic_notifications (
-            student_id, title, message, type, is_read, action_url, action_label
-          )
-          SELECT
-            ${studentAccountId}, ${notif.title}, ${notif.message}, ${notif.type},
-            ${notif.isRead}, ${notif.actionUrl || null}, 'عرض التفاصيل'
-          WHERE NOT EXISTS (
-            SELECT 1 FROM public.academic_notifications
-            WHERE student_id = ${studentAccountId} AND title = ${notif.title}
-          );
+          INSERT INTO public.academic_profiles (
+            id, full_name, email, student_code, department, level, current_gpa, max_gpa,
+            faculty, level_number, registered_hours, academic_year, semester
+          ) VALUES (
+            ${studentAccountId}, ${student.fullName}, ${student.email},
+            ${student.academicId}, ${student.department}, ${student.level},
+            ${student.gpa}, ${student.maxGpa},
+            ${student.faculty}, ${student.levelNumber}, ${student.registeredHours},
+            ${student.academicYear}, ${student.semester}
+          ) ON CONFLICT (id) DO UPDATE SET
+            full_name = EXCLUDED.full_name,
+            student_code = EXCLUDED.student_code,
+            department = EXCLUDED.department,
+            level = EXCLUDED.level,
+            current_gpa = EXCLUDED.current_gpa,
+            max_gpa = EXCLUDED.max_gpa,
+            faculty = EXCLUDED.faculty,
+            level_number = EXCLUDED.level_number,
+            registered_hours = EXCLUDED.registered_hours,
+            academic_year = EXCLUDED.academic_year,
+            semester = EXCLUDED.semester;
         `;
+
+        if (student.enrollDefaultCourses) {
+          // Enroll in default courses
+          for (const courseId of ['ai-301', 'ai-305']) {
+            await sql`
+              INSERT INTO public.academic_student_codes (
+                student_id, course_id, code, receipt_number, semester, status
+              ) VALUES (
+                ${studentAccountId}, ${courseId}, ${'CODE-' + courseId.toUpperCase() + '-DEMO'},
+                'REC-DEMO-2026', 'الفصل الدراسي الأول', 'active'
+              ) ON CONFLICT (student_id, course_id) DO NOTHING;
+            `;
+          }
+
+          // Seed initial notifications for demo student idempotently
+          for (const notif of INITIAL_NOTIFICATIONS) {
+            await sql`
+              INSERT INTO public.academic_notifications (
+                student_id, title, message, type, is_read, action_url, action_label
+              )
+              SELECT
+                ${studentAccountId}, ${notif.title}, ${notif.message}, ${notif.type},
+                ${notif.isRead}, ${notif.actionUrl || null}, 'عرض التفاصيل'
+              WHERE NOT EXISTS (
+                SELECT 1 FROM public.academic_notifications
+                WHERE student_id = ${studentAccountId} AND title = ${notif.title}
+              );
+            `;
+          }
+        } else {
+          // Clean accounts: seed initial welcome notification prompting them to redeem codes
+          const welcomeTitle = 'مرحباً بك في بوابة المقررات الأكاديمية';
+          const welcomeMessage = 'تم تفعيل حسابك الجامعي بنجاح. يرجى التوجه إلى صفحة شحن الأكواد لتفعيل مقررات الفصل الدراسي الحالي.';
+          await sql`
+            INSERT INTO public.academic_notifications (
+              student_id, title, message, type, is_read, action_url, action_label
+            )
+            SELECT
+              ${studentAccountId}, ${welcomeTitle}, ${welcomeMessage}, 'system',
+              false, '/codes', 'تفعيل المقررات'
+            WHERE NOT EXISTS (
+              SELECT 1 FROM public.academic_notifications
+              WHERE student_id = ${studentAccountId} AND title = ${welcomeTitle}
+            );
+          `;
+        }
       }
     } else {
-      console.log('[SEED] Skipping demo account (production mode or SEED_DEMO_PASSWORD not provided).');
+      console.log('[SEED] Skipping student accounts (production mode or SEED_DEMO_PASSWORD not provided).');
     }
 
     // 3. Seed Redeemable Codes (Hashed with CODE_PEPPER)

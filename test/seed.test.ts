@@ -93,4 +93,68 @@ describe('TASK 2 — Seed and Example Files (F2)', () => {
       fs.unlinkSync(invalidOptionFile);
     }
   });
+
+  it('seeds 4 student accounts (demo student + 3 friends) with nullable GPA and must_change_password=true', async () => {
+    const testDbName = 'test_seed_students';
+    await clients.ownerSql.unsafe(`CREATE DATABASE ${testDbName};`);
+
+    const port = 5434;
+    const testDbUrl = `postgres://postgres:postgres@localhost:${port}/${testDbName}?sslmode=disable`;
+    const db = postgres(testDbUrl, { prepare: false });
+
+    try {
+      const { runMigrations } = await import('@/scripts/migrate');
+      await runMigrations(testDbUrl);
+      await seed(testDbUrl);
+
+      const accounts = await db`
+        SELECT a.national_id, a.must_change_password, a.is_active, p.full_name, p.student_code, p.current_gpa
+        FROM public.academic_accounts a
+        JOIN public.academic_profiles p ON p.id = a.id
+        ORDER BY p.student_code ASC;
+      `;
+
+      expect(accounts.length).toBe(4);
+
+      // Verify demo student
+      const demo = accounts.find((s) => s.student_code === '20230814');
+      const s1 = accounts.find((s) => s.student_code === '20230815');
+      const s2 = accounts.find((s) => s.student_code === '20230816');
+      const s3 = accounts.find((s) => s.student_code === '20230817');
+
+      expect(demo).toBeDefined();
+      expect(s1).toBeDefined();
+      expect(s2).toBeDefined();
+      expect(s3).toBeDefined();
+
+      if (!demo || !s1 || !s2 || !s3) {
+        throw new Error('Expected all 4 student accounts to be found in the database');
+      }
+
+      expect(demo.full_name).toBe('عبد الرحمن خالد منصور');
+      expect(Number(demo.current_gpa)).toBe(3.84);
+      expect(demo.must_change_password).toBe(true);
+
+      // Verify friend 1 (Nour El-Din)
+      expect(s1.full_name).toBe('نور الدين وائل عبدالرؤف');
+      expect(s1.national_id).toBe('30405120102513');
+      expect(s1.current_gpa).toBeNull();
+      expect(s1.must_change_password).toBe(true);
+
+      // Verify friend 2 (Sarah)
+      expect(s2.full_name).toBe('ساره نبيل ابوالمجد');
+      expect(s2.national_id).toBe('30409230104226');
+      expect(s2.current_gpa).toBeNull();
+      expect(s2.must_change_password).toBe(true);
+
+      // Verify friend 3 (Yasser)
+      expect(s3.full_name).toBe('ياسر وليد عبدالجواد');
+      expect(s3.national_id).toBe('30411182103719');
+      expect(s3.current_gpa).toBeNull();
+      expect(s3.must_change_password).toBe(true);
+    } finally {
+      await db.end();
+      await clients.ownerSql.unsafe(`DROP DATABASE ${testDbName};`);
+    }
+  });
 });

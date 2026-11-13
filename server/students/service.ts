@@ -26,11 +26,17 @@ export async function getStudentProfile(accountId: string): Promise<StudentProfi
 
   if (!profile) return null;
 
-  const gpa = Number(profile.current_gpa) || 0;
-  let gpaRating = 'امتياز مع مرتبة الشرف';
-  if (gpa < 2.0) gpaRating = 'مقبول';
-  else if (gpa < 3.0) gpaRating = 'جيد';
-  else if (gpa < 3.5) gpaRating = 'جيد جداً';
+  const gpa = profile.current_gpa !== null && profile.current_gpa !== undefined && profile.current_gpa !== ''
+    ? Number(profile.current_gpa)
+    : null;
+
+  let gpaRating = 'قيد الرصد';
+  if (gpa !== null) {
+    if (gpa < 2.0) gpaRating = 'مقبول';
+    else if (gpa < 3.0) gpaRating = 'جيد';
+    else if (gpa < 3.5) gpaRating = 'جيد جداً';
+    else gpaRating = 'امتياز مع مرتبة الشرف';
+  }
 
   return {
     id: profile.id,

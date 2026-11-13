@@ -6,7 +6,7 @@ export interface StudentProfile {
   faculty: string;
   level: string;
   levelNumber: number;
-  gpa: number;
+  gpa: number | null;
   maxGpa: number;
   gpaRating: string;
   registeredHours: number;

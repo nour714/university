@@ -1,4 +1,8 @@
+import { loadEnvConfig } from '@next/env';
 import { z } from 'zod';
+
+// Automatically load .env.local, .env when running standalone CLI scripts
+loadEnvConfig(process.cwd());
 
 function isLocalhost(urlStr: string): boolean {
   try {

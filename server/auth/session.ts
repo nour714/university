@@ -14,7 +14,7 @@ export interface AuthenticatedStudent {
     studentCode: string;
     department: string;
     level: string;
-    currentGpa: number;
+    currentGpa: number | null;
     maxGpa: number;
     avatarUrl: string | null;
   };
@@ -123,11 +123,17 @@ export const validateSession = cache(async (rawToken: string): Promise<Authentic
     `;
   }
 
-  const gpa = Number(row.current_gpa) || 0;
-  let gpaRating = 'امتياز مع مرتبة الشرف';
-  if (gpa < 2.0) gpaRating = 'مقبول';
-  else if (gpa < 3.0) gpaRating = 'جيد';
-  else if (gpa < 3.5) gpaRating = 'جيد جداً';
+  const gpa = row.current_gpa !== null && row.current_gpa !== undefined && row.current_gpa !== ''
+    ? Number(row.current_gpa)
+    : null;
+
+  let gpaRating = 'قيد الرصد';
+  if (gpa !== null) {
+    if (gpa < 2.0) gpaRating = 'مقبول';
+    else if (gpa < 3.0) gpaRating = 'جيد';
+    else if (gpa < 3.5) gpaRating = 'جيد جداً';
+    else gpaRating = 'امتياز مع مرتبة الشرف';
+  }
 
   const studentProfile: StudentProfile = {
     id: row.account_id,
@@ -158,7 +164,7 @@ export const validateSession = cache(async (rawToken: string): Promise<Authentic
       studentCode: row.student_code || '',
       department: row.department || '',
       level: row.level || 'المستوى الأول',
-      currentGpa: Number(row.current_gpa) || 0,
+      currentGpa: gpa,
       maxGpa: Number(row.max_gpa) || 4.0,
       avatarUrl: row.avatar_url || null,
     },

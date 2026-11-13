@@ -6,19 +6,26 @@ interface StudentStatsGridProps {
 }
 
 export function StudentStatsGrid({ student }: StudentStatsGridProps) {
+  const gpa = student.gpa;
+  const isGpaAvailable = gpa !== null && gpa !== undefined;
+
   const stats = [
     {
       id: 'gpa',
       title: 'المعدل التراكمي (GPA)',
-      value: student.gpa.toFixed(2),
-      unit: `/ ${student.maxGpa.toFixed(2)}`,
+      value: gpa !== null && gpa !== undefined ? gpa.toFixed(2) : '—',
+      unit: isGpaAvailable ? `/ ${student.maxGpa.toFixed(2)}` : '',
       badge: student.gpaRating,
-      badgeColor: 'bg-amber-500/10 text-amber-700 border-amber-300/60',
+      badgeColor: isGpaAvailable
+        ? 'bg-amber-500/10 text-amber-700 border-amber-300/60'
+        : 'bg-slate-500/10 text-slate-700 border-slate-300/60',
       icon: Award,
-      iconColor: 'from-amber-400 to-amber-600 text-white shadow-amber-500/30',
-      borderHover: 'hover:border-amber-400/80',
-      description: 'أداء أكاديمي فائق',
-      highlight: true,
+      iconColor: isGpaAvailable
+        ? 'from-amber-400 to-amber-600 text-white shadow-amber-500/30'
+        : 'from-slate-400 to-slate-600 text-white shadow-slate-500/30',
+      borderHover: isGpaAvailable ? 'hover:border-amber-400/80' : 'hover:border-slate-400/80',
+      description: isGpaAvailable ? 'أداء أكاديمي فائق' : 'لم يتم رصد نتائج بعد',
+      highlight: isGpaAvailable,
     },
     {
       id: 'level',

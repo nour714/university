@@ -9,7 +9,7 @@ import { listCourses, listEnrolledCourses, getCourseById, CourseWithEnrollment }
  */
 export async function listCoursesAction(): Promise<CourseWithEnrollment[]> {
   const student = await requireAuth();
-  return listCourses(student.accountId);
+  return listCourses(student.accountId, student.studentProfile.levelNumber);
 }
 
 /**
@@ -17,7 +17,7 @@ export async function listCoursesAction(): Promise<CourseWithEnrollment[]> {
  */
 export async function listEnrolledCoursesAction(): Promise<CourseWithEnrollment[]> {
   const student = await requireAuth();
-  return listEnrolledCourses(student.accountId);
+  return listEnrolledCourses(student.accountId, student.studentProfile.levelNumber);
 }
 
 /**
@@ -25,5 +25,9 @@ export async function listEnrolledCoursesAction(): Promise<CourseWithEnrollment[
  */
 export async function getCourseByIdAction(courseId: string): Promise<CourseWithEnrollment | null> {
   const student = await requireAuth();
-  return getCourseById(courseId, student.accountId);
+  const course = await getCourseById(courseId, student.accountId);
+  if (!course || (course.level !== student.studentProfile.levelNumber && !course.enrolled)) {
+    return null;
+  }
+  return course;
 }

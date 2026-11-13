@@ -1,3 +1,8 @@
 code,course_id,receipt_number,semester
-CODE-AI301-EXAMPLE-01,ai-301,REC-2026-001,الفصل الدراسي الأول
-CODE-AI302-EXAMPLE-02,ai-302,REC-2026-002,الفصل الدراسي الأول
+CODE-ALL3-EXAMPLE-01,all,REC-2026-BUNDLE-01,الفصل الدراسي الأول
+CODE-CS311-EXAMPLE-01,cs-311,REC-2026-001,الفصل الدراسي الأول
+CODE-AI303-EXAMPLE-01,ai-303,REC-2026-002,الفصل الدراسي الأول
+CODE-DS302-EXAMPLE-01,ds-302,REC-2026-003,الفصل الدراسي الأول
+CODE-CS302-EXAMPLE-01,cs-302,REC-2026-004,الفصل الدراسي الأول
+CODE-CS303-EXAMPLE-01,cs-303,REC-2026-005,الفصل الدراسي الأول
+CODE-AI302-EXAMPLE-01,ai-302,REC-2026-006,الفصل الدراسي الأول

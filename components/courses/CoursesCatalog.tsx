@@ -10,11 +10,13 @@ import { KeyActivationModal } from '@/components/codes/KeyActivationModal';
 
 interface CoursesCatalogProps {
   courses: Course[];
+  studentLevel?: number;
+  studentLevelName?: string;
 }
 
 type CatalogTab = 'enrolled' | 'all';
 
-function CoursesCatalogInner({ courses }: CoursesCatalogProps) {
+function CoursesCatalogInner({ courses, studentLevel, studentLevelName }: CoursesCatalogProps) {
   const searchParams = useSearchParams();
   const pathname = usePathname();
 
@@ -144,7 +146,7 @@ function CoursesCatalogInner({ courses }: CoursesCatalogProps) {
               }`}
             >
               <BookOpen className="w-3.5 h-3.5 text-slate-500" />
-              <span>دليل المقررات الأكاديمية</span>
+              <span>{studentLevelName ? `مقررات ${studentLevelName}` : 'دليل المقررات الأكاديمية'}</span>
               <span
                 className={`text-[10px] px-1.5 py-0.5 rounded-full font-mono ${
                   activeTab === 'all'
@@ -183,6 +185,8 @@ function CoursesCatalogInner({ courses }: CoursesCatalogProps) {
             placeholder={
               activeTab === 'enrolled'
                 ? 'ابحث في مقرراتك المفعلة باسم المادة أو كود المقرر...'
+                : studentLevelName
+                ? `ابحث في مقررات ${studentLevelName} (مثال: تعلم الآلة، AI301، اسم الدكتور)...`
                 : 'ابحث في دليل المقررات (مثال: تعلم الآلة، AI301، اسم الدكتور)...'
             }
             className="w-full pr-10 pl-10 py-2.5 rounded-xl border border-slate-200 bg-slate-50/60 hover:bg-white focus:bg-white focus:border-blue-600 focus:ring-3 focus:ring-blue-600/10 text-xs sm:text-sm text-slate-800 placeholder:text-slate-400 transition-all outline-hidden font-medium min-h-[42px]"

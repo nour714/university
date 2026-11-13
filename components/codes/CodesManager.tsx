@@ -111,19 +111,30 @@ export function CodesManager({ initialCodes }: CodesManagerProps = {}) {
       }
 
       const newCode = res.data;
-      setCodes((prev) => [newCode, ...prev.filter((c) => c.id !== newCode.id)]);
+      const isBundle = newCode.courseCode === 'ALL-L3-S1';
+
+      // Re-fetch all student codes so all bundle courses immediately reflect in UI
+      try {
+        const latestCodes = await listCodes();
+        setCodes(latestCodes.length > 0 ? latestCodes : [newCode, ...codes.filter((c) => c.id !== newCode.id)]);
+      } catch {
+        setCodes((prev) => [newCode, ...prev.filter((c) => c.id !== newCode.id)]);
+      }
+
       setSuccessMessage(newCode);
       setInputCode('');
 
       // Send live notification
       addNotification({
         type: 'material',
-        title: `تم تفعيل كود المقرر بنجاح (${newCode.courseCode})`,
-        message: `تم فتح كامل صلاحيات المحاضرات والاختبارات لمقرر ${newCode.courseName} في حسابك.`,
+        title: isBundle ? 'تم تفعيل باقة المقرارات الشاملة بنجاح!' : `تم تفعيل كود المقرر بنجاح (${newCode.courseCode})`,
+        message: isBundle 
+          ? 'تم فتح كامل صلاحيات المحاضرات والاختبارات لكافة مقررات المستوى الثالث في حسابك.'
+          : `تم فتح كامل صلاحيات المحاضرات والاختبارات لمقرر ${newCode.courseName} في حسابك.`,
         courseCode: newCode.courseCode,
         courseName: newCode.courseName,
         courseId: newCode.courseId,
-        actionUrl: `/courses/${newCode.courseId}`,
+        actionUrl: isBundle ? '/courses' : `/courses/${newCode.courseId}`,
         priority: 'urgent',
       });
 
@@ -295,10 +306,10 @@ export function CodesManager({ initialCodes }: CodesManagerProps = {}) {
               </div>
 
               <Link
-                href={`/courses/${successMessage.courseId}`}
+                href={successMessage.courseCode === 'ALL-L3-S1' ? '/courses' : `/courses/${successMessage.courseId}`}
                 className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-xs transition-all active:scale-95"
               >
-                <span>فتح المقرر الآن</span>
+                <span>{successMessage.courseCode === 'ALL-L3-S1' ? 'تصفح كافة المقرارات' : 'فتح المقرر الآن'}</span>
                 <ArrowLeft className="w-3.5 h-3.5" />
               </Link>
             </div>

@@ -30,7 +30,7 @@ export default async function CourseDetailPage({ params }: CourseDetailPageProps
 
   const course = await getCourseById(id, student.accountId);
 
-  if (!course) {
+  if (!course || (course.level !== student.studentProfile.levelNumber && !course.enrolled)) {
     notFound();
   }
 

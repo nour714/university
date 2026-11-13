@@ -116,6 +116,23 @@ describe('Courses & Content Protection (Finding C1)', () => {
       expect(enrolledOnly.find((c) => c.id === courseId)).toBeDefined();
       expect(enrolledOnly.every((c) => c.enrolled === true)).toBe(true);
     });
+
+    it('listCourses filters by student level and excludes courses from other levels', async () => {
+      // courseId is level 2
+      const level2Courses = await listCourses(enrolledStudentId, 2);
+      expect(level2Courses.some((c) => c.id === courseId)).toBe(true);
+      expect(level2Courses.every((c) => c.level === 2)).toBe(true);
+
+      // Level 3 should NOT contain level 2 courseId
+      const level3Courses = await listCourses(enrolledStudentId, 3);
+      expect(level3Courses.some((c) => c.id === courseId)).toBe(false);
+      expect(level3Courses.every((c) => c.level === 3)).toBe(true);
+
+      // Level 1 should NOT contain level 2 courseId
+      const level1Courses = await listCourses(enrolledStudentId, 1);
+      expect(level1Courses.some((c) => c.id === courseId)).toBe(false);
+      expect(level1Courses.every((c) => c.level === 1)).toBe(true);
+    });
   });
 
   describe('resolveContentDownload SQL authorization', () => {

@@ -168,4 +168,94 @@ describe('Codes Redemption & Concurrency Locking (Finding S1 & Concurrency)', ()
       expect(checkRedeemed.error).toContain('كود التفعيل غير صالح أو تم استخدامه مسبقاً');
     });
   });
+
+  describe('Bundle / All-In-One Code Redemption (Level 3 Semester 1)', () => {
+    const bundleStudentId = 'e0000000-0000-0000-0000-000000000099';
+    const bundleStudentNid = '30101010109999';
+    const rawBundleCode = 'ALL3-TEST-BUNDLE-2026';
+    const bundleHash = computeCodeHash(normalizeCode(rawBundleCode), env.CODE_PEPPER);
+
+    beforeAll(async () => {
+      // 1. Ensure test student account exists
+      await clients.ownerSql`
+        INSERT INTO public.academic_accounts (id, national_id, password_hash, is_active)
+        VALUES (${bundleStudentId}, ${bundleStudentNid}, 'hash', true)
+        ON CONFLICT (id) DO NOTHING;
+      `;
+
+      // 2. Ensure at least two Level 3 Semester 1 courses exist
+      await clients.ownerSql`
+        INSERT INTO public.academic_courses (
+          id, code, title, description, doctor_name, credit_hours, level, department, semester
+        ) VALUES 
+          ('test-l3-c1', 'CS311', 'تطوير تطبيقات الموبايل', 'وصف', 'د. مروة', 3, 3, 'علوم الحاسب', 'الفصل الأول'),
+          ('test-l3-c2', 'AI303', 'الرؤية الحاسوبية', 'وصف', 'د. مروة', 3, 3, 'الذكاء الاصطناعي', 'الفصل الأول')
+        ON CONFLICT (id) DO NOTHING;
+      `;
+
+      // 3. Insert bundle code
+      await clients.ownerSql`
+        INSERT INTO academic_private.redeemable_codes (
+          code_hash, masked_code, course_id, receipt_number, semester, is_redeemed, is_bundle
+        ) VALUES (
+          ${bundleHash}, 'ALL3-****-2026', null, 'REC-BUNDLE-01', 'الفصل الأول', false, true
+        ) ON CONFLICT (code_hash) DO UPDATE SET is_redeemed = false, redeemed_by = null, redeemed_at = null;
+      `;
+    });
+
+    it('checkEnrollmentKey recognizes bundle code and shows bundle title', async () => {
+      const checkRes = await checkEnrollmentKey(rawBundleCode, bundleStudentId);
+      expect(checkRes.valid).toBe(true);
+      expect(checkRes.alreadyEnrolled).toBe(false);
+      expect(checkRes.courseCode).toBe('ALL-L3-S1');
+      expect(checkRes.courseTitle).toContain('كافة مقررات المستوى الثالث');
+    });
+
+    it('redeems bundle code and enrolls student in ALL Level 3 Semester 1 courses at once', async () => {
+      const res = await redeemCodeForStudent(bundleStudentId, rawBundleCode);
+      expect(res.success).toBe(true);
+      expect(res.data?.courseCode).toBe('ALL-L3-S1');
+
+      // Verify all Level 3 Semester 1 courses are enrolled
+      const enrolled = await clients.ownerSql`
+        SELECT sc.course_id 
+        FROM public.academic_student_codes sc
+        JOIN public.academic_courses c ON c.id = sc.course_id
+        WHERE sc.student_id = ${bundleStudentId} AND c.level = 3 AND c.semester = 'الفصل الأول'
+      `;
+      expect(enrolled.length).toBeGreaterThanOrEqual(2);
+
+      // Verify bundle code is marked as redeemed
+      const [codeRow] = await clients.ownerSql`
+        SELECT is_redeemed, redeemed_by FROM academic_private.redeemable_codes
+        WHERE code_hash = ${bundleHash}
+      `;
+      expect(codeRow.is_redeemed).toBe(true);
+      expect(codeRow.redeemed_by).toBe(bundleStudentId);
+    });
+
+    it('refuses to burn a second bundle code if student is already enrolled in all courses', async () => {
+      const secondBundleCode = 'ALL3-SECOND-BUNDLE-2026';
+      const secondBundleHash = computeCodeHash(normalizeCode(secondBundleCode), env.CODE_PEPPER);
+
+      await clients.ownerSql`
+        INSERT INTO academic_private.redeemable_codes (
+          code_hash, masked_code, course_id, receipt_number, semester, is_redeemed, is_bundle
+        ) VALUES (
+          ${secondBundleHash}, 'ALL3-****-2026', null, 'REC-BUNDLE-02', 'الفصل الأول', false, true
+        ) ON CONFLICT (code_hash) DO UPDATE SET is_redeemed = false;
+      `;
+
+      const res = await redeemCodeForStudent(bundleStudentId, secondBundleCode);
+      expect(res.success).toBe(false);
+      expect(res.error).toContain('مسجل بالفعل');
+
+      // Second bundle code was NOT burned
+      const [row] = await clients.ownerSql`
+        SELECT is_redeemed FROM academic_private.redeemable_codes
+        WHERE code_hash = ${secondBundleHash}
+      `;
+      expect(row.is_redeemed).toBe(false);
+    });
+  });
 });

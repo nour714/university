@@ -8,40 +8,74 @@ export interface CourseWithEnrollment extends Course {
   locked?: boolean;
 }
 
-export const listCourses = cache(async (studentId?: string): Promise<CourseWithEnrollment[]> => {
+export const listCourses = cache(async (studentId?: string, level?: number): Promise<CourseWithEnrollment[]> => {
   try {
-    const rows = await appSql`
-      SELECT 
-        c.id,
-        c.code,
-        c.title,
-        c.english_title,
-        c.description,
-        c.doctor_name,
-        c.doctor_title,
-        c.doctor_avatar,
-        c.credit_hours,
-        c.level,
-        c.department,
-        c.semester,
-        c.icon_name,
-        c.thumbnail_color,
-        COUNT(cc.id) FILTER (WHERE cc.type = 'file') AS count_files,
-        COUNT(cc.id) FILTER (WHERE cc.type = 'video') AS count_videos,
-        COUNT(cc.id) FILTER (WHERE cc.type = 'image') AS count_images,
-        COUNT(cc.id) FILTER (WHERE cc.type = 'link') AS count_links,
-        COUNT(cc.id) AS count_total,
-        EXISTS (
-          SELECT 1 FROM public.academic_student_codes sc
-          WHERE sc.course_id = c.id 
-            AND sc.student_id = ${studentId || null} 
-            AND sc.status = 'active'
-        ) AS enrolled
-      FROM public.academic_courses c
-      LEFT JOIN public.academic_course_contents cc ON cc.course_id = c.id
-      GROUP BY c.id
-      ORDER BY c.level, c.code
-    `;
+    const rows = level
+      ? await appSql`
+          SELECT 
+            c.id,
+            c.code,
+            c.title,
+            c.english_title,
+            c.description,
+            c.doctor_name,
+            c.doctor_title,
+            c.doctor_avatar,
+            c.credit_hours,
+            c.level,
+            c.department,
+            c.semester,
+            c.icon_name,
+            c.thumbnail_color,
+            COUNT(cc.id) FILTER (WHERE cc.type = 'file') AS count_files,
+            COUNT(cc.id) FILTER (WHERE cc.type = 'video') AS count_videos,
+            COUNT(cc.id) FILTER (WHERE cc.type = 'image') AS count_images,
+            COUNT(cc.id) FILTER (WHERE cc.type = 'link') AS count_links,
+            COUNT(cc.id) AS count_total,
+            EXISTS (
+              SELECT 1 FROM public.academic_student_codes sc
+              WHERE sc.course_id = c.id 
+                AND sc.student_id = ${studentId || null} 
+                AND sc.status = 'active'
+            ) AS enrolled
+          FROM public.academic_courses c
+          LEFT JOIN public.academic_course_contents cc ON cc.course_id = c.id
+          WHERE c.level = ${level}
+          GROUP BY c.id
+          ORDER BY c.code
+        `
+      : await appSql`
+          SELECT 
+            c.id,
+            c.code,
+            c.title,
+            c.english_title,
+            c.description,
+            c.doctor_name,
+            c.doctor_title,
+            c.doctor_avatar,
+            c.credit_hours,
+            c.level,
+            c.department,
+            c.semester,
+            c.icon_name,
+            c.thumbnail_color,
+            COUNT(cc.id) FILTER (WHERE cc.type = 'file') AS count_files,
+            COUNT(cc.id) FILTER (WHERE cc.type = 'video') AS count_videos,
+            COUNT(cc.id) FILTER (WHERE cc.type = 'image') AS count_images,
+            COUNT(cc.id) FILTER (WHERE cc.type = 'link') AS count_links,
+            COUNT(cc.id) AS count_total,
+            EXISTS (
+              SELECT 1 FROM public.academic_student_codes sc
+              WHERE sc.course_id = c.id 
+                AND sc.student_id = ${studentId || null} 
+                AND sc.status = 'active'
+            ) AS enrolled
+          FROM public.academic_courses c
+          LEFT JOIN public.academic_course_contents cc ON cc.course_id = c.id
+          GROUP BY c.id
+          ORDER BY c.level, c.code
+        `;
 
     return rows.map((r) => ({
       id: r.id,
@@ -79,9 +113,9 @@ export const listCourses = cache(async (studentId?: string): Promise<CourseWithE
  * Returns only the courses in which the student has an active enrollment key.
  * Used for "مقرراتي المفعلة" tab and quick dashboard filters.
  */
-export const listEnrolledCourses = cache(async (studentId?: string): Promise<CourseWithEnrollment[]> => {
+export const listEnrolledCourses = cache(async (studentId?: string, level?: number): Promise<CourseWithEnrollment[]> => {
   if (!studentId) return [];
-  const allCourses = await listCourses(studentId);
+  const allCourses = await listCourses(studentId, level);
   return allCourses.filter((c) => Boolean(c.enrolled));
 });
 

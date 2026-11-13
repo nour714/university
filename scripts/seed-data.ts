@@ -146,7 +146,8 @@ async function seed(customOwnerUrl?: string) {
         ) ON CONFLICT (id) DO UPDATE SET
           title = EXCLUDED.title,
           doctor_name = EXCLUDED.doctor_name,
-          description = EXCLUDED.description;
+          description = EXCLUDED.description,
+          level = EXCLUDED.level;
       `;
 
       // Seed course content items
@@ -172,21 +173,26 @@ async function seed(customOwnerUrl?: string) {
       }
     }
 
-    // Ensure extra courses referenced by exams/codes exist
+    // Ensure extra courses referenced by exams/codes exist with correct academic levels
     const extraCourses = [
-      { id: 'ai-303', code: 'AI-303', title: 'الرؤية الحاسوبية ومعالجة الصور', doctor: 'د. ريم سليمان', dept: 'الذكاء الاصطناعي' },
-      { id: 'ai-305', code: 'AI-305', title: 'التعلم العميق والشبكات العصبية المتقدمة', doctor: 'د. طارق الحسين', dept: 'الذكاء الاصطناعي' },
-      { id: 'ai-402', code: 'AI-402', title: 'التعلم المعزز والأنظمة الذكية', doctor: 'د. ريم سليمان', dept: 'الذكاء الاصطناعي' },
-      { id: 'ai-403', code: 'AI-403', title: 'الأنظمة الذكية والروبوتات المتقدمة', doctor: 'أ.د. طارق الحصري', dept: 'الذكاء الاصطناعي' },
-      { id: 'cs-204', code: 'CS-204', title: 'الرؤية الحاسوبية (مختبر تطبيقي)', doctor: 'د. محمود عبد الرحيم', dept: 'علوم الحاسب' },
+      { id: 'ai-303', code: 'AI-303', title: 'الرؤية الحاسوبية ومعالجة الصور', doctor: 'د. ريم سليمان', dept: 'الذكاء الاصطناعي', level: 3 },
+      { id: 'ai-305', code: 'AI-305', title: 'التعلم العميق والشبكات العصبية المتقدمة', doctor: 'د. طارق الحسين', dept: 'الذكاء الاصطناعي', level: 3 },
+      { id: 'ai-402', code: 'AI-402', title: 'التعلم المعزز والأنظمة الذكية', doctor: 'د. ريم سليمان', dept: 'الذكاء الاصطناعي', level: 4 },
+      { id: 'ai-403', code: 'AI-403', title: 'الأنظمة الذكية والروبوتات المتقدمة', doctor: 'أ.د. طارق الحصري', dept: 'الذكاء الاصطناعي', level: 4 },
+      { id: 'cs-204', code: 'CS-204', title: 'الرؤية الحاسوبية (مختبر تطبيقي)', doctor: 'د. محمود عبد الرحيم', dept: 'علوم الحاسب', level: 2 },
     ];
     for (const ec of extraCourses) {
       await sql`
         INSERT INTO public.academic_courses (
-          id, code, title, doctor_name, department, description, semester
+          id, code, title, doctor_name, department, description, semester, level
         ) VALUES (
-          ${ec.id}, ${ec.code}, ${ec.title}, ${ec.doctor}, ${ec.dept}, 'مقرر دراسي تخصصي', 'الفصل الأول'
-        ) ON CONFLICT (id) DO NOTHING;
+          ${ec.id}, ${ec.code}, ${ec.title}, ${ec.doctor}, ${ec.dept}, 'مقرر دراسي تخصصي', 'الفصل الأول', ${ec.level}
+        ) ON CONFLICT (id) DO UPDATE SET
+          level = EXCLUDED.level,
+          title = EXCLUDED.title,
+          code = EXCLUDED.code,
+          doctor_name = EXCLUDED.doctor_name,
+          department = EXCLUDED.department;
       `;
     }
 
@@ -300,11 +306,11 @@ async function seed(customOwnerUrl?: string) {
 
       await sql`
         INSERT INTO academic_private.redeemable_codes (
-          code_hash, masked_code, course_id, receipt_number, semester, is_redeemed
+          code_hash, masked_code, course_id, receipt_number, semester, is_redeemed, is_bundle
         ) VALUES (
           ${codeHash}, ${masked}, ${item.courseId},
           ${'REC-2026-' + Math.floor(1000 + Math.random() * 9000)},
-          'الفصل الدراسي الأول 2026/2027', false
+          'الفصل الدراسي الأول 2026/2027', false, ${Boolean(item.isBundle)}
         ) ON CONFLICT (code_hash) DO NOTHING;
       `;
     }

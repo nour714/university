@@ -36,9 +36,9 @@ export async function checkEnrollmentKey(
 
   try {
     const [rc] = await appSql`
-      SELECT rc.id, rc.course_id, rc.is_redeemed, c.code AS course_code, c.title AS course_title, c.doctor_name
+      SELECT rc.id, rc.course_id, rc.is_redeemed, rc.is_bundle, c.code AS course_code, c.title AS course_title, c.doctor_name
       FROM academic_private.redeemable_codes rc
-      JOIN public.academic_courses c ON c.id = rc.course_id
+      LEFT JOIN public.academic_courses c ON c.id = rc.course_id
       WHERE rc.code_hash = ${codeHash}
     `;
 
@@ -46,7 +46,43 @@ export async function checkEnrollmentKey(
       return { valid: false, error: 'كود التفعيل غير صالح أو تم استخدامه مسبقاً.' };
     }
 
-    if (studentAccountId) {
+    if (rc.is_bundle) {
+      if (studentAccountId) {
+        const [l3Count] = await appSql`
+          SELECT count(*)::int AS count
+          FROM public.academic_courses
+          WHERE level = 3 AND semester = 'الفصل الأول'
+        `;
+        const [enrolledCount] = await appSql`
+          SELECT count(DISTINCT sc.course_id)::int AS count
+          FROM public.academic_student_codes sc
+          JOIN public.academic_courses c ON c.id = sc.course_id
+          WHERE sc.student_id = ${studentAccountId}
+            AND c.level = 3 AND c.semester = 'الفصل الأول'
+            AND sc.status = 'active'
+        `;
+        if (l3Count && enrolledCount && l3Count.count > 0 && enrolledCount.count >= l3Count.count) {
+          return {
+            valid: true,
+            alreadyEnrolled: true,
+            courseCode: 'ALL-L3-S1',
+            courseTitle: 'باقة كافة مقررات المستوى الثالث (الفصل الأول)',
+            doctorName: 'هيئة التدريس - المستوى الثالث',
+            error: 'أنت مسجل بالفعل في كافة مقررات هذا المستوى الدراسي.',
+          };
+        }
+      }
+
+      return {
+        valid: true,
+        alreadyEnrolled: false,
+        courseCode: 'ALL-L3-S1',
+        courseTitle: 'باقة كافة مقررات المستوى الثالث (الفصل الأول)',
+        doctorName: 'هيئة التدريس - المستوى الثالث',
+      };
+    }
+
+    if (studentAccountId && rc.course_id) {
       const [enrolled] = await appSql`
         SELECT 1 FROM public.academic_student_codes
         WHERE student_id = ${studentAccountId} AND course_id = ${rc.course_id} AND status = 'active'
@@ -127,7 +163,7 @@ export async function redeemCodeForStudent(
     const result = await appSql.begin(async (tx) => {
       // 1. Lock the redeemable code row for update
       const [rc] = await tx`
-        SELECT id, course_id, receipt_number, semester, masked_code
+        SELECT id, course_id, receipt_number, semester, masked_code, is_bundle
         FROM academic_private.redeemable_codes
         WHERE code_hash = ${codeHash} AND NOT is_redeemed
         FOR UPDATE
@@ -141,7 +177,89 @@ export async function redeemCodeForStudent(
         return { ok: false, reason: 'invalid_code' };
       }
 
-      // 2. Prevent burning code if student is already enrolled
+      // Handle Bundle Code (activates all Level 3 Semester 1 courses at once)
+      if (rc.is_bundle) {
+        const l3Courses = await tx`
+          SELECT id, code, title, doctor_name
+          FROM public.academic_courses
+          WHERE level = 3 AND semester = 'الفصل الأول'
+          ORDER BY code
+        `;
+
+        if (l3Courses.length === 0) {
+          return { ok: false, reason: 'no_courses_found' };
+        }
+
+        const enrolledRows = await tx`
+          SELECT course_id FROM public.academic_student_codes
+          WHERE student_id = ${studentAccountId}
+            AND course_id IN ${tx(l3Courses.map((c) => c.id))}
+            AND status = 'active'
+        `;
+
+        if (enrolledRows.length >= l3Courses.length) {
+          return { ok: false, reason: 'already_enrolled' };
+        }
+
+        // Mark bundle code as redeemed atomically
+        await tx`
+          UPDATE academic_private.redeemable_codes
+             SET is_redeemed = true,
+                 redeemed_by = ${studentAccountId},
+                 redeemed_at = now()
+           WHERE id = ${rc.id}
+        `;
+
+        // Enroll student into each course of Level 3 Semester 1
+        for (const course of l3Courses) {
+          await tx`
+            INSERT INTO public.academic_student_codes (
+              student_id, course_id, code, receipt_number, semester, status
+            ) VALUES (
+              ${studentAccountId}, ${course.id}, ${rc.masked_code},
+              ${rc.receipt_number}, ${rc.semester}, 'active'
+            )
+            ON CONFLICT (student_id, course_id) DO NOTHING
+          `;
+        }
+
+        await tx`
+          INSERT INTO academic_private.redeem_attempts (student_id, success)
+          VALUES (${studentAccountId}, true)
+        `;
+
+        await tx`
+          INSERT INTO academic_private.audit_log (actor, action, details)
+          VALUES (
+            ${studentAccountId},
+            'BUNDLE_CODE_REDEEMED',
+            ${tx.json({
+              code_id: rc.id,
+              bundle: 'ALL-L3-S1',
+              enrolled_courses: l3Courses.map((c) => c.id),
+              masked_code: rc.masked_code,
+            })}
+          )
+        `;
+
+        return {
+          ok: true,
+          data: {
+            id: rc.id,
+            code: rc.masked_code,
+            courseCode: 'ALL-L3-S1',
+            courseName: `جميع مقررات المستوى الثالث (${l3Courses.length} مقررات)`,
+            courseId: l3Courses[0]?.id || '',
+            doctorName: 'هيئة تدريس المستوى الثالث',
+            receiptNumber: rc.receipt_number,
+            activatedAt: new Date().toLocaleDateString('ar-EG'),
+            semester: rc.semester,
+            status: 'active' as const,
+          },
+        };
+      }
+
+      // 2. Single Course Code: Prevent burning code if student is already enrolled
       const [alreadyEnrolled] = await tx`
         SELECT 1 FROM public.academic_student_codes
         WHERE student_id = ${studentAccountId} AND course_id = ${rc.course_id}

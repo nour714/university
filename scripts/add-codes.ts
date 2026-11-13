@@ -62,12 +62,14 @@ async function addCodes() {
       const normalized = normalizeCode(entry.code);
       const codeHash = computeCodeHash(normalized, pepper);
       const masked = maskCode(normalized);
+      const isBundle = entry.courseId.toLowerCase() === 'all' || entry.courseId.toLowerCase() === 'bundle';
+      const courseId = isBundle ? null : entry.courseId;
 
       await sql`
         INSERT INTO academic_private.redeemable_codes (
-          code_hash, masked_code, course_id, receipt_number, semester, is_redeemed
+          code_hash, masked_code, course_id, receipt_number, semester, is_redeemed, is_bundle
         ) VALUES (
-          ${codeHash}, ${masked}, ${entry.courseId}, ${entry.receiptNumber}, ${entry.semester}, false
+          ${codeHash}, ${masked}, ${courseId}, ${entry.receiptNumber}, ${entry.semester}, false, ${isBundle}
         )
         ON CONFLICT (code_hash) DO NOTHING
       `;

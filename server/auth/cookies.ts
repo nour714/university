@@ -11,7 +11,8 @@ export async function setSessionCookie(token: string): Promise<void> {
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax',
     path: '/',
-    maxAge: 12 * 60 * 60, // 12 hours absolute maximum
+    // Omit maxAge so this acts strictly as a browser Session Cookie.
+    // The cookie is deleted as soon as the browser is closed.
   });
 }
 

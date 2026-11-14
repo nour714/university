@@ -24,7 +24,7 @@ const EnvSchema = z.object({
   DB_SSL: z
     .enum(['require', 'disable'])
     .default(isProduction ? 'require' : 'disable'),
-  DB_POOL_MAX: z.coerce.number().int().positive().default(isProduction ? 3 : 10),
+  DB_POOL_MAX: z.coerce.number().int().positive().default(isProduction ? 10 : 10),
 
   // Server Actions Configuration
   ALLOWED_ORIGINS: z.string().optional(),

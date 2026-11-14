@@ -130,8 +130,30 @@ async function seed(customOwnerUrl?: string) {
   });
 
   try {
-    // 1. Seed Courses & Contents
-    console.log('[SEED] Seeding courses...');
+    // 1. Clean up old courses and seed new Level 3 courses
+    console.log('[SEED] Cleaning old courses and seeding new Level 3 courses...');
+    const validCourseIds = RAW_COURSES_DATA.map((c) => c.id);
+    await sql`
+      DELETE FROM academic_private.redeemable_codes 
+      WHERE course_id IS NOT NULL AND course_id != ALL(${validCourseIds})
+    `;
+    await sql`
+      DELETE FROM public.academic_student_codes 
+      WHERE course_id != ALL(${validCourseIds})
+    `;
+    await sql`
+      DELETE FROM public.academic_exams 
+      WHERE course_id != ALL(${validCourseIds})
+    `;
+    await sql`
+      DELETE FROM public.academic_course_contents 
+      WHERE course_id != ALL(${validCourseIds})
+    `;
+    await sql`
+      DELETE FROM public.academic_courses 
+      WHERE id != ALL(${validCourseIds})
+    `;
+
     for (const course of RAW_COURSES_DATA) {
       await sql`
         INSERT INTO public.academic_courses (
@@ -171,29 +193,6 @@ async function seed(customOwnerUrl?: string) {
           `;
         }
       }
-    }
-
-    // Ensure extra courses referenced by exams/codes exist with correct academic levels
-    const extraCourses = [
-      { id: 'ai-303', code: 'AI-303', title: 'الرؤية الحاسوبية ومعالجة الصور', doctor: 'د. ريم سليمان', dept: 'الذكاء الاصطناعي', level: 3 },
-      { id: 'ai-305', code: 'AI-305', title: 'التعلم العميق والشبكات العصبية المتقدمة', doctor: 'د. طارق الحسين', dept: 'الذكاء الاصطناعي', level: 3 },
-      { id: 'ai-402', code: 'AI-402', title: 'التعلم المعزز والأنظمة الذكية', doctor: 'د. ريم سليمان', dept: 'الذكاء الاصطناعي', level: 4 },
-      { id: 'ai-403', code: 'AI-403', title: 'الأنظمة الذكية والروبوتات المتقدمة', doctor: 'أ.د. طارق الحصري', dept: 'الذكاء الاصطناعي', level: 4 },
-      { id: 'cs-204', code: 'CS-204', title: 'الرؤية الحاسوبية (مختبر تطبيقي)', doctor: 'د. محمود عبد الرحيم', dept: 'علوم الحاسب', level: 2 },
-    ];
-    for (const ec of extraCourses) {
-      await sql`
-        INSERT INTO public.academic_courses (
-          id, code, title, doctor_name, department, description, semester, level
-        ) VALUES (
-          ${ec.id}, ${ec.code}, ${ec.title}, ${ec.doctor}, ${ec.dept}, 'مقرر دراسي تخصصي', 'الفصل الأول', ${ec.level}
-        ) ON CONFLICT (id) DO UPDATE SET
-          level = EXCLUDED.level,
-          title = EXCLUDED.title,
-          code = EXCLUDED.code,
-          doctor_name = EXCLUDED.doctor_name,
-          department = EXCLUDED.department;
-      `;
     }
 
     // 2. Student Accounts (Conditional, Non-Production only, must_change_password = true)
@@ -249,7 +248,7 @@ async function seed(customOwnerUrl?: string) {
 
         if (student.enrollDefaultCourses) {
           // Enroll in default courses
-          for (const courseId of ['ai-301', 'ai-305']) {
+          for (const courseId of ['cs-311', 'ai-302']) {
             await sql`
               INSERT INTO public.academic_student_codes (
                 student_id, course_id, code, receipt_number, semester, status
@@ -318,9 +317,9 @@ async function seed(customOwnerUrl?: string) {
     // 4. Seed Exams & Questions & Keys
     console.log('[SEED] Seeding exams, questions and keys...');
     for (const exam of RAW_EXAMS_DATA) {
-      const courseId = exam.id === 'exam-ai301-midterm' ? 'ai-301' :
-                       exam.id === 'exam-ai305-quiz' ? 'ai-305' :
-                       exam.id === 'exam-ai302-final' ? 'ai-302' : 'cs-204';
+      const courseId = exam.id === 'exam-ai301-midterm' ? 'cs-303' :
+                       exam.id === 'exam-ai305-quiz' ? 'ai-302' :
+                       exam.id === 'exam-ai302-final' ? 'ai-302' : 'ai-303';
 
       await sql`
         INSERT INTO public.academic_exams (

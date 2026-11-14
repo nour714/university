@@ -258,4 +258,90 @@ describe('Codes Redemption & Concurrency Locking (Finding S1 & Concurrency)', ()
       expect(row.is_redeemed).toBe(false);
     });
   });
+
+  describe('Empirical Verification: Only 6 Level 3 Courses Exist & All Codes Work', () => {
+    const studentForIndiv = 'e0000000-0000-0000-0000-000000000088';
+    const studentForBundle = 'e0000000-0000-0000-0000-000000000077';
+
+    beforeAll(async () => {
+      // 1. Create fresh test accounts
+      await clients.ownerSql`
+        INSERT INTO public.academic_accounts (id, national_id, password_hash, is_active)
+        VALUES 
+          (${studentForIndiv}, '30101010108888', 'hash', true),
+          (${studentForBundle}, '30101010107777', 'hash', true)
+        ON CONFLICT (id) DO NOTHING;
+      `;
+
+      // 2. Run seed to populate real seeded courses and codes
+      const { seed } = await import('@/scripts/seed-data');
+      await seed(clients.ownerUrl);
+    });
+
+    it('asserts ONLY the 6 new Level 3 courses exist and old courses are removed', async () => {
+      const rows = await clients.ownerSql`
+        SELECT id, code, title, doctor_name, level, semester 
+        FROM public.academic_courses 
+        ORDER BY id;
+      `;
+
+      const courseIds = rows.map((r) => r.id).sort();
+      const expectedIds = ['ai-302', 'ai-303', 'cs-302', 'cs-303', 'cs-311', 'ds-302'].sort();
+      expect(courseIds).toEqual(expectedIds);
+
+      // Verify each course is strictly Level 3 Semester 1
+      for (const course of rows) {
+        expect(course.level).toBe(3);
+        expect(course.semester).toBe('الفصل الأول');
+      }
+
+      // Explicitly assert old courses do NOT exist
+      const oldCourseIds = ['ai-301', 'cs-201', 'ai-101', 'ai-401', 'ai-402', 'ai-403', 'cs-204', 'ai-305'];
+      for (const oldId of oldCourseIds) {
+        expect(courseIds).not.toContain(oldId);
+      }
+    });
+
+    it('verifies that each of the 6 individual course activation codes works correctly', async () => {
+      const individualCodes = [
+        { code: 'MOBL-2026-M91A', expectedCourseId: 'cs-311', expectedTitle: 'تطوير برمجيات الأجهزة المحمولة' },
+        { code: 'CVIS-2026-V84X', expectedCourseId: 'ai-303', expectedTitle: 'الرؤية الحاسوبية' },
+        { code: 'DATA-2026-D37K', expectedCourseId: 'ds-302', expectedTitle: 'تحليل البيانات' },
+        { code: 'PDCS-2026-P62M', expectedCourseId: 'cs-302', expectedTitle: 'الحوسبة المتوازية والموزعة' },
+        { code: 'ALGO-2026-A19T', expectedCourseId: 'cs-303', expectedTitle: 'مقدمة في الخوارزميات' },
+        { code: 'DEEP-2026-B55H', expectedCourseId: 'ai-302', expectedTitle: 'أساسيات التعلم العميق' },
+      ];
+
+      for (const item of individualCodes) {
+        const res = await redeemCodeForStudent(studentForIndiv, item.code);
+        expect(res.success).toBe(true);
+        expect(res.data?.courseId).toBe(item.expectedCourseId);
+        expect(res.data?.courseName).toBe(item.expectedTitle);
+
+        // Verify student is enrolled in DB
+        const [enrolled] = await clients.ownerSql`
+          SELECT 1 FROM public.academic_student_codes
+          WHERE student_id = ${studentForIndiv} AND course_id = ${item.expectedCourseId} AND status = 'active'
+        `;
+        expect(enrolled).toBeDefined();
+      }
+    });
+
+    it('verifies that the Master Bundle Code (ALL3-2026-FULL) activates all 6 courses at once', async () => {
+      const res = await redeemCodeForStudent(studentForBundle, 'ALL3-2026-FULL');
+      expect(res.success).toBe(true);
+      expect(res.data?.courseCode).toBe('ALL-L3-S1');
+
+      // Verify student is enrolled in ALL 6 courses
+      const enrollments = await clients.ownerSql`
+        SELECT course_id FROM public.academic_student_codes
+        WHERE student_id = ${studentForBundle} AND status = 'active'
+      `;
+      expect(enrollments.length).toBe(6);
+
+      const enrolledIds = enrollments.map((e) => e.course_id).sort();
+      const expectedIds = ['ai-302', 'ai-303', 'cs-302', 'cs-303', 'cs-311', 'ds-302'].sort();
+      expect(enrolledIds).toEqual(expectedIds);
+    });
+  });
 });

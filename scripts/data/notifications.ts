@@ -1,19 +1,19 @@
 export const INITIAL_NOTIFICATIONS = [
   {
     title: 'محاضرة جديدة: الشبكات العصبية الالتفافية (CNN)',
-    message: 'تم رفع تسجيل وفيديو المحاضرة 03 في مقرر التعلم العميق والشبكات العصبية.',
+    message: 'تم رفع تسجيل وفيديو المحاضرة 03 في مقرر أساسيات التعلم العميق د/ بسمة حسن.',
     type: 'course' as const,
     isRead: false,
     priority: 'urgent' as const,
     actionUrl: '/courses/ai-302',
   },
   {
-    title: 'تحديد موعد الميدتيرم: تعلم الآلة المتقدم',
-    message: 'أعلن أ.د. طارق الحصري عن موعد الاختبار النصفي لمقرر AI301 يوم الأحد القادم.',
+    title: 'تحديد موعد الميدتيرم: مقدمة في الخوارزميات',
+    message: 'أعلنت د/ فاطمة طلعت عن موعد الاختبار النصفي لمقرر CS303 يوم الأحد القادم.',
     type: 'exam' as const,
     isRead: false,
     priority: 'urgent' as const,
-    actionUrl: '/courses/ai-301',
+    actionUrl: '/courses/cs-303',
   },
   {
     title: 'تحديث أمني: يرجى التحقق من أجهزة تسجيل الدخول',

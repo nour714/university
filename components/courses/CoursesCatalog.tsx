@@ -232,23 +232,23 @@ function CoursesCatalogInner({ courses, studentLevelName }: CoursesCatalogProps)
             المقررات الدراسية والمحاضرات والاختبارات تتطلب إدخال مفتاح المادة الخاص بإيصال الاشتراك. أدخل الكود الآن لفتح كامل الصلاحيات فوراً.
           </p>
 
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-2.5">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3 max-w-md mx-auto pt-1">
             <button
               type="button"
               onClick={() => handleOpenActivationModal()}
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs sm:text-sm shadow-md shadow-blue-600/20 transition-all min-h-[44px] active:scale-95 cursor-pointer"
+              className="flex-1 inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 active:scale-[0.98] text-white font-bold text-xs sm:text-sm shadow-md shadow-blue-600/20 transition-all min-h-[46px] whitespace-nowrap cursor-pointer"
             >
-              <KeyRound className="w-4 h-4" />
-              <span>تفعيل مفتاح مقرر الآن</span>
+              <KeyRound className="w-4 h-4 shrink-0" />
+              <span>تفعيل مفتاح مقرر</span>
             </button>
 
             <button
               type="button"
               onClick={() => setActiveTab('all')}
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs sm:text-sm transition-all min-h-[44px] cursor-pointer"
+              className="flex-1 inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-slate-100 hover:bg-slate-200 active:scale-[0.98] text-slate-700 font-bold text-xs sm:text-sm border border-slate-200/80 transition-all min-h-[46px] whitespace-nowrap cursor-pointer"
             >
-              <BookOpen className="w-4 h-4" />
-              <span>استعراض دليل المقررات المتاحة</span>
+              <BookOpen className="w-4 h-4 shrink-0 text-slate-500" />
+              <span>دليل المقررات المتاحة</span>
             </button>
           </div>
         </div>

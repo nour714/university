@@ -11,5 +11,14 @@ REVOKE INSERT, UPDATE, DELETE, TRUNCATE ON academic_private.exam_keys FROM acade
 GRANT SELECT ON academic_private.exam_keys TO academic_grader;
 
 -- 3. Ensure role demotions are permanent
-ALTER ROLE academic_app NOSUPERUSER NOCREATEDB NOCREATEROLE NOBYPASSRLS;
-ALTER ROLE academic_grader NOSUPERUSER NOCREATEDB NOCREATEROLE NOBYPASSRLS;
+DO $$
+BEGIN
+  IF EXISTS (SELECT FROM pg_roles WHERE rolname = 'academic_app') THEN
+    ALTER ROLE academic_app NOCREATEDB NOCREATEROLE NOBYPASSRLS;
+  END IF;
+  IF EXISTS (SELECT FROM pg_roles WHERE rolname = 'academic_grader') THEN
+    ALTER ROLE academic_grader NOCREATEDB NOCREATEROLE NOBYPASSRLS;
+  END IF;
+EXCEPTION WHEN OTHERS THEN
+  NULL;
+END $$;

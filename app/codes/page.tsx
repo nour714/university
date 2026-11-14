@@ -4,7 +4,7 @@ import { listStudentCodes } from '@/server/codes/service';
 import { CodesManager } from '@/components/codes/CodesManager';
 
 export const metadata: Metadata = {
-  title: 'أكوادي الأكاديمية والصلاحيات | كلية الذكاء الاصطناعي',
+  title: 'أكوادي الأكاديمية والصلاحيات | كلية الذكاء الاصطناعي - جامعة كفر الشيخ',
   description: 'إدارة وتفعيل أكواد الوصول للمحاضرات المعتمدة، سلايدات الشرح، والاختبارات لجميع الفصول الدراسية.',
 };
 

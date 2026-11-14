@@ -117,7 +117,7 @@ export function Sidebar({ currentPath }: { currentPath?: string }) {
                   </span>
                   <Sparkles className="w-3.5 h-3.5 text-amber-400 shrink-0" />
                 </div>
-                <p className="text-[11px] text-blue-200 truncate mt-0.5">المنصة الأكاديمية</p>
+                <p className="text-[11px] text-blue-200 truncate mt-0.5">جامعة كفر الشيخ</p>
               </div>
             </button>
 

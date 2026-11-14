@@ -4,7 +4,7 @@ import { useState, useMemo, useEffect, Suspense } from 'react';
 import { useSearchParams, usePathname } from 'next/navigation';
 import { Course } from '@/types/course';
 import { CourseCard } from './CourseCard';
-import { Search, X, FolderSearch, KeyRound, BookOpen, Sparkles, CheckCircle2 } from 'lucide-react';
+import { Search, X, FolderSearch, KeyRound, BookOpen, CheckCircle2 } from 'lucide-react';
 import { matchesSearch } from '@/lib/normalizeArabic';
 import { KeyActivationModal } from '@/components/codes/KeyActivationModal';
 
@@ -16,7 +16,7 @@ interface CoursesCatalogProps {
 
 type CatalogTab = 'enrolled' | 'all';
 
-function CoursesCatalogInner({ courses, studentLevel, studentLevelName }: CoursesCatalogProps) {
+function CoursesCatalogInner({ courses, studentLevelName }: CoursesCatalogProps) {
   const searchParams = useSearchParams();
   const pathname = usePathname();
 

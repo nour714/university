@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { KeyRound, Unlock, X, CheckCircle2, AlertCircle, ArrowLeft, Loader2 } from 'lucide-react';
@@ -33,14 +33,17 @@ export function KeyActivationModal({
   const inputRef = useRef<HTMLInputElement>(null);
   const modalRef = useRef<HTMLDivElement>(null);
 
-  // Focus input when modal opens & reset state
+  const handleClose = useCallback(() => {
+    setInputCode('');
+    setErrorMessage('');
+    setActivatedCode(null);
+    setIsLoading(false);
+    onClose();
+  }, [onClose]);
+
+  // Focus input when modal opens & lock scroll
   useEffect(() => {
     if (isOpen) {
-      setInputCode('');
-      setErrorMessage('');
-      setActivatedCode(null);
-      setIsLoading(false);
-
       // Lock body scroll
       document.body.style.overflow = 'hidden';
 
@@ -63,13 +66,13 @@ export function KeyActivationModal({
 
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
-        onClose();
+        handleClose();
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, onClose]);
+  }, [isOpen, handleClose]);
 
   if (!isOpen) return null;
 
@@ -152,7 +155,7 @@ export function KeyActivationModal({
       dir="rtl"
       onClick={(e) => {
         if (e.target === e.currentTarget) {
-          onClose();
+          handleClose();
         }
       }}
     >
@@ -178,7 +181,7 @@ export function KeyActivationModal({
 
           <button
             type="button"
-            onClick={onClose}
+            onClick={handleClose}
             aria-label="إغلاق نافذة التفعيل"
             className="w-9 h-9 rounded-xl flex items-center justify-center text-blue-200 hover:text-white hover:bg-white/10 transition-colors cursor-pointer shrink-0"
           >
@@ -225,7 +228,7 @@ export function KeyActivationModal({
               <div className="flex items-center gap-2 pt-1">
                 <Link
                   href={`/courses/${activatedCode.courseId}`}
-                  onClick={onClose}
+                  onClick={handleClose}
                   className="flex-1 inline-flex items-center justify-center gap-1.5 h-10 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-xs transition-all cursor-pointer active:scale-95"
                 >
                   <span>استعراض المقرر الآن</span>
@@ -233,7 +236,7 @@ export function KeyActivationModal({
                 </Link>
                 <button
                   type="button"
-                  onClick={onClose}
+                  onClick={handleClose}
                   className="h-10 px-4 rounded-xl bg-white hover:bg-emerald-100 text-emerald-800 border border-emerald-200 font-bold text-xs transition-all cursor-pointer"
                 >
                   إغلاق
@@ -318,7 +321,7 @@ export function KeyActivationModal({
 
                 <button
                   type="button"
-                  onClick={onClose}
+                  onClick={handleClose}
                   disabled={isLoading}
                   className="h-11 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition-all cursor-pointer"
                 >
@@ -332,7 +335,7 @@ export function KeyActivationModal({
           <div className="pt-2 border-t border-slate-100 text-center">
             <Link
               href="/codes"
-              onClick={onClose}
+              onClick={handleClose}
               className="text-xs text-blue-600 hover:text-blue-800 font-semibold inline-flex items-center gap-1 hover:underline"
             >
               <span>الانتقال لصفحة سجل الأكواد والصلاحيات الكاملة</span>

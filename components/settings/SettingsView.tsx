@@ -746,7 +746,7 @@ export function SettingsView({ student: initialStudent }: { student?: StudentPro
           {/* Academic Physical Unit Footer Note */}
           <div className="p-3 rounded-xl bg-blue-50/80 border border-blue-100 text-[11px] text-blue-900 flex items-center gap-2">
             <Building2 className="w-4 h-4 text-blue-600 shrink-0" />
-            <span>وحدة تكنولوجيا المعلومات • الدور الأرضي بمبنى كلية الذكاء الاصطناعي</span>
+            <span>وحدة تكنولوجيا المعلومات • الدور الأرضي بمبنى كلية الذكاء الاصطناعي - جامعة كفر الشيخ</span>
           </div>
         </div>
       )}

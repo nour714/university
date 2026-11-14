@@ -24,8 +24,7 @@ import {
   Unlock,
   CheckCircle2,
   AlertCircle,
-  Loader2,
-  Sparkles
+  Loader2
 } from 'lucide-react';
 
 interface CourseContentBrowserProps {
@@ -532,7 +531,7 @@ export function CourseContentBrowser({ items, courseCode, isLocked }: CourseCont
           {/* Footer Card Summary */}
           <div className="bg-slate-50/80 rounded-2xl px-5 py-3 border border-slate-200 text-xs text-slate-500 flex flex-col sm:flex-row items-center justify-between gap-2 shadow-2xs">
             <span className="font-semibold text-slate-700">إجمالي المعروض: {filteredItems.length} عنصر</span>
-            <span className="text-[11px] text-slate-400">الملفات مخزنة وموثقة سحابياً بواسطة كلية الذكاء الاصطناعي</span>
+            <span className="text-[11px] text-slate-400">الملفات مخزنة وموثقة سحابياً بواسطة كلية الذكاء الاصطناعي - جامعة كفر الشيخ</span>
           </div>
         </div>
       ) : (

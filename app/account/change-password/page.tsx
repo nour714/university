@@ -4,7 +4,7 @@ import { requireAuth } from '@/server/auth/requireAuth';
 import { ChangePasswordForm } from '@/components/auth/ChangePasswordForm';
 
 export const metadata: Metadata = {
-  title: 'تغيير كلمة المرور الإجباري | كلية الذكاء الاصطناعي',
+  title: 'تغيير كلمة المرور الإجباري | كلية الذكاء الاصطناعي - جامعة كفر الشيخ',
   description: 'تحديث كلمة المرور لحسابك الأكاديمي لمتابعة استخدام المنصة بأمان.',
 };
 

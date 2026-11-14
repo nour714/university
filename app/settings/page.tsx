@@ -3,7 +3,7 @@ import { requireAuth } from '@/server/auth/requireAuth';
 import { SettingsView } from '@/components/settings/SettingsView';
 
 export const metadata: Metadata = {
-  title: 'الإعدادات والدعم الفني | كلية الذكاء الاصطناعي',
+  title: 'الإعدادات والدعم الفني | كلية الذكاء الاصطناعي - جامعة كفر الشيخ',
   description: 'إدارة أمان الحساب الأكاديمي، تغيير وتحديث كلمة المرور، وخدمات الدعم الفني والمساعدة المباشرة.',
 };
 

@@ -1,10 +1,10 @@
 import { listCourses } from '@/server/courses/service';
 import { requireAuth } from '@/server/auth/requireAuth';
 import { CoursesCatalog } from '@/components/courses/CoursesCatalog';
-import { Sparkles, GraduationCap } from 'lucide-react';
+import { GraduationCap } from 'lucide-react';
 
 export const metadata = {
-  title: 'مكتبة المقررات الأكاديمية | كلية الذكاء الاصطناعي',
+  title: 'مكتبة المقررات الأكاديمية | كلية الذكاء الاصطناعي - جامعة كفر الشيخ',
   description: 'استكشف المقررات الدراسية، المحاضرات، التمارين، والوسائط للمستوى الدراسي المسجل للطالب.',
 };
 

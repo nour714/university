@@ -21,7 +21,7 @@ import { RAW_COURSES_DATA } from './data/courses';
 import { RAW_EXAMS_DATA } from './data/exams';
 import { DEMO_REDEEMABLE_CODES } from './data/codes';
 import { INITIAL_NOTIFICATIONS } from './data/notifications';
-import { DEMO_STUDENT, SEED_STUDENTS } from './data/student';
+import { SEED_STUDENTS } from './data/student';
 
 const ExamKeyEntrySchema = z.object({
   correctOptionId: z.string().min(1, 'correctOptionId is required'),

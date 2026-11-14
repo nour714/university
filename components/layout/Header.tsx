@@ -40,7 +40,7 @@ export function Header() {
             <div className="flex items-center gap-2">
               <span className="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 text-[10px] font-bold border border-blue-200/60">
                 <Sparkles className="w-2.5 h-2.5 text-blue-600" />
-                <span>البوابة الأكاديمية الرسمية</span>
+                <span>جامعة كفر الشيخ</span>
               </span>
             </div>
             <h2 className="text-xs sm:text-base font-extrabold text-slate-800 tracking-tight truncate leading-snug">

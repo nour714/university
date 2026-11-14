@@ -213,7 +213,7 @@ export function LoginForm() {
         <div className="w-16 h-16 flex items-center justify-center shrink-0">
           <Image
             src="/logo.png"
-            alt="شعار كلية الذكاء الاصطناعي"
+            alt="شعار كلية الذكاء الاصطناعي - جامعة كفر الشيخ"
             width={64}
             height={64}
             className="w-full h-full object-contain select-none drop-shadow-[0_2px_16px_rgba(59,130,246,0.85)]"
@@ -226,7 +226,7 @@ export function LoginForm() {
             كلية الذكاء الاصطناعي
           </span>
           <span className="text-xs sm:text-sm font-bold text-blue-400 drop-shadow-[0_1px_4px_rgba(0,0,0,0.8)]">
-            جامعة المستقبل • البوابة الأكاديمية
+            جامعة كفر الشيخ • البوابة الأكاديمية
           </span>
         </div>
       </div>
@@ -234,7 +234,7 @@ export function LoginForm() {
       {/* Mobile Floating Brand Badge (Cleanly positioned directly under the logo, above the card) */}
       <div className="lg:hidden flex items-center justify-center px-4 py-1.5 rounded-full bg-slate-900/85 backdrop-blur-md border border-white/20 shadow-xl shadow-blue-950/60 mb-2.5 z-20 select-none">
         <span className="text-xs sm:text-sm font-black text-white tracking-wide drop-shadow-xs">
-          كلية الذكاء الاصطناعي
+          كلية الذكاء الاصطناعي • جامعة كفر الشيخ
         </span>
       </div>
 

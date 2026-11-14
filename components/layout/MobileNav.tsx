@@ -58,7 +58,7 @@ export function MobileNav({ navLinks }: MobileNavProps) {
                       <h2 className="font-extrabold text-sm text-white">كلية الذكاء الاصطناعي</h2>
                       <Sparkles className="w-3.5 h-3.5 text-amber-400" />
                     </div>
-                    <p className="text-[11px] text-blue-200">بوابة المقررات الأكاديمية</p>
+                    <p className="text-[11px] text-blue-200">جامعة كفر الشيخ • البوابة الأكاديمية</p>
                   </div>
                 </div>
                 <button
@@ -117,7 +117,7 @@ export function MobileNav({ navLinks }: MobileNavProps) {
 
             {/* Drawer Footer */}
             <div className="pt-4 border-t border-blue-900/60 text-[11px] text-blue-300 text-center">
-              جامعة المستقبل الذكية © 2026
+              كلية الذكاء الاصطناعي • جامعة كفر الشيخ © 2026
             </div>
           </div>
         </div>

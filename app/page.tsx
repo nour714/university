@@ -4,6 +4,8 @@ import { StudentHero } from '@/components/home/StudentHero';
 import { StudentStatsGrid } from '@/components/home/StudentStatsGrid';
 import { QuickCoursesAction } from '@/components/home/QuickCoursesAction';
 
+export const maxDuration = 100;
+
 export const metadata: Metadata = {
   title: 'الرئيسية | لوحة تحكم الطالب - كلية الذكاء الاصطناعي - جامعة كفر الشيخ',
   description: 'لوحة التحكم الأكاديمية للطالب - استعراض المعدل التراكمي، الساعات المسجلة، المستوى، وعدد المقرارات.',

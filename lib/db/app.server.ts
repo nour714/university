@@ -13,8 +13,11 @@ export function getAppSql(): postgres.Sql {
       prepare: false, // Required for Supavisor transaction mode
       fetch_types: false, // Prevents pg_catalog type introspection query on connection init
       max: env.DB_POOL_MAX,
-      idle_timeout: 10,
-      connect_timeout: 5,
+      idle_timeout: 15,
+      connect_timeout: 8,
+      connection: {
+        statement_timeout: 8000,
+      },
       max_lifetime: 60 * 5, // Connection recycling for serverless talking to Supavisor
       ssl: env.DB_SSL === 'require' ? 'require' : false,
     });

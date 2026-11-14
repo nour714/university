@@ -12,8 +12,6 @@ const nextConfig: NextConfig = {
     unoptimized: true,
   },
   allowedDevOrigins: ['192.168.1.4', 'localhost:5500', '192.168.4.6'],
-  cacheComponents: true,
-  partialPrefetching: true,
   turbopack: {
     rules: {
       "*.css": {

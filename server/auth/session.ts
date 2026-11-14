@@ -112,15 +112,15 @@ export const validateSession = cache(async (rawToken: string): Promise<Authentic
     return null;
   }
 
-  // Sliding idle window update: only write to DB if > 60 seconds elapsed since last seen update
+  // Sliding idle window update: non-blocking write to DB if > 60 seconds elapsed since last seen update
   const lastSeenMs = row.last_seen_at ? new Date(row.last_seen_at).getTime() : 0;
   if (Date.now() - lastSeenMs > 60 * 1000) {
-    await appSql`
+    void appSql`
       UPDATE public.academic_sessions
          SET last_seen_at = now(),
              idle_expires_at = LEAST(now() + interval '30 minutes', absolute_expires_at)
        WHERE id = ${row.session_id}
-    `;
+    `.catch(() => {});
   }
 
   const gpa = row.current_gpa !== null && row.current_gpa !== undefined && row.current_gpa !== ''

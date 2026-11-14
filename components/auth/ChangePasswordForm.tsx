@@ -62,6 +62,9 @@ export function ChangePasswordForm({ student }: ChangePasswordFormProps) {
       }
 
       setSuccessMessage('تم تحديث كلمة المرور بنجاح! جارٍ تحويلك إلى لوحة التحكم...');
+      if (typeof window !== 'undefined') {
+        sessionStorage.setItem('academic_tab_active', '1');
+      }
       setTimeout(() => {
         router.push('/');
         router.refresh();
@@ -76,6 +79,9 @@ export function ChangePasswordForm({ student }: ChangePasswordFormProps) {
   const handleLogout = async () => {
     setIsLoading(true);
     try {
+      if (typeof window !== 'undefined') {
+        sessionStorage.removeItem('academic_tab_active');
+      }
       await logoutAction();
       router.push('/login');
     } finally {

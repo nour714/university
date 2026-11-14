@@ -5,6 +5,7 @@ export function clearSession(): void {
   }
 
   try {
+    sessionStorage.removeItem('academic_tab_active');
     const keysToRemove: string[] = [];
     for (let i = 0; i < localStorage.length; i++) {
       const key = localStorage.key(i);

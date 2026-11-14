@@ -51,6 +51,16 @@ export function LoginForm() {
   const [isHelpSubmitted, setIsHelpSubmitted] = useState(false);
   const [isSubmittingHelp, setIsSubmittingHelp] = useState(false);
 
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      if (sessionStorage.getItem('academic_tab_active') === '1') {
+        router.replace('/');
+      } else {
+        fetch('/auth/clear', { method: 'POST' }).catch(() => {});
+      }
+    }
+  }, [router]);
+
   const handleHelpSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!helpMessage.trim()) return;
@@ -89,6 +99,10 @@ export function LoginForm() {
       if (!res.success) {
         setErrorMessage(res.error);
         return;
+      }
+
+      if (typeof window !== 'undefined') {
+        sessionStorage.setItem('academic_tab_active', '1');
       }
 
       if (res.mustChangePassword) {

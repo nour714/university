@@ -134,7 +134,7 @@ export function ExamCard({ exam }: ExamCardProps) {
               <HelpCircle className="w-3.5 h-3.5" />
             </div>
             <div className="min-w-0 flex-1">
-              <p className="text-[10px] text-slate-400">عدد الأسئلة</p>
+              <p className="text-[10px] text-slate-600">عدد الأسئلة</p>
               <p className="font-bold text-slate-800 truncate">{exam.questionsCount} سؤال</p>
             </div>
           </div>
@@ -145,7 +145,7 @@ export function ExamCard({ exam }: ExamCardProps) {
               <Clock className="w-3.5 h-3.5" />
             </div>
             <div className="min-w-0 flex-1">
-              <p className="text-[10px] text-slate-400">مدة الامتحان</p>
+              <p className="text-[10px] text-slate-600">مدة الامتحان</p>
               <p className="font-bold text-slate-800 truncate">{exam.durationMinutes} دقيقة</p>
             </div>
           </div>
@@ -156,7 +156,7 @@ export function ExamCard({ exam }: ExamCardProps) {
               <Award className="w-3.5 h-3.5" />
             </div>
             <div className="min-w-0 flex-1">
-              <p className="text-[10px] text-slate-400">درجة الامتحان</p>
+              <p className="text-[10px] text-slate-600">درجة الامتحان</p>
               <p className="font-bold text-slate-800 truncate">{exam.totalMarks} درجة</p>
             </div>
           </div>
@@ -167,7 +167,7 @@ export function ExamCard({ exam }: ExamCardProps) {
               <Calendar className="w-3.5 h-3.5" />
             </div>
             <div className="min-w-0 flex-1">
-              <p className="text-[10px] text-slate-400">فترة الاختبار</p>
+              <p className="text-[10px] text-slate-600">فترة الاختبار</p>
               <p className="font-bold text-slate-800 truncate" title={`${formatDateTime(exam.startDate)} - ${formatDateTime(exam.endDate)}`}>
                 {formatDateTime(exam.startDate)}
               </p>
@@ -189,7 +189,7 @@ export function ExamCard({ exam }: ExamCardProps) {
 
           {!isLiveNow && !isCompleted && (
             <div className="flex items-center gap-2 text-slate-600 font-mono">
-              <span className="text-xs font-sans text-slate-400">يبدأ خلال:</span>
+              <span className="text-xs font-sans text-slate-600">يبدأ خلال:</span>
               <span className="px-2 py-0.5 rounded-md bg-amber-100/80 text-amber-900 font-bold text-xs tracking-wider">
                 {String(timeLeft.hours).padStart(2, '0')}:{String(timeLeft.minutes).padStart(2, '0')}:{String(timeLeft.seconds).padStart(2, '0')}
               </span>
@@ -226,7 +226,7 @@ export function ExamCard({ exam }: ExamCardProps) {
             <button
               type="button"
               disabled
-              className="w-full sm:w-auto px-5 py-2.5 min-h-[44px] rounded-xl bg-slate-100 text-slate-400 font-bold text-xs sm:text-sm flex items-center justify-center gap-2 cursor-not-allowed border border-slate-200"
+              className="w-full sm:w-auto px-5 py-2.5 min-h-[44px] rounded-xl bg-slate-100 text-slate-600 font-bold text-xs sm:text-sm flex items-center justify-center gap-2 cursor-not-allowed border border-slate-200"
             >
               <span>في انتظار موعد البدء</span>
             </button>

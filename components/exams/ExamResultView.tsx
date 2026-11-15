@@ -82,20 +82,20 @@ export function ExamResultView({
           
           {/* Card 1 (Far Right in RTL): الدرجة */}
           <div className="bg-white rounded-2xl border border-slate-200/90 p-3.5 sm:p-5 flex flex-col items-center justify-center text-center min-h-[125px] sm:min-h-[155px] shadow-2xs">
-            <span className="text-[11px] sm:text-xs font-semibold text-slate-400 mb-1.5 sm:mb-2">
+            <span className="text-[11px] sm:text-xs font-semibold text-slate-600 mb-1.5 sm:mb-2">
               الدرجة المحققة
             </span>
             <div className="text-3xl sm:text-5xl font-black text-blue-600 font-mono tracking-tight leading-none my-1">
               {finalScore}
             </div>
-            <span className="text-[11px] sm:text-xs font-medium text-slate-400 mt-1.5 sm:mt-2">
+            <span className="text-[11px] sm:text-xs font-medium text-slate-600 mt-1.5 sm:mt-2">
               من {exam.totalMarks} درجة
             </span>
           </div>
 
           {/* Card 2: النسبة */}
           <div className="bg-white rounded-2xl border border-slate-200/90 p-3.5 sm:p-5 flex flex-col items-center justify-center text-center min-h-[125px] sm:min-h-[155px] shadow-2xs">
-            <span className="text-[11px] sm:text-xs font-semibold text-slate-400 mb-1.5 sm:mb-2">
+            <span className="text-[11px] sm:text-xs font-semibold text-slate-600 mb-1.5 sm:mb-2">
               النسبة المئوية
             </span>
             <div className="text-3xl sm:text-5xl font-black text-slate-800 font-mono tracking-tight leading-none my-1">
@@ -108,26 +108,26 @@ export function ExamResultView({
 
           {/* Card 3: التسليم */}
           <div className="bg-white rounded-2xl border border-slate-200/90 p-3.5 sm:p-5 flex flex-col items-center justify-center text-center min-h-[125px] sm:min-h-[155px] shadow-2xs">
-            <span className="text-[11px] sm:text-xs font-semibold text-slate-400 mb-1.5 sm:mb-2">
+            <span className="text-[11px] sm:text-xs font-semibold text-slate-600 mb-1.5 sm:mb-2">
               وقت التسليم
             </span>
             <div className="text-2xl sm:text-4xl font-black text-slate-800 font-mono tracking-tight leading-none my-1">
               {formattedSubmissionTime}
             </div>
-            <span className="text-[10px] sm:text-xs font-medium text-slate-400 mt-1.5 sm:mt-2 truncate max-w-full">
+            <span className="text-[10px] sm:text-xs font-medium text-slate-600 mt-1.5 sm:mt-2 truncate max-w-full">
               {isAutoSubmitted ? 'تسليم تلقائي' : 'تسليم يدوي'}
             </span>
           </div>
 
           {/* Card 4 (Far Left in RTL): إجابات صحيحة */}
           <div className="bg-white rounded-2xl border border-slate-200/90 p-3.5 sm:p-5 flex flex-col items-center justify-center text-center min-h-[125px] sm:min-h-[155px] shadow-2xs">
-            <span className="text-[11px] sm:text-xs font-semibold text-slate-400 mb-1.5 sm:mb-2">
+            <span className="text-[11px] sm:text-xs font-semibold text-slate-600 mb-1.5 sm:mb-2">
               إجابات صحيحة
             </span>
             <div className="text-3xl sm:text-5xl font-black text-slate-800 font-mono tracking-tight leading-none my-1">
               {correctCount}
             </div>
-            <span className="text-[11px] sm:text-xs font-medium text-slate-400 mt-1.5 sm:mt-2">
+            <span className="text-[11px] sm:text-xs font-medium text-slate-600 mt-1.5 sm:mt-2">
               من {exam.questions.length} أسئلة
             </span>
           </div>

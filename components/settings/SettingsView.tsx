@@ -70,7 +70,7 @@ export function SettingsView({ student: initialStudent }: { student?: StudentPro
 
   // Password Strength Calculation
   const getPasswordStrength = () => {
-    if (!newPassword) return { percent: 0, label: '', barColor: 'bg-slate-200', textColor: 'text-slate-400' };
+    if (!newPassword) return { percent: 0, label: '', barColor: 'bg-slate-200', textColor: 'text-slate-600' };
     let score = 0;
     if (hasMinLength) score++;
     if (hasLetters) score++;
@@ -196,7 +196,7 @@ export function SettingsView({ student: initialStudent }: { student?: StudentPro
     { value: 'code', label: 'مشكلة في كود تفعيل المقرر', icon: <KeyRound className="w-4 h-4 text-amber-500" /> },
     { value: 'exam', label: 'استفسار بخصوص اختبار أو نتيجة', icon: <HelpCircle className="w-4 h-4 text-blue-500" /> },
     { value: 'account', label: 'مشكلة في الحساب الأكاديمي', icon: <User className="w-4 h-4 text-indigo-500" /> },
-    { value: 'other', label: 'استفسار عام', icon: <MessageSquare className="w-4 h-4 text-slate-400" /> },
+    { value: 'other', label: 'استفسار عام', icon: <MessageSquare className="w-4 h-4 text-slate-600" /> },
   ];
 
   const priorityOptions: SelectOption[] = [
@@ -291,7 +291,7 @@ export function SettingsView({ student: initialStudent }: { student?: StudentPro
             <div>
               <p className="text-[11px] text-slate-500 font-medium">أمان كلمة السر</p>
               <p className="text-sm font-extrabold text-slate-800">مشفرة وآمنة</p>
-              <p className="text-[10px] text-slate-400">آخر تغيير: الفصل الحالي</p>
+              <p className="text-[10px] text-slate-600">آخر تغيير: الفصل الحالي</p>
             </div>
           </div>
 
@@ -302,7 +302,7 @@ export function SettingsView({ student: initialStudent }: { student?: StudentPro
             <div>
               <p className="text-[11px] text-slate-500 font-medium">الدعم الفني</p>
               <p className="text-sm font-extrabold text-emerald-700">متاح الآن</p>
-              <p className="text-[10px] text-slate-400">رد فوري عبر واتساب</p>
+              <p className="text-[10px] text-slate-600">رد فوري عبر واتساب</p>
             </div>
           </div>
         </div>

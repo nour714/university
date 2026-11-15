@@ -14,7 +14,15 @@ export const DEMO_REDEEMABLE_CODES: DemoRedeemableCode[] = [
   {
     code: 'ALL3-2026-FULL',
     courseCode: 'ALL-L3-S1',
-    courseName: 'باقة كافة مقررات المستوى الثالث (الفصل الأول)',
+    courseName: 'كل مقررات الفصل',
+    courseId: null,
+    doctorName: 'هيئة تدريس المستوى الثالث',
+    isBundle: true,
+  },
+  {
+    code: 'XXXP-UKTX-R35R',
+    courseCode: 'ALL-L3-S1',
+    courseName: 'كل مقررات الفصل',
     courseId: null,
     doctorName: 'هيئة تدريس المستوى الثالث',
     isBundle: true,
@@ -22,7 +30,7 @@ export const DEMO_REDEEMABLE_CODES: DemoRedeemableCode[] = [
   {
     code: 'UNIV-2026-L3S1',
     courseCode: 'ALL-L3-S1',
-    courseName: 'باقة كافة مقررات المستوى الثالث (الفصل الأول - احتياطي)',
+    courseName: 'كل مقررات الفصل (احتياطي)',
     courseId: null,
     doctorName: 'هيئة تدريس المستوى الثالث',
     isBundle: true,

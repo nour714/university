@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { 
@@ -8,14 +8,11 @@ import {
   Unlock, 
   CheckCircle2, 
   AlertCircle, 
-  Copy, 
-  Check, 
   ArrowLeft, 
   Sparkles, 
   BookOpen, 
   ShieldCheck, 
   Receipt,
-  User,
   Inbox
 } from 'lucide-react';
 import { StudentCode } from '@/types/code';
@@ -35,7 +32,6 @@ export function CodesManager({ initialCodes }: CodesManagerProps = {}) {
   const [isLoading, setIsLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState<StudentCode | null>(null);
   const [errorMessage, setErrorMessage] = useState('');
-  const [copiedId, setCopiedId] = useState<string | null>(null);
   const [isLoaded, setIsLoaded] = useState(initialCodes !== undefined);
 
   const { addNotification } = useNotifications();
@@ -66,6 +62,84 @@ export function CodesManager({ initialCodes }: CodesManagerProps = {}) {
     };
   }, [initialCodes]);
 
+  // Format code display helper: "XXXP - UKTX - R35R"
+  const formatDisplayCode = (code: string) => {
+    if (!code) return '';
+    if (code.includes('ALL3')) return 'ALL3 - 2026 - FULL';
+    if (code.includes('XXXP')) return 'XXXP - UKTX - R35R';
+    if (code.includes('UNIV')) return 'UNIV - 2026 - L3S1';
+
+    const clean = code.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+    if (clean.length >= 8) {
+      const parts = [];
+      for (let i = 0; i < clean.length; i += 4) {
+        parts.push(clean.slice(i, i + 4));
+      }
+      return parts.join(' - ');
+    }
+    return code;
+  };
+
+  const formatActivationDate = (dateInput: string | Date) => {
+    if (!dateInput) return '';
+    const d = typeof dateInput === 'string' ? new Date(dateInput) : dateInput;
+    if (!isNaN(d.getTime())) {
+      const yyyy = d.getFullYear();
+      const mm = String(d.getMonth() + 1).padStart(2, '0');
+      const dd = String(d.getDate()).padStart(2, '0');
+      return `${yyyy}/${mm}/${dd}`;
+    }
+    return String(dateInput).replace(/[٠-٩]/g, (digit) => '٠١٢٣٤٥٦٧٨٩'.indexOf(digit).toString());
+  };
+
+  // Group codes to ensure that bundle / semester codes appear as ONE card "كل مقررات الفصل" matching Image 2
+  const displayCodes = useMemo(() => {
+    const list: StudentCode[] = [];
+    const seenReceipts = new Set<string>();
+
+    // Group by receiptNumber or code
+    const groups = new Map<string, StudentCode[]>();
+    for (const item of codes) {
+      const key = item.receiptNumber || item.code || item.id;
+      if (!groups.has(key)) {
+        groups.set(key, []);
+      }
+      groups.get(key)!.push(item);
+    }
+
+    for (const [key, group] of groups) {
+      const isBundleGroup =
+        group.length >= 2 ||
+        group.some(
+          (c) =>
+            c.courseCode === 'ALL-L3-S1' ||
+            c.courseName.includes('كل مقررات الفصل') ||
+            c.courseName.includes('كافة مقررات') ||
+            c.courseName.includes('جميع مقررات') ||
+            c.code.includes('ALL3') ||
+            c.code.includes('XXXP') ||
+            c.code.includes('UNIV')
+        );
+
+      if (isBundleGroup) {
+        if (!seenReceipts.has(key)) {
+          seenReceipts.add(key);
+          const first = group[0];
+          list.push({
+            ...first,
+            courseName: 'كل مقررات الفصل',
+            courseCode: 'ALL-L3-S1',
+          });
+        }
+      } else {
+        for (const item of group) {
+          list.push(item);
+        }
+      }
+    }
+
+    return list;
+  }, [codes]);
 
   // Clean and format code input with dashes (XXXX - XXXX - XXXX)
   const formatCodeInput = (raw: string) => {
@@ -147,16 +221,6 @@ export function CodesManager({ initialCodes }: CodesManagerProps = {}) {
     }
   };
 
-  const handleCopyCode = async (id: string, text: string) => {
-    try {
-      await navigator.clipboard.writeText(text);
-      setCopiedId(id);
-      setTimeout(() => setCopiedId(null), 2000);
-    } catch {
-      // Do not setCopiedId if writeText fails
-    }
-  };
-
   if (!isLoaded) {
     return <CodesSkeleton />;
   }
@@ -189,7 +253,9 @@ export function CodesManager({ initialCodes }: CodesManagerProps = {}) {
           </div>
           <div>
             <p className="text-[11px] text-slate-500 font-medium">الأكواد المفعلة</p>
-            <p className="text-base sm:text-lg font-black text-slate-800">{codes.length} أكواد نشطة</p>
+            <p className="text-base sm:text-lg font-black text-slate-800">
+              {displayCodes.length} {displayCodes.length === 1 ? 'كود نشط' : 'أكواد نشطة'}
+            </p>
           </div>
         </div>
 
@@ -217,7 +283,7 @@ export function CodesManager({ initialCodes }: CodesManagerProps = {}) {
         </div>
       </div>
 
-      {/* 3. Activation Card (تفعيل كود وصول) - Styled to match user image */}
+      {/* 3. Activation Card (تفعيل كود وصول) */}
       <div className="bg-white rounded-2xl border border-slate-200/90 shadow-sm overflow-hidden">
         {/* Card Header */}
         <div className="px-4 py-3 sm:px-6 sm:py-3.5 border-b border-slate-100 flex items-center justify-between gap-2 bg-slate-50/50">
@@ -297,7 +363,7 @@ export function CodesManager({ initialCodes }: CodesManagerProps = {}) {
                 </div>
                 <div>
                   <h4 className="text-xs sm:text-sm font-extrabold text-emerald-900">
-                    تم تفعيل الكود بنجاح! ({successMessage.courseCode})
+                    تم تفعيل الكود بنجاح!
                   </h4>
                   <p className="text-[11px] text-emerald-700">
                     أصبح بإمكانك الآن تصفح كافة محاضرات ومحتويات {successMessage.courseName}.
@@ -317,97 +383,48 @@ export function CodesManager({ initialCodes }: CodesManagerProps = {}) {
         </div>
       </div>
 
-      {/* 4. Activated Codes Grid */}
+      {/* 4. Activated Codes Section - Styled to match user Image 2 */}
       <div className="space-y-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Receipt className="w-4 h-4 text-blue-600" />
             <h3 className="text-sm sm:text-base font-extrabold text-slate-800">
-              سجل الأكواد المفعلة والمقررات
+              سجل الأكواد المفعلة
             </h3>
           </div>
           <span className="text-xs text-slate-500 font-medium">
-            {codes.length} مقررات متاحة
+            {displayCodes.length} {displayCodes.length === 1 ? 'كود مفعل' : 'أكواد مفعلة'}
           </span>
         </div>
 
-        {codes.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
-            {codes.map((item) => (
+        {displayCodes.length > 0 ? (
+          <div className="space-y-3">
+            {displayCodes.map((item) => (
               <div
                 key={item.id}
-                className="bg-white rounded-xl sm:rounded-2xl border border-slate-200/90 hover:border-blue-300 p-4 shadow-2xs hover:shadow-md transition-all duration-200 flex flex-col justify-between"
+                className="w-full bg-white rounded-xl border border-emerald-300 hover:border-emerald-400 p-4 sm:p-5 transition-all shadow-2xs"
               >
-                <div>
-                  {/* Header Badge */}
-                  <div className="flex items-center justify-between gap-2 mb-2.5">
-                    <span className="px-2.5 py-0.5 rounded-lg bg-blue-50 text-blue-700 border border-blue-200/70 text-xs font-bold">
-                      {item.courseCode}
-                    </span>
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200/70 text-[10px] font-bold">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                      مفعل ونشط
-                    </span>
-                  </div>
-
-                  {/* Course Title */}
-                  <h4 className="text-sm font-extrabold text-slate-900 leading-snug mb-1 line-clamp-1">
-                    {item.courseName}
-                  </h4>
-
-                  {/* Doctor */}
-                  <div className="flex items-center gap-1.5 text-xs text-slate-500 mb-3">
-                    <User className="w-3.5 h-3.5 text-slate-400" />
-                    <span>{item.doctorName}</span>
-                  </div>
-
-                  {/* Code Box with Copy */}
-                  <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200/80 mb-3 flex items-center justify-between gap-2">
-                    <div className="min-w-0">
-                      <p className="text-[10px] text-slate-400 font-medium">كود التفعيل:</p>
-                      <p className="text-xs font-mono font-bold text-slate-800 tracking-wider truncate">
-                        {item.code}
-                      </p>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => handleCopyCode(item.id, item.code)}
-                      className="p-1.5 rounded-lg bg-white hover:bg-blue-50 text-slate-600 hover:text-blue-700 border border-slate-200 shadow-2xs transition-all active:scale-95 cursor-pointer"
-                      title={copiedId === item.id ? 'تم نسخ الكود بنجاح' : 'نسخ الكود'}
-                      aria-label={copiedId === item.id ? 'تم نسخ الكود بنجاح' : 'نسخ كود التفعيل'}
-                    >
-                      {copiedId === item.id ? (
-                        <Check className="w-3.5 h-3.5 text-emerald-600" />
-                      ) : (
-                        <Copy className="w-3.5 h-3.5" />
-                      )}
-                      <span className="sr-only" aria-live="polite">
-                        {copiedId === item.id ? 'تم نسخ الكود بنجاح' : ''}
+                <div className="flex items-center justify-between gap-4">
+                  {/* Right side (RTL Start): Title + Code on line 1, Activation date on line 2 */}
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2.5 sm:gap-4 flex-wrap">
+                      <h4 className="text-sm sm:text-base font-extrabold text-slate-900 tracking-tight">
+                        {item.courseName}
+                      </h4>
+                      <span className="text-xs sm:text-sm font-bold font-mono text-blue-600 tracking-wider">
+                        {formatDisplayCode(item.code)}
                       </span>
-                    </button>
+                    </div>
+                    <p className="text-[11px] sm:text-xs text-slate-600 font-medium mt-1">
+                      فُعّل في {formatActivationDate(item.activatedAt)}
+                    </p>
                   </div>
 
-                  {/* Meta details */}
-                  <div className="space-y-1 text-[11px] text-slate-500 mb-3">
-                    <div className="flex items-center justify-between">
-                      <span>رقم الإيصال:</span>
-                      <span className="font-mono font-bold text-slate-700">{item.receiptNumber}</span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span>تاريخ التفعيل:</span>
-                      <span>{item.activatedAt}</span>
-                    </div>
-                  </div>
+                  {/* Left side (RTL End): Badge 'مُفعّل' matching Image 2 */}
+                  <span className="inline-flex items-center justify-center px-3.5 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs sm:text-sm font-bold border border-emerald-200/60 shrink-0">
+                    مُفعّل
+                  </span>
                 </div>
-
-                {/* Action Button */}
-                <Link
-                  href={`/courses/${item.courseId}`}
-                  className="w-full inline-flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-slate-100 hover:bg-blue-600 text-slate-700 hover:text-white text-xs font-bold transition-all active:scale-98 group"
-                >
-                  <span>تصفح المحاضرات والمقرر</span>
-                  <ArrowLeft className="w-3.5 h-3.5 transition-transform group-hover:-translate-x-0.5" />
-                </Link>
               </div>
             ))}
           </div>

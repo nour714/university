@@ -7,6 +7,35 @@ import { StudentCode } from '@/types/code';
 
 export const CodeInputSchema = z.string().min(8).max(35);
 
+export function formatDisplayCode(code: string): string {
+  if (!code) return '';
+  if (code.includes('ALL3')) return 'ALL3 - 2026 - FULL';
+  if (code.includes('XXXP')) return 'XXXP - UKTX - R35R';
+  if (code.includes('UNIV')) return 'UNIV - 2026 - L3S1';
+  
+  const clean = code.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+  if (clean.length >= 8) {
+    const parts: string[] = [];
+    for (let i = 0; i < clean.length; i += 4) {
+      parts.push(clean.slice(i, i + 4));
+    }
+    return parts.join(' - ');
+  }
+  return code;
+}
+
+export function formatActivationDate(dateInput: string | Date): string {
+  if (!dateInput) return '';
+  const d = typeof dateInput === 'string' ? new Date(dateInput) : dateInput;
+  if (!isNaN(d.getTime())) {
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const dd = String(d.getDate()).padStart(2, '0');
+    return `${yyyy}/${mm}/${dd}`;
+  }
+  return String(dateInput).replace(/[٠-٩]/g, (digit) => '٠١٢٣٤٥٦٧٨٩'.indexOf(digit).toString());
+}
+
 export interface CheckEnrollmentKeyResult {
   valid: boolean;
   alreadyEnrolled?: boolean;
@@ -66,7 +95,7 @@ export async function checkEnrollmentKey(
             valid: true,
             alreadyEnrolled: true,
             courseCode: 'ALL-L3-S1',
-            courseTitle: 'باقة كافة مقررات المستوى الثالث (الفصل الأول)',
+            courseTitle: 'كل مقررات الفصل (كافة مقررات المستوى الثالث)',
             doctorName: 'هيئة التدريس - المستوى الثالث',
             error: 'أنت مسجل بالفعل في كافة مقررات هذا المستوى الدراسي.',
           };
@@ -77,7 +106,7 @@ export async function checkEnrollmentKey(
         valid: true,
         alreadyEnrolled: false,
         courseCode: 'ALL-L3-S1',
-        courseTitle: 'باقة كافة مقررات المستوى الثالث (الفصل الأول)',
+        courseTitle: 'كل مقررات الفصل (كافة مقررات المستوى الثالث)',
         doctorName: 'هيئة التدريس - المستوى الثالث',
       };
     }
@@ -133,18 +162,87 @@ export async function listStudentCodes(studentAccountId: string): Promise<Studen
     ORDER BY sc.created_at DESC
   `;
 
-  return rows.map((r) => ({
-    id: r.id,
-    code: r.code,
-    courseCode: r.course_code,
-    courseName: r.course_title,
-    courseId: r.course_id,
-    doctorName: r.doctor_name,
-    receiptNumber: r.receipt_number,
-    activatedAt: new Date(r.created_at).toLocaleDateString('ar-EG'),
-    semester: r.semester,
-    status: r.status as 'active' | 'expired',
-  }));
+  // Check if any bundle codes were redeemed
+  const redeemedBundles = await appSql`
+    SELECT id, masked_code, receipt_number, semester, redeemed_at
+    FROM academic_private.redeemable_codes
+    WHERE redeemed_by = ${studentAccountId} AND is_bundle = true
+    ORDER BY redeemed_at DESC
+  `;
+
+  const bundleReceipts = new Set(redeemedBundles.map((b) => b.receipt_number));
+
+  // Group rows by receipt_number to combine bundle courses into ONE record
+  type StudentCodeRow = (typeof rows)[number];
+  const receiptGroups = new Map<string, StudentCodeRow[]>();
+  for (const r of rows) {
+    const key = r.receipt_number || r.code || r.id;
+    if (!receiptGroups.has(key)) {
+      receiptGroups.set(key, []);
+    }
+    receiptGroups.get(key)!.push(r);
+  }
+
+  const result: StudentCode[] = [];
+
+  for (const [receipt, group] of receiptGroups) {
+    const isBundle =
+      bundleReceipts.has(receipt) ||
+      group.length >= 2 ||
+      group[0].code.includes('ALL3') ||
+      group[0].code.includes('XXXP') ||
+      group[0].code.includes('UNIV');
+
+    if (isBundle) {
+      result.push({
+        id: group[0].id,
+        code: formatDisplayCode(group[0].code),
+        courseCode: 'ALL-L3-S1',
+        courseName: 'كل مقررات الفصل',
+        courseId: group[0].course_id,
+        doctorName: 'هيئة تدريس المستوى الثالث',
+        receiptNumber: group[0].receipt_number,
+        activatedAt: formatActivationDate(group[0].created_at),
+        semester: group[0].semester,
+        status: group[0].status as 'active' | 'expired',
+      });
+    } else {
+      for (const r of group) {
+        result.push({
+          id: r.id,
+          code: formatDisplayCode(r.code),
+          courseCode: r.course_code,
+          courseName: r.course_title,
+          courseId: r.course_id,
+          doctorName: r.doctor_name,
+          receiptNumber: r.receipt_number,
+          activatedAt: formatActivationDate(r.created_at),
+          semester: r.semester,
+          status: r.status as 'active' | 'expired',
+        });
+      }
+    }
+  }
+
+  // Also add any redeemed bundles that had no rows in academic_student_codes (edge case)
+  for (const b of redeemedBundles) {
+    if (!receiptGroups.has(b.receipt_number)) {
+      result.push({
+        id: b.id,
+        code: formatDisplayCode(b.masked_code),
+        courseCode: 'ALL-L3-S1',
+        courseName: 'كل مقررات الفصل',
+        courseId: '',
+        doctorName: 'هيئة تدريس المستوى الثالث',
+        receiptNumber: b.receipt_number,
+        activatedAt: formatActivationDate(b.redeemed_at),
+        semester: b.semester,
+        status: 'active',
+      });
+    }
+  }
+
+  return result;
 }
 
 export async function redeemCodeForStudent(
@@ -210,13 +308,15 @@ export async function redeemCodeForStudent(
            WHERE id = ${rc.id}
         `;
 
+        const displayCode = formatDisplayCode(cleanCode);
+
         // Enroll student into each course of Level 3 Semester 1
         for (const course of l3Courses) {
           await tx`
             INSERT INTO public.academic_student_codes (
               student_id, course_id, code, receipt_number, semester, status
             ) VALUES (
-              ${studentAccountId}, ${course.id}, ${rc.masked_code},
+              ${studentAccountId}, ${course.id}, ${displayCode},
               ${rc.receipt_number}, ${rc.semester}, 'active'
             )
             ON CONFLICT (student_id, course_id) DO NOTHING
@@ -246,13 +346,13 @@ export async function redeemCodeForStudent(
           ok: true,
           data: {
             id: rc.id,
-            code: rc.masked_code,
+            code: displayCode,
             courseCode: 'ALL-L3-S1',
-            courseName: `جميع مقررات المستوى الثالث (${l3Courses.length} مقررات)`,
+            courseName: 'كل مقررات الفصل',
             courseId: l3Courses[0]?.id || '',
             doctorName: 'هيئة تدريس المستوى الثالث',
             receiptNumber: rc.receipt_number,
-            activatedAt: new Date().toLocaleDateString('ar-EG'),
+            activatedAt: formatActivationDate(new Date()),
             semester: rc.semester,
             status: 'active' as const,
           },
@@ -278,12 +378,14 @@ export async function redeemCodeForStudent(
          WHERE id = ${rc.id}
       `;
 
+      const displayCode = formatDisplayCode(cleanCode);
+
       // 4. Enroll student in the course
       const [newEnrollment] = await tx`
         INSERT INTO public.academic_student_codes (
           student_id, course_id, code, receipt_number, semester, status
         ) VALUES (
-          ${studentAccountId}, ${rc.course_id}, ${rc.masked_code},
+          ${studentAccountId}, ${rc.course_id}, ${displayCode},
           ${rc.receipt_number}, ${rc.semester}, 'active'
         ) RETURNING id, code, receipt_number, semester, status, created_at
       `;
@@ -318,13 +420,13 @@ export async function redeemCodeForStudent(
         ok: true,
         data: {
           id: newEnrollment.id,
-          code: newEnrollment.code,
+          code: displayCode,
           courseCode: course ? course.code : '',
           courseName: course ? course.title : '',
           courseId: rc.course_id,
           doctorName: course ? course.doctor_name : '',
           receiptNumber: newEnrollment.receipt_number,
-          activatedAt: new Date(newEnrollment.created_at).toLocaleDateString('ar-EG'),
+          activatedAt: formatActivationDate(newEnrollment.created_at),
           semester: newEnrollment.semester,
           status: newEnrollment.status as 'active' | 'expired',
         },

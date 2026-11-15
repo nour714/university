@@ -258,7 +258,7 @@ export function NotificationBell() {
                       <span className="w-2 h-2 rounded-full bg-blue-600 shrink-0 animate-pulse" />
                     )}
                   </div>
-                  <span className="text-[11px] text-slate-400 font-medium shrink-0">
+                  <span className="text-[11px] text-slate-600 font-medium shrink-0">
                     {notif.timeAgo}
                   </span>
                 </div>
@@ -283,7 +283,7 @@ export function NotificationBell() {
                       e.stopPropagation();
                       removeNotification(notif.id);
                     }}
-                    className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 active:scale-95 transition-all cursor-pointer"
+                    className="p-1.5 rounded-lg text-slate-600 hover:text-rose-600 hover:bg-rose-50 active:scale-95 transition-all cursor-pointer"
                     title="حذف الإشعار"
                     aria-label="حذف الإشعار"
                   >
@@ -296,13 +296,13 @@ export function NotificationBell() {
         ) : (
           /* Empty state for the tab */
           <div className="py-12 text-center">
-            <div className="w-12 h-12 rounded-2xl bg-slate-100 text-slate-400 flex items-center justify-center mx-auto mb-3">
+            <div className="w-12 h-12 rounded-2xl bg-slate-100 text-slate-600 flex items-center justify-center mx-auto mb-3">
               <Bell className="w-6 h-6" />
             </div>
             <p className="text-xs font-bold text-slate-700 mb-1">
               لا توجد إشعارات في هذا القسم
             </p>
-            <p className="text-[11px] text-slate-400 max-w-[220px] mx-auto">
+            <p className="text-[11px] text-slate-600 max-w-[220px] mx-auto">
               أي تحديث جديد للمحاضرات أو الاختبارات سيظهر لك هنا فوراً.
             </p>
           </div>

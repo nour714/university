@@ -291,7 +291,7 @@ export function CourseContentBrowser({ items, courseCode, isLocked }: CourseCont
             <button
               type="button"
               onClick={() => setSearchQuery('')}
-              className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-semibold text-slate-400 hover:text-slate-700 px-2 py-1"
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-semibold text-slate-600 hover:text-slate-800 px-2 py-1"
             >
               مسح
             </button>
@@ -434,7 +434,7 @@ export function CourseContentBrowser({ items, courseCode, isLocked }: CourseCont
                       )}
                     </div>
                     <span className="text-slate-300">•</span>
-                    <div className="flex items-center gap-1 text-slate-400">
+                    <div className="flex items-center gap-1 text-slate-600">
                       <Calendar className="w-3 h-3" />
                       <span>{item.uploadedAt}</span>
                     </div>
@@ -464,8 +464,8 @@ export function CourseContentBrowser({ items, courseCode, isLocked }: CourseCont
                 </div>
 
                 {/* Upload Date Badge */}
-                <div className="inline-flex items-center gap-1.5 text-xs text-slate-400 min-w-[95px] justify-center bg-slate-50 border border-slate-200/50 px-2.5 py-1 rounded-lg">
-                  <Calendar className="w-3.5 h-3.5 text-slate-400" />
+                <div className="inline-flex items-center gap-1.5 text-xs text-slate-600 min-w-[95px] justify-center bg-slate-50 border border-slate-200/50 px-2.5 py-1 rounded-lg">
+                  <Calendar className="w-3.5 h-3.5 text-slate-600" />
                   <span>{item.uploadedAt}</span>
                 </div>
               </div>
@@ -531,7 +531,7 @@ export function CourseContentBrowser({ items, courseCode, isLocked }: CourseCont
           {/* Footer Card Summary */}
           <div className="bg-slate-50/80 rounded-2xl px-5 py-3 border border-slate-200 text-xs text-slate-500 flex flex-col sm:flex-row items-center justify-between gap-2 shadow-2xs">
             <span className="font-semibold text-slate-700">إجمالي المعروض: {filteredItems.length} عنصر</span>
-            <span className="text-[11px] text-slate-400">الملفات مخزنة وموثقة سحابياً بواسطة كلية الذكاء الاصطناعي - جامعة كفر الشيخ</span>
+            <span className="text-[11px] text-slate-600">الملفات مخزنة وموثقة سحابياً بواسطة كلية الذكاء الاصطناعي - جامعة كفر الشيخ</span>
           </div>
         </div>
       ) : (

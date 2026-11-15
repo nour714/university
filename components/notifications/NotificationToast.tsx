@@ -73,7 +73,7 @@ export function NotificationToast() {
               {toast.type === 'material' && 'محتوى أكاديمي'}
               {toast.type === 'announcement' && 'إشعار هام'}
             </span>
-            <span className="text-[10px] text-slate-400 font-medium">الآن</span>
+            <span className="text-[10px] text-slate-600 font-medium">الآن</span>
           </div>
 
           <h4 className="text-xs font-extrabold text-slate-900 leading-snug line-clamp-1 mb-1">
@@ -102,7 +102,7 @@ export function NotificationToast() {
             <button
               type="button"
               onClick={dismissToast}
-              className="text-[11px] font-medium text-slate-400 hover:text-slate-700 px-2 py-0.5 rounded-md hover:bg-slate-100 transition-colors"
+              className="text-[11px] font-medium text-slate-600 hover:text-slate-800 px-2 py-0.5 rounded-md hover:bg-slate-100 transition-colors"
             >
               إغلاق
             </button>
@@ -113,7 +113,7 @@ export function NotificationToast() {
         <button
           type="button"
           onClick={dismissToast}
-          className="text-slate-400 hover:text-slate-700 p-1 rounded-lg hover:bg-slate-100 transition-all shrink-0 -mt-1 -mr-1"
+          className="text-slate-600 hover:text-slate-800 p-1 rounded-lg hover:bg-slate-100 transition-all shrink-0 -mt-1 -mr-1"
           aria-label="إغلاق الإشعار"
         >
           <X className="w-4 h-4" />

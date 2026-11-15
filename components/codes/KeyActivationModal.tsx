@@ -274,7 +274,7 @@ export function KeyActivationModal({
                     <button
                       type="button"
                       onClick={() => setInputCode('')}
-                      className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 p-1 rounded-lg"
+                      className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-600 hover:text-slate-800 p-1 rounded-lg"
                       title="مسح"
                       aria-label="مسح الكود المدخل"
                     >

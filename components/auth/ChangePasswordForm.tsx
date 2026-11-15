@@ -138,11 +138,11 @@ export function ChangePasswordForm({ student }: ChangePasswordFormProps) {
                 required
                 className="w-full h-11 px-3.5 ps-10 pe-10 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 text-xs text-slate-900 transition-all outline-hidden font-medium"
               />
-              <Lock className="w-4 h-4 text-slate-400 absolute start-3 top-3.5" />
+              <Lock className="w-4 h-4 text-slate-600 absolute start-3 top-3.5" />
               <button
                 type="button"
                 onClick={() => setShowCurrent(!showCurrent)}
-                className="absolute end-3 top-3 text-slate-400 hover:text-slate-600 p-0.5 cursor-pointer"
+                className="absolute end-3 top-3 text-slate-600 hover:text-slate-800 p-0.5 cursor-pointer"
                 title={showCurrent ? 'إخفاء' : 'إظهار'}
                 aria-label={showCurrent ? 'إخفاء كلمة المرور الحالية' : 'إظهار كلمة المرور الحالية'}
               >
@@ -166,11 +166,11 @@ export function ChangePasswordForm({ student }: ChangePasswordFormProps) {
                 required
                 className="w-full h-11 px-3.5 ps-10 pe-10 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 text-xs text-slate-900 transition-all outline-hidden font-medium"
               />
-              <Lock className="w-4 h-4 text-slate-400 absolute start-3 top-3.5" />
+              <Lock className="w-4 h-4 text-slate-600 absolute start-3 top-3.5" />
               <button
                 type="button"
                 onClick={() => setShowNew(!showNew)}
-                className="absolute end-3 top-3 text-slate-400 hover:text-slate-600 p-0.5 cursor-pointer"
+                className="absolute end-3 top-3 text-slate-600 hover:text-slate-800 p-0.5 cursor-pointer"
                 title={showNew ? 'إخفاء' : 'إظهار'}
                 aria-label={showNew ? 'إخفاء كلمة المرور الجديدة' : 'إظهار كلمة المرور الجديدة'}
               >
@@ -206,11 +206,11 @@ export function ChangePasswordForm({ student }: ChangePasswordFormProps) {
                 required
                 className="w-full h-11 px-3.5 ps-10 pe-10 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 text-xs text-slate-900 transition-all outline-hidden font-medium"
               />
-              <Lock className="w-4 h-4 text-slate-400 absolute start-3 top-3.5" />
+              <Lock className="w-4 h-4 text-slate-600 absolute start-3 top-3.5" />
               <button
                 type="button"
                 onClick={() => setShowConfirm(!showConfirm)}
-                className="absolute end-3 top-3 text-slate-400 hover:text-slate-600 p-0.5 cursor-pointer"
+                className="absolute end-3 top-3 text-slate-600 hover:text-slate-800 p-0.5 cursor-pointer"
                 title={showConfirm ? 'إخفاء' : 'إظهار'}
                 aria-label={showConfirm ? 'إخفاء تأكيد كلمة المرور' : 'إظهار تأكيد كلمة المرور'}
               >

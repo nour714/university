@@ -114,21 +114,23 @@ describe('TASK 2 — Seed and Example Files (F2)', () => {
         ORDER BY p.student_code ASC;
       `;
 
-      expect(accounts.length).toBe(4);
+      expect(accounts.length).toBe(5);
 
       // Verify demo student
       const demo = accounts.find((s) => s.student_code === '20230814');
       const s1 = accounts.find((s) => s.student_code === '20230815');
       const s2 = accounts.find((s) => s.student_code === '20230816');
       const s3 = accounts.find((s) => s.student_code === '20230817');
+      const s4 = accounts.find((s) => s.student_code === '20240818');
 
       expect(demo).toBeDefined();
       expect(s1).toBeDefined();
       expect(s2).toBeDefined();
       expect(s3).toBeDefined();
+      expect(s4).toBeDefined();
 
-      if (!demo || !s1 || !s2 || !s3) {
-        throw new Error('Expected all 4 student accounts to be found in the database');
+      if (!demo || !s1 || !s2 || !s3 || !s4) {
+        throw new Error('Expected all 5 student accounts to be found in the database');
       }
 
       expect(demo.full_name).toBe('عبد الرحمن خالد منصور');
@@ -152,6 +154,12 @@ describe('TASK 2 — Seed and Example Files (F2)', () => {
       expect(s3.national_id).toBe('30411182103719');
       expect(s3.current_gpa).toBeNull();
       expect(s3.must_change_password).toBe(true);
+
+      // Verify Level 2 student (Arwa)
+      expect(s4.full_name).toBe('أروى محمد إبراهيم');
+      expect(s4.national_id).toBe('30504150103428');
+      expect(s4.current_gpa).toBeNull();
+      expect(s4.must_change_password).toBe(true);
     } finally {
       await db.end();
       await clients.ownerSql.unsafe(`DROP DATABASE ${testDbName};`);

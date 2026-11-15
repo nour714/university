@@ -101,6 +101,26 @@ export const NEW_STUDENT_ACCOUNTS: SeedStudentData[] = [
     status: 'منتظم',
     enrollDefaultCourses: false,
   },
+  {
+    id: 'std_20240818',
+    fullName: 'أروى محمد إبراهيم',
+    email: 'arwa.mohamed@university.edu.eg',
+    academicId: '20240818',
+    nationalId: '30504150103428',
+    department: 'هندسة وعلوم الذكاء الاصطناعي',
+    faculty: 'كلية الذكاء الاصطناعي',
+    level: 'المستوى الثاني',
+    levelNumber: 2,
+    gpa: null,
+    maxGpa: 4.00,
+    gpaRating: 'قيد الرصد',
+    registeredHours: 18,
+    coursesCount: 6,
+    academicYear: '2026/2027',
+    semester: 'الفصل الدراسي الأول',
+    status: 'منتظم',
+    enrollDefaultCourses: false,
+  },
 ];
 
 export const SEED_STUDENTS: SeedStudentData[] = [DEMO_STUDENT, ...NEW_STUDENT_ACCOUNTS];

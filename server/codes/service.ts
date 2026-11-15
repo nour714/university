@@ -9,10 +9,6 @@ export const CodeInputSchema = z.string().min(8).max(35);
 
 export function formatDisplayCode(code: string): string {
   if (!code) return '';
-  if (code.includes('ALL3')) return 'ALL3 - 2026 - FULL';
-  if (code.includes('XXXP')) return 'XXXP - UKTX - R35R';
-  if (code.includes('UNIV')) return 'UNIV - 2026 - L3S1';
-  
   const clean = code.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
   if (clean.length >= 8) {
     const parts: string[] = [];
@@ -22,6 +18,19 @@ export function formatDisplayCode(code: string): string {
     return parts.join(' - ');
   }
   return code;
+}
+
+export function getLevelTitle(targetLevel: number): string {
+  switch (targetLevel) {
+    case 1:
+      return 'المستوى الأول';
+    case 2:
+      return 'المستوى الثاني';
+    case 4:
+      return 'المستوى الرابع';
+    default:
+      return 'المستوى الثالث';
+  }
 }
 
 export function formatActivationDate(dateInput: string | Date): string {
@@ -77,7 +86,7 @@ export async function checkEnrollmentKey(
 
     if (rc.is_bundle) {
       const targetLevel = rc.target_level || 3;
-      const levelTitle = targetLevel === 1 ? 'المستوى الأول' : 'المستوى الثالث';
+      const levelTitle = getLevelTitle(targetLevel);
       const bundleCourseCode = `ALL-L${targetLevel}-S1`;
       const bundleCourseTitle = `باقة كافة مقررات ${levelTitle} (الفصل الأول)`;
       const bundleDoctorName = `هيئة التدريس - ${levelTitle}`;
@@ -203,8 +212,11 @@ export async function listStudentCodes(studentAccountId: string): Promise<Studen
       const isL1 =
         group[0].code.includes('ALL1') ||
         group.some((g) => g.course_code?.startsWith('CS1') || g.course_code?.startsWith('BS1') || g.course_code?.startsWith('IT1') || g.course_code?.startsWith('HU1'));
-      const targetLvl = isL1 ? 1 : 3;
-      const levelTitle = targetLvl === 1 ? 'المستوى الأول' : 'المستوى الثالث';
+      const isL2 =
+        group[0].code.includes('ALL2') ||
+        group.some((g) => g.course_code?.startsWith('AI2') || g.course_code?.startsWith('CS2') || g.course_code?.startsWith('HU2'));
+      const targetLvl = isL1 ? 1 : isL2 ? 2 : 3;
+      const levelTitle = getLevelTitle(targetLvl);
 
       result.push({
         id: group[0].id,
@@ -356,7 +368,7 @@ export async function redeemCodeForStudent(
           )
         `;
 
-        const levelTitle = targetLevel === 1 ? 'المستوى الأول' : 'المستوى الثالث';
+        const levelTitle = getLevelTitle(targetLevel);
         return {
           ok: true,
           data: {

@@ -166,9 +166,18 @@ async function seed(customOwnerUrl?: string) {
           ${course.description}, ${course.semester}, ${course.iconName || 'BookOpen'},
           ${course.thumbnailColor || 'from-blue-600 to-indigo-700'}
         ) ON CONFLICT (id) DO UPDATE SET
+          code = EXCLUDED.code,
           title = EXCLUDED.title,
+          english_title = EXCLUDED.english_title,
           doctor_name = EXCLUDED.doctor_name,
+          doctor_title = EXCLUDED.doctor_title,
+          doctor_avatar = EXCLUDED.doctor_avatar,
+          credit_hours = EXCLUDED.credit_hours,
+          department = EXCLUDED.department,
           description = EXCLUDED.description,
+          semester = EXCLUDED.semester,
+          icon_name = EXCLUDED.icon_name,
+          thumbnail_color = EXCLUDED.thumbnail_color,
           level = EXCLUDED.level;
       `;
 

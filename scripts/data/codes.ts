@@ -50,6 +50,46 @@ export const DEMO_REDEEMABLE_CODES: DemoRedeemableCode[] = [
   },
 
   // =========================================================================
+  // Master Bundle Codes - Level 2 (باقة مقررات المستوى الثاني - الفصل الأول)
+  // =========================================================================
+  {
+    code: 'ALL2-2026-FULL',
+    courseCode: 'ALL-L2-S1',
+    courseName: 'باقة كافة مقررات المستوى الثاني',
+    courseId: null,
+    doctorName: 'هيئة تدريس المستوى الثاني',
+    isBundle: true,
+    targetLevel: 2,
+  },
+  {
+    code: 'ALL2-2026-PLUS',
+    courseCode: 'ALL-L2-S1',
+    courseName: 'باقة كافة مقررات المستوى الثاني (إضافي)',
+    courseId: null,
+    doctorName: 'هيئة تدريس المستوى الثاني',
+    isBundle: true,
+    targetLevel: 2,
+  },
+  {
+    code: 'ALL2-2026-GOLD',
+    courseCode: 'ALL-L2-S1',
+    courseName: 'باقة كافة مقررات المستوى الثاني (مميز)',
+    courseId: null,
+    doctorName: 'هيئة تدريس المستوى الثاني',
+    isBundle: true,
+    targetLevel: 2,
+  },
+  {
+    code: 'UNIV-2026-L2S1',
+    courseCode: 'ALL-L2-S1',
+    courseName: 'باقة كافة مقررات المستوى الثاني (احتياطي)',
+    courseId: null,
+    doctorName: 'هيئة تدريس المستوى الثاني',
+    isBundle: true,
+    targetLevel: 2,
+  },
+
+  // =========================================================================
   // Master Bundle Codes - Level 3 (باقة مقررات المستوى الثالث - الفصل الأول)
   // =========================================================================
   {
@@ -333,5 +373,116 @@ export const DEMO_REDEEMABLE_CODES: DemoRedeemableCode[] = [
     courseId: 'hu-101',
     doctorName: 'د/ محمد يسري',
     targetLevel: 1,
+  },
+
+  // =========================================================================
+  // Individual Course Codes - Level 2 (المستوى الثاني - الفصل الأول)
+  // =========================================================================
+  // 1. Introduction to Machine Learning - د/ محمود الصباغ
+  {
+    code: 'MACH-2026-M21A',
+    courseCode: 'AI201',
+    courseName: 'مقدمة في تعلم الآلة',
+    courseId: 'ai-201',
+    doctorName: 'د/ محمود الصباغ',
+    targetLevel: 2,
+  },
+  {
+    code: 'MACH-2026-L84B',
+    courseCode: 'AI201',
+    courseName: 'مقدمة في تعلم الآلة',
+    courseId: 'ai-201',
+    doctorName: 'د/ محمود الصباغ',
+    targetLevel: 2,
+  },
+
+  // 2. Introduction to Computer Vision and Robotics - أ.د/ تامر مدحت
+  {
+    code: 'ROBO-2026-R22A',
+    courseCode: 'AI202',
+    courseName: 'مقدمة في الرؤية الحاسوبية والروبوتات',
+    courseId: 'ai-202',
+    doctorName: 'أ.د/ تامر مدحت',
+    targetLevel: 2,
+  },
+  {
+    code: 'ROBO-2026-V73B',
+    courseCode: 'AI202',
+    courseName: 'مقدمة في الرؤية الحاسوبية والروبوتات',
+    courseId: 'ai-202',
+    doctorName: 'أ.د/ تامر مدحت',
+    targetLevel: 2,
+  },
+
+  // 3. Object Oriented Programming - أ.م.د/ محمد عبده
+  {
+    code: 'OOPP-2026-O23A',
+    courseCode: 'CS201',
+    courseName: 'البرمجة كائنية التوجه',
+    courseId: 'cs-201',
+    doctorName: 'أ.م.د/ محمد عبده',
+    targetLevel: 2,
+  },
+  {
+    code: 'OOPP-2026-P65B',
+    courseCode: 'CS201',
+    courseName: 'البرمجة كائنية التوجه',
+    courseId: 'cs-201',
+    doctorName: 'أ.م.د/ محمد عبده',
+    targetLevel: 2,
+  },
+
+  // 4. Computer Architecture - د/ بسمة حسن
+  {
+    code: 'ARCH-2026-A24A',
+    courseCode: 'CS202',
+    courseName: 'معمارية الحاسب',
+    courseId: 'cs-202',
+    doctorName: 'د/ بسمة حسن',
+    targetLevel: 2,
+  },
+  {
+    code: 'ARCH-2026-C91B',
+    courseCode: 'CS202',
+    courseName: 'معمارية الحاسب',
+    courseId: 'cs-202',
+    doctorName: 'د/ بسمة حسن',
+    targetLevel: 2,
+  },
+
+  // 5. Information Retrieval and Web Search - د/ مروة الصديق
+  {
+    code: 'RETR-2026-I25A',
+    courseCode: 'CS203',
+    courseName: 'استرجاع المعلومات والبحث في الويب',
+    courseId: 'cs-203',
+    doctorName: 'د/ مروة الصديق',
+    targetLevel: 2,
+  },
+  {
+    code: 'RETR-2026-W42B',
+    courseCode: 'CS203',
+    courseName: 'استرجاع المعلومات والبحث في الويب',
+    courseId: 'cs-203',
+    doctorName: 'د/ مروة الصديق',
+    targetLevel: 2,
+  },
+
+  // 6. Scientific Writing - أ.د/ محمود يسن
+  {
+    code: 'SCIW-2026-S26A',
+    courseCode: 'HU201',
+    courseName: 'الكتابة العلمية',
+    courseId: 'hu-201',
+    doctorName: 'أ.د/ محمود يسن',
+    targetLevel: 2,
+  },
+  {
+    code: 'SCIW-2026-W19B',
+    courseCode: 'HU201',
+    courseName: 'الكتابة العلمية',
+    courseId: 'hu-201',
+    doctorName: 'أ.د/ محمود يسن',
+    targetLevel: 2,
   },
 ];

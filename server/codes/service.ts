@@ -65,7 +65,7 @@ export async function checkEnrollmentKey(
 
   try {
     const [rc] = await appSql`
-      SELECT rc.id, rc.course_id, rc.is_redeemed, rc.is_bundle, c.code AS course_code, c.title AS course_title, c.doctor_name
+      SELECT rc.id, rc.course_id, rc.is_redeemed, rc.is_bundle, rc.target_level, c.code AS course_code, c.title AS course_title, c.doctor_name
       FROM academic_private.redeemable_codes rc
       LEFT JOIN public.academic_courses c ON c.id = rc.course_id
       WHERE rc.code_hash = ${codeHash}
@@ -76,27 +76,33 @@ export async function checkEnrollmentKey(
     }
 
     if (rc.is_bundle) {
+      const targetLevel = rc.target_level || 3;
+      const levelTitle = targetLevel === 1 ? 'المستوى الأول' : 'المستوى الثالث';
+      const bundleCourseCode = `ALL-L${targetLevel}-S1`;
+      const bundleCourseTitle = `باقة كافة مقررات ${levelTitle} (الفصل الأول)`;
+      const bundleDoctorName = `هيئة التدريس - ${levelTitle}`;
+
       if (studentAccountId) {
-        const [l3Count] = await appSql`
+        const [lvlCount] = await appSql`
           SELECT count(*)::int AS count
           FROM public.academic_courses
-          WHERE level = 3 AND semester = 'الفصل الأول'
+          WHERE level = ${targetLevel} AND semester = 'الفصل الأول'
         `;
         const [enrolledCount] = await appSql`
           SELECT count(DISTINCT sc.course_id)::int AS count
           FROM public.academic_student_codes sc
           JOIN public.academic_courses c ON c.id = sc.course_id
           WHERE sc.student_id = ${studentAccountId}
-            AND c.level = 3 AND c.semester = 'الفصل الأول'
+            AND c.level = ${targetLevel} AND c.semester = 'الفصل الأول'
             AND sc.status = 'active'
         `;
-        if (l3Count && enrolledCount && l3Count.count > 0 && enrolledCount.count >= l3Count.count) {
+        if (lvlCount && enrolledCount && lvlCount.count > 0 && enrolledCount.count >= lvlCount.count) {
           return {
             valid: true,
             alreadyEnrolled: true,
-            courseCode: 'ALL-L3-S1',
-            courseTitle: 'كل مقررات الفصل (كافة مقررات المستوى الثالث)',
-            doctorName: 'هيئة التدريس - المستوى الثالث',
+            courseCode: bundleCourseCode,
+            courseTitle: bundleCourseTitle,
+            doctorName: bundleDoctorName,
             error: 'أنت مسجل بالفعل في كافة مقررات هذا المستوى الدراسي.',
           };
         }
@@ -105,9 +111,9 @@ export async function checkEnrollmentKey(
       return {
         valid: true,
         alreadyEnrolled: false,
-        courseCode: 'ALL-L3-S1',
-        courseTitle: 'كل مقررات الفصل (كافة مقررات المستوى الثالث)',
-        doctorName: 'هيئة التدريس - المستوى الثالث',
+        courseCode: bundleCourseCode,
+        courseTitle: bundleCourseTitle,
+        doctorName: bundleDoctorName,
       };
     }
 
@@ -189,18 +195,24 @@ export async function listStudentCodes(studentAccountId: string): Promise<Studen
     const isBundle =
       bundleReceipts.has(receipt) ||
       group.length >= 2 ||
-      group[0].code.includes('ALL3') ||
+      group[0].code.includes('ALL') ||
       group[0].code.includes('XXXP') ||
       group[0].code.includes('UNIV');
 
     if (isBundle) {
+      const isL1 =
+        group[0].code.includes('ALL1') ||
+        group.some((g) => g.course_code?.startsWith('CS1') || g.course_code?.startsWith('BS1') || g.course_code?.startsWith('IT1') || g.course_code?.startsWith('HU1'));
+      const targetLvl = isL1 ? 1 : 3;
+      const levelTitle = targetLvl === 1 ? 'المستوى الأول' : 'المستوى الثالث';
+
       result.push({
         id: group[0].id,
         code: formatDisplayCode(group[0].code),
-        courseCode: 'ALL-L3-S1',
-        courseName: 'كل مقررات الفصل',
+        courseCode: `ALL-L${targetLvl}-S1`,
+        courseName: `باقة كافة مقررات ${levelTitle}`,
         courseId: group[0].course_id,
-        doctorName: 'هيئة تدريس المستوى الثالث',
+        doctorName: `هيئة تدريس ${levelTitle}`,
         receiptNumber: group[0].receipt_number,
         activatedAt: formatActivationDate(group[0].created_at),
         semester: group[0].semester,
@@ -261,7 +273,7 @@ export async function redeemCodeForStudent(
     const result = await appSql.begin(async (tx) => {
       // 1. Lock the redeemable code row for update
       const [rc] = await tx`
-        SELECT id, course_id, receipt_number, semester, masked_code, is_bundle
+        SELECT id, course_id, receipt_number, semester, masked_code, is_bundle, target_level
         FROM academic_private.redeemable_codes
         WHERE code_hash = ${codeHash} AND NOT is_redeemed
         FOR UPDATE
@@ -275,27 +287,28 @@ export async function redeemCodeForStudent(
         return { ok: false, reason: 'invalid_code' };
       }
 
-      // Handle Bundle Code (activates all Level 3 Semester 1 courses at once)
+      // Handle Bundle Code (activates all target level courses at once)
       if (rc.is_bundle) {
-        const l3Courses = await tx`
+        const targetLevel = rc.target_level || 3;
+        const targetCourses = await tx`
           SELECT id, code, title, doctor_name
           FROM public.academic_courses
-          WHERE level = 3 AND semester = 'الفصل الأول'
+          WHERE level = ${targetLevel} AND semester = 'الفصل الأول'
           ORDER BY code
         `;
 
-        if (l3Courses.length === 0) {
+        if (targetCourses.length === 0) {
           return { ok: false, reason: 'no_courses_found' };
         }
 
         const enrolledRows = await tx`
           SELECT course_id FROM public.academic_student_codes
           WHERE student_id = ${studentAccountId}
-            AND course_id IN ${tx(l3Courses.map((c) => c.id))}
+            AND course_id IN ${tx(targetCourses.map((c) => c.id))}
             AND status = 'active'
         `;
 
-        if (enrolledRows.length >= l3Courses.length) {
+        if (enrolledRows.length >= targetCourses.length) {
           return { ok: false, reason: 'already_enrolled' };
         }
 
@@ -310,8 +323,8 @@ export async function redeemCodeForStudent(
 
         const displayCode = formatDisplayCode(cleanCode);
 
-        // Enroll student into each course of Level 3 Semester 1
-        for (const course of l3Courses) {
+        // Enroll student into each course of target level
+        for (const course of targetCourses) {
           await tx`
             INSERT INTO public.academic_student_codes (
               student_id, course_id, code, receipt_number, semester, status
@@ -335,22 +348,24 @@ export async function redeemCodeForStudent(
             'BUNDLE_CODE_REDEEMED',
             ${tx.json({
               code_id: rc.id,
-              bundle: 'ALL-L3-S1',
-              enrolled_courses: l3Courses.map((c) => c.id),
+              bundle: `ALL-L${targetLevel}-S1`,
+              target_level: targetLevel,
+              enrolled_courses: targetCourses.map((c) => c.id),
               masked_code: rc.masked_code,
             })}
           )
         `;
 
+        const levelTitle = targetLevel === 1 ? 'المستوى الأول' : 'المستوى الثالث';
         return {
           ok: true,
           data: {
             id: rc.id,
             code: displayCode,
-            courseCode: 'ALL-L3-S1',
-            courseName: 'كل مقررات الفصل',
-            courseId: l3Courses[0]?.id || '',
-            doctorName: 'هيئة تدريس المستوى الثالث',
+            courseCode: `ALL-L${targetLevel}-S1`,
+            courseName: `باقة كافة مقررات ${levelTitle}`,
+            courseId: targetCourses[0]?.id || '',
+            doctorName: `هيئة تدريس ${levelTitle}`,
             receiptNumber: rc.receipt_number,
             activatedAt: formatActivationDate(new Date()),
             semester: rc.semester,

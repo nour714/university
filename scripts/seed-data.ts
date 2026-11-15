@@ -305,11 +305,11 @@ async function seed(customOwnerUrl?: string) {
 
       await sql`
         INSERT INTO academic_private.redeemable_codes (
-          code_hash, masked_code, course_id, receipt_number, semester, is_redeemed, is_bundle
+          code_hash, masked_code, course_id, receipt_number, semester, is_redeemed, is_bundle, target_level
         ) VALUES (
           ${codeHash}, ${masked}, ${item.courseId},
           ${'REC-2026-' + Math.floor(1000 + Math.random() * 9000)},
-          'الفصل الدراسي الأول 2026/2027', false, ${Boolean(item.isBundle)}
+          'الفصل الدراسي الأول 2026/2027', false, ${Boolean(item.isBundle)}, ${item.targetLevel || null}
         ) ON CONFLICT (code_hash) DO NOTHING;
       `;
     }

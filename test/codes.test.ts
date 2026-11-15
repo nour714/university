@@ -259,9 +259,10 @@ describe('Codes Redemption & Concurrency Locking (Finding S1 & Concurrency)', ()
     });
   });
 
-  describe('Empirical Verification: Only 6 Level 3 Courses Exist & All Codes Work', () => {
+  describe('Empirical Verification: Level 1 & Level 3 Courses Exist & All Codes Work', () => {
     const studentForIndiv = 'e0000000-0000-0000-0000-000000000088';
     const studentForBundle = 'e0000000-0000-0000-0000-000000000077';
+    const studentForL1Bundle = 'e0000000-0000-0000-0000-000000000066';
 
     beforeAll(async () => {
       // 1. Create fresh test accounts
@@ -269,7 +270,8 @@ describe('Codes Redemption & Concurrency Locking (Finding S1 & Concurrency)', ()
         INSERT INTO public.academic_accounts (id, national_id, password_hash, is_active)
         VALUES 
           (${studentForIndiv}, '30101010108888', 'hash', true),
-          (${studentForBundle}, '30101010107777', 'hash', true)
+          (${studentForBundle}, '30101010107777', 'hash', true),
+          (${studentForL1Bundle}, '30101010106666', 'hash', true)
         ON CONFLICT (id) DO NOTHING;
       `;
 
@@ -278,31 +280,33 @@ describe('Codes Redemption & Concurrency Locking (Finding S1 & Concurrency)', ()
       await seed(clients.ownerUrl);
     });
 
-    it('asserts ONLY the 6 new Level 3 courses exist and old courses are removed', async () => {
+    it('asserts 6 Level 3 courses and 7 Level 1 courses exist, and legacy courses are removed', async () => {
       const rows = await clients.ownerSql`
         SELECT id, code, title, doctor_name, level, semester 
         FROM public.academic_courses 
         ORDER BY id;
       `;
 
-      const courseIds = rows.map((r) => r.id).sort();
-      const expectedIds = ['ai-302', 'ai-303', 'cs-302', 'cs-303', 'cs-311', 'ds-302'].sort();
-      expect(courseIds).toEqual(expectedIds);
+      const l3Rows = rows.filter((r) => r.level === 3);
+      const l1Rows = rows.filter((r) => r.level === 1);
 
-      // Verify each course is strictly Level 3 Semester 1
-      for (const course of rows) {
-        expect(course.level).toBe(3);
-        expect(course.semester).toBe('الفصل الأول');
-      }
+      const l3CourseIds = l3Rows.map((r) => r.id).sort();
+      const expectedL3Ids = ['ai-302', 'ai-303', 'cs-302', 'cs-303', 'cs-311', 'ds-302'].sort();
+      expect(l3CourseIds).toEqual(expectedL3Ids);
+
+      const l1CourseIds = l1Rows.map((r) => r.id).sort();
+      const expectedL1Ids = ['bs-101', 'bs-102', 'bs-103', 'cs-101', 'cs-102', 'hu-101', 'it-101'].sort();
+      expect(l1CourseIds).toEqual(expectedL1Ids);
 
       // Explicitly assert old courses do NOT exist
       const oldCourseIds = ['ai-301', 'cs-201', 'ai-101', 'ai-401', 'ai-402', 'ai-403', 'cs-204', 'ai-305'];
+      const allCourseIds = rows.map((r) => r.id);
       for (const oldId of oldCourseIds) {
-        expect(courseIds).not.toContain(oldId);
+        expect(allCourseIds).not.toContain(oldId);
       }
     });
 
-    it('verifies that each of the 6 individual course activation codes works correctly', async () => {
+    it('verifies that each of the 6 Level 3 individual course activation codes works correctly', async () => {
       const individualCodes = [
         { code: 'MOBL-2026-M91A', expectedCourseId: 'cs-311', expectedTitle: 'تطوير برمجيات الأجهزة المحمولة' },
         { code: 'CVIS-2026-V84X', expectedCourseId: 'ai-303', expectedTitle: 'الرؤية الحاسوبية' },
@@ -327,12 +331,12 @@ describe('Codes Redemption & Concurrency Locking (Finding S1 & Concurrency)', ()
       }
     });
 
-    it('verifies that the Master Bundle Code (ALL3-2026-FULL) activates all 6 courses at once', async () => {
+    it('verifies that the Level 3 Master Bundle Code (ALL3-2026-FULL) activates all 6 Level 3 courses at once', async () => {
       const res = await redeemCodeForStudent(studentForBundle, 'ALL3-2026-FULL');
       expect(res.success).toBe(true);
       expect(res.data?.courseCode).toBe('ALL-L3-S1');
 
-      // Verify student is enrolled in ALL 6 courses
+      // Verify student is enrolled in ALL 6 Level 3 courses
       const enrollments = await clients.ownerSql`
         SELECT course_id FROM public.academic_student_codes
         WHERE student_id = ${studentForBundle} AND status = 'active'
@@ -341,6 +345,23 @@ describe('Codes Redemption & Concurrency Locking (Finding S1 & Concurrency)', ()
 
       const enrolledIds = enrollments.map((e) => e.course_id).sort();
       const expectedIds = ['ai-302', 'ai-303', 'cs-302', 'cs-303', 'cs-311', 'ds-302'].sort();
+      expect(enrolledIds).toEqual(expectedIds);
+    });
+
+    it('verifies that the Level 1 Master Bundle Code (ALL1-2026-FULL) activates all 7 Level 1 courses at once', async () => {
+      const res = await redeemCodeForStudent(studentForL1Bundle, 'ALL1-2026-FULL');
+      expect(res.success).toBe(true);
+      expect(res.data?.courseCode).toBe('ALL-L1-S1');
+
+      // Verify student is enrolled in ALL 7 Level 1 courses
+      const enrollments = await clients.ownerSql`
+        SELECT course_id FROM public.academic_student_codes
+        WHERE student_id = ${studentForL1Bundle} AND status = 'active'
+      `;
+      expect(enrollments.length).toBe(7);
+
+      const enrolledIds = enrollments.map((e) => e.course_id).sort();
+      const expectedIds = ['bs-101', 'bs-102', 'bs-103', 'cs-101', 'cs-102', 'hu-101', 'it-101'].sort();
       expect(enrolledIds).toEqual(expectedIds);
     });
   });

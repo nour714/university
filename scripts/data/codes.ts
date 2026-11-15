@@ -35,6 +35,30 @@ export const DEMO_REDEEMABLE_CODES: DemoRedeemableCode[] = [
     doctorName: 'هيئة تدريس المستوى الثالث',
     isBundle: true,
   },
+  {
+    code: 'ALL3-2026-PLUS',
+    courseCode: 'ALL-L3-S1',
+    courseName: 'كل مقررات الفصل',
+    courseId: null,
+    doctorName: 'هيئة تدريس المستوى الثالث',
+    isBundle: true,
+  },
+  {
+    code: 'ALL3-2026-GOLD',
+    courseCode: 'ALL-L3-S1',
+    courseName: 'كل مقررات الفصل',
+    courseId: null,
+    doctorName: 'هيئة تدريس المستوى الثالث',
+    isBundle: true,
+  },
+  {
+    code: 'ALL3-2026-PREM',
+    courseCode: 'ALL-L3-S1',
+    courseName: 'كل مقررات الفصل',
+    courseId: null,
+    doctorName: 'هيئة تدريس المستوى الثالث',
+    isBundle: true,
+  },
 
   // =========================================================================
   // Individual Course Codes: أكواد تفعيل مستقلة لكل مقرر دراسي على حدة

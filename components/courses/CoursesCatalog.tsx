@@ -172,7 +172,7 @@ function CoursesCatalogInner({ courses, studentLevelName }: CoursesCatalogProps)
 
         {/* Search Input Bar */}
         <div className="relative">
-          <Search className="w-4 h-4 text-slate-400 absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+          <Search className="w-4 h-4 text-slate-600 absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
           <input
             type="search"
             inputMode="search"
@@ -189,7 +189,7 @@ function CoursesCatalogInner({ courses, studentLevelName }: CoursesCatalogProps)
                 ? `ابحث في مقررات ${studentLevelName} (مثال: تعلم الآلة، AI301، اسم الدكتور)...`
                 : 'ابحث في دليل المقررات (مثال: تعلم الآلة، AI301، اسم الدكتور)...'
             }
-            className="w-full pr-10 pl-10 py-2.5 rounded-xl border border-slate-200 bg-slate-50/60 hover:bg-white focus:bg-white focus:border-blue-600 focus:ring-3 focus:ring-blue-600/10 text-xs sm:text-sm text-slate-800 placeholder:text-slate-400 transition-all outline-hidden font-medium min-h-[42px]"
+            className="w-full pr-10 pl-10 py-2.5 rounded-xl border border-slate-200 bg-slate-50/60 hover:bg-white focus:bg-white focus:border-blue-600 focus:ring-3 focus:ring-blue-600/10 text-xs sm:text-sm text-slate-800 placeholder:text-slate-600 transition-all outline-hidden font-medium min-h-[42px]"
           />
           {searchQuery && (
             <button

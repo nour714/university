@@ -95,7 +95,7 @@ export function CustomSelect({
         </div>
 
         <ChevronDown
-          className={`w-4 h-4 text-slate-400 transition-transform duration-200 shrink-0 ${
+          className={`w-4 h-4 text-slate-600 transition-transform duration-200 shrink-0 ${
             isOpen ? 'rotate-180 text-blue-600' : ''
           }`}
         />
@@ -128,7 +128,7 @@ export function CustomSelect({
               >
                 <div className="flex items-center gap-2 truncate">
                   {option.icon && (
-                    <span className={isSelected ? 'text-white' : 'text-slate-400'}>
+                    <span className={isSelected ? 'text-white' : 'text-slate-600'}>
                       {option.icon}
                     </span>
                   )}

@@ -298,7 +298,7 @@ export function LoginForm() {
                     className="w-full h-10 sm:h-11 px-3.5 ps-9 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 text-xs sm:text-sm text-slate-900 transition-all outline-hidden font-medium"
                     required
                   />
-                  <User className="w-4 h-4 text-slate-400 absolute start-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                  <User className="w-4 h-4 text-slate-600 absolute start-3 top-1/2 -translate-y-1/2 pointer-events-none" />
                 </div>
               </div>
 
@@ -327,11 +327,11 @@ export function LoginForm() {
                     className="w-full h-10 sm:h-11 px-3.5 ps-9 pe-9 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 text-xs sm:text-sm text-slate-900 transition-all outline-hidden font-medium"
                     required
                   />
-                  <Lock className="w-4 h-4 text-slate-400 absolute start-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                  <Lock className="w-4 h-4 text-slate-600 absolute start-3 top-1/2 -translate-y-1/2 pointer-events-none" />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute end-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer p-1"
+                    className="absolute end-2.5 top-1/2 -translate-y-1/2 text-slate-600 hover:text-slate-800 cursor-pointer p-1"
                     title={showPassword ? 'إخفاء' : 'إظهار'}
                     aria-label={showPassword ? 'إخفاء كلمة المرور' : 'إظهار كلمة المرور'}
                   >
@@ -380,7 +380,7 @@ export function LoginForm() {
           {/* Footer Assistance */}
           <div className="mt-2.5 pt-2 border-t border-slate-100 flex items-center justify-center text-[11px] text-slate-500 font-medium">
             <div className="flex items-center gap-1.5">
-              <HelpCircle className="w-3.5 h-3.5 text-slate-400" />
+              <HelpCircle className="w-3.5 h-3.5 text-slate-600" />
               <span>تواجه صعوبة في الدخول؟</span>
               <button
                 type="button"
@@ -552,7 +552,7 @@ export function LoginForm() {
                         <selectedIssue.icon className="w-3.5 h-3.5 text-blue-600 shrink-0" />
                         <span className="truncate">{selectedIssue.label}</span>
                       </div>
-                      <ChevronDown className={`w-3.5 h-3.5 text-slate-400 transition-transform duration-200 shrink-0 ${isIssueTypeDropdownOpen ? 'rotate-180 text-blue-600' : ''}`} />
+                      <ChevronDown className={`w-3.5 h-3.5 text-slate-600 transition-transform duration-200 shrink-0 ${isIssueTypeDropdownOpen ? 'rotate-180 text-blue-600' : ''}`} />
                     </button>
 
                     {/* Custom Dropdown Menu */}

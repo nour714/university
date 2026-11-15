@@ -195,7 +195,7 @@ function CoursesCatalogInner({ courses, studentLevelName }: CoursesCatalogProps)
             <button
               type="button"
               onClick={() => setSearchQuery('')}
-              className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 p-1.5 rounded-lg hover:bg-slate-100 transition-all active:scale-95 cursor-pointer"
+              className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-600 hover:text-slate-800 p-1.5 rounded-lg hover:bg-slate-100 transition-all active:scale-95 cursor-pointer"
               title="مسح البحث"
               aria-label="مسح البحث"
             >

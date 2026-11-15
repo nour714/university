@@ -101,7 +101,7 @@ export function ExamsDashboard({ initialExams }: ExamsDashboardProps) {
               <button
                 type="button"
                 onClick={() => setSearchQuery('')}
-                className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 p-1.5 cursor-pointer rounded-lg hover:bg-slate-100 transition-colors"
+                className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-600 hover:text-slate-800 p-1.5 cursor-pointer rounded-lg hover:bg-slate-100 transition-colors"
                 title="مسح البحث"
                 aria-label="مسح البحث"
               >

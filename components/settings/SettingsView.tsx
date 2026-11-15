@@ -407,7 +407,7 @@ export function SettingsView({ student: initialStudent }: { student?: StudentPro
                   <button
                     type="button"
                     onClick={() => setShowCurrentPassword(!showCurrentPassword)}
-                    className="absolute inset-y-0 end-0 px-3.5 flex items-center text-slate-400 hover:text-slate-600 cursor-pointer"
+                    className="absolute inset-y-0 end-0 px-3.5 flex items-center text-slate-600 hover:text-slate-800 cursor-pointer"
                     title={showCurrentPassword ? 'إخفاء' : 'إظهار'}
                     aria-label={showCurrentPassword ? 'إخفاء كلمة المرور الحالية' : 'إظهار كلمة المرور الحالية'}
                   >
@@ -434,7 +434,7 @@ export function SettingsView({ student: initialStudent }: { student?: StudentPro
                   <button
                     type="button"
                     onClick={() => setShowNewPassword(!showNewPassword)}
-                    className="absolute inset-y-0 end-0 px-3.5 flex items-center text-slate-400 hover:text-slate-600 cursor-pointer"
+                    className="absolute inset-y-0 end-0 px-3.5 flex items-center text-slate-600 hover:text-slate-800 cursor-pointer"
                     title={showNewPassword ? 'إخفاء' : 'إظهار'}
                     aria-label={showNewPassword ? 'إخفاء كلمة المرور الجديدة' : 'إظهار كلمة المرور الجديدة'}
                   >
@@ -461,7 +461,7 @@ export function SettingsView({ student: initialStudent }: { student?: StudentPro
                   <button
                     type="button"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="absolute inset-y-0 end-0 px-3.5 flex items-center text-slate-400 hover:text-slate-600 cursor-pointer"
+                    className="absolute inset-y-0 end-0 px-3.5 flex items-center text-slate-600 hover:text-slate-800 cursor-pointer"
                     title={showConfirmPassword ? 'إخفاء' : 'إظهار'}
                     aria-label={showConfirmPassword ? 'إخفاء تأكيد كلمة المرور' : 'إظهار تأكيد كلمة المرور'}
                   >
@@ -484,19 +484,19 @@ export function SettingsView({ student: initialStudent }: { student?: StudentPro
                     />
                   </div>
                   <div className="grid grid-cols-2 gap-1.5 pt-1 text-[11px]">
-                    <div className={`flex items-center gap-1 ${hasMinLength ? 'text-emerald-600 font-bold' : 'text-slate-400'}`}>
+                    <div className={`flex items-center gap-1 ${hasMinLength ? 'text-emerald-600 font-bold' : 'text-slate-600'}`}>
                       <Check className="w-3.5 h-3.5 shrink-0" />
                       <span>8 خانات على الأقل</span>
                     </div>
-                    <div className={`flex items-center gap-1 ${hasLetters ? 'text-emerald-600 font-bold' : 'text-slate-400'}`}>
+                    <div className={`flex items-center gap-1 ${hasLetters ? 'text-emerald-600 font-bold' : 'text-slate-600'}`}>
                       <Check className="w-3.5 h-3.5 shrink-0" />
                       <span>تحتوي على حروف</span>
                     </div>
-                    <div className={`flex items-center gap-1 ${hasNumbers ? 'text-emerald-600 font-bold' : 'text-slate-400'}`}>
+                    <div className={`flex items-center gap-1 ${hasNumbers ? 'text-emerald-600 font-bold' : 'text-slate-600'}`}>
                       <Check className="w-3.5 h-3.5 shrink-0" />
                       <span>تحتوي على أرقام</span>
                     </div>
-                    <div className={`flex items-center gap-1 ${passwordsMatch ? 'text-emerald-600 font-bold' : 'text-slate-400'}`}>
+                    <div className={`flex items-center gap-1 ${passwordsMatch ? 'text-emerald-600 font-bold' : 'text-slate-600'}`}>
                       <Check className="w-3.5 h-3.5 shrink-0" />
                       <span>تطابق الكلمتين</span>
                     </div>
@@ -603,7 +603,7 @@ export function SettingsView({ student: initialStudent }: { student?: StudentPro
             {/* Working Hours compact badge */}
             <div className="pt-1 flex items-center justify-between text-[11px] text-slate-500 border-t border-slate-100">
               <div className="flex items-center gap-1.5">
-                <Clock className="w-3.5 h-3.5 text-slate-400" />
+                <Clock className="w-3.5 h-3.5 text-slate-600" />
                 <span>الأحد - الخميس (8:30 ص - 3:30 م)</span>
               </div>
               <span className="text-[10px] text-emerald-600 font-bold bg-emerald-50 px-2 py-0.5 rounded-full">
@@ -729,7 +729,7 @@ export function SettingsView({ student: initialStudent }: { student?: StudentPro
                       <span className="text-xs font-bold text-slate-800">
                         {faq.q}
                       </span>
-                      <ChevronDown className={`w-3.5 h-3.5 text-slate-400 transition-transform duration-200 shrink-0 ${isOpen ? 'rotate-180' : ''}`} />
+                      <ChevronDown className={`w-3.5 h-3.5 text-slate-600 transition-transform duration-200 shrink-0 ${isOpen ? 'rotate-180' : ''}`} />
                     </button>
 
                     {isOpen && (

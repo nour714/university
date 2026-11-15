@@ -62,7 +62,7 @@ export function CourseFilters({ value, onChange }: CourseFiltersProps) {
           <button
             type="button"
             onClick={handleClear}
-            className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 p-1.5 rounded-lg hover:bg-slate-100 transition-all active:scale-95"
+            className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-600 hover:text-slate-800 p-1.5 rounded-lg hover:bg-slate-100 transition-all active:scale-95"
             title="مسح البحث"
             aria-label="مسح البحث"
           >

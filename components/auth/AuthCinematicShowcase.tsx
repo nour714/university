@@ -93,16 +93,18 @@ export function AuthCinematicShowcase() {
                 <div className="absolute inset-0 bg-slate-950/40" />
               </div>
 
-              {/* Foreground Image - Object-contain preserves 100% of the image without cropping side badges */}
-              <div className="relative w-full h-full p-2 sm:p-3 flex items-center justify-center">
-                <Image
-                  src={slide.imageSrc}
-                  alt={slide.altText}
-                  fill
-                  sizes="(max-width: 1024px) 100vw, 60vw"
-                  className="object-contain object-center drop-shadow-2xl"
-                  priority={idx === 0}
-                />
+              {/* Foreground Image - Object-contain with controlled scale so all side badges & edges fit gracefully */}
+              <div className="relative w-full h-full p-4 sm:p-5 lg:p-6 flex items-center justify-center">
+                <div className="relative w-full h-full flex items-center justify-center">
+                  <Image
+                    src={slide.imageSrc}
+                    alt={slide.altText}
+                    fill
+                    sizes="(max-width: 1024px) 100vw, 50vw"
+                    className="object-contain object-center scale-[0.92] drop-shadow-2xl transition-transform duration-500"
+                    priority={idx === 0}
+                  />
+                </div>
               </div>
             </div>
           );

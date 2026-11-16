@@ -19,6 +19,18 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   title: 'كلية الذكاء الاصطناعي - جامعة كفر الشيخ | مكتبة المقررات الأكاديمية',
   description: 'المنصة الرقمية لكلية الذكاء الاصطناعي بجامعة كفر الشيخ - تصفح المقررات، المحاضرات، التمارين، والوسائط التعليمية بسرعة وأداء فائق.',
+  icons: {
+    icon: [
+      { url: '/favicon.ico', sizes: 'any' },
+      { url: '/icon-192.png', type: 'image/png', sizes: '192x192' },
+      { url: '/icon-512.png', type: 'image/png', sizes: '512x512' },
+      { url: '/logo.png', type: 'image/png' },
+    ],
+    shortcut: '/favicon.ico',
+    apple: [
+      { url: '/apple-icon.png', sizes: '180x180', type: 'image/png' },
+    ],
+  },
   robots: {
     index: false,
     follow: false,

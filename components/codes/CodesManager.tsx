@@ -13,7 +13,10 @@ import {
   BookOpen, 
   ShieldCheck, 
   Receipt,
-  Inbox
+  Inbox,
+  Copy,
+  Check,
+  Calendar
 } from 'lucide-react';
 import { StudentCode } from '@/types/code';
 import { useNotifications } from '@/context/NotificationContext';
@@ -32,7 +35,18 @@ export function CodesManager({ initialCodes }: CodesManagerProps = {}) {
   const [isLoading, setIsLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState<StudentCode | null>(null);
   const [errorMessage, setErrorMessage] = useState('');
+  const [copiedId, setCopiedId] = useState<string | null>(null);
   const [isLoaded, setIsLoaded] = useState(initialCodes !== undefined);
+
+  const handleCopyCode = async (id: string, text: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopiedId(id);
+      setTimeout(() => setCopiedId(null), 2000);
+    } catch {
+      // Fallback
+    }
+  };
 
   const { addNotification } = useNotifications();
 
@@ -66,6 +80,8 @@ export function CodesManager({ initialCodes }: CodesManagerProps = {}) {
   const formatDisplayCode = (code: string) => {
     if (!code) return '';
     if (code.includes('ALL3')) return 'ALL3 - 2026 - FULL';
+    if (code.includes('ALL2')) return 'ALL2 - 2026 - FULL';
+    if (code.includes('ALL1')) return 'ALL1 - 2026 - FULL';
     if (code.includes('XXXP')) return 'XXXP - UKTX - R35R';
     if (code.includes('UNIV')) return 'UNIV - 2026 - L3S1';
 
@@ -399,34 +415,113 @@ export function CodesManager({ initialCodes }: CodesManagerProps = {}) {
 
         {displayCodes.length > 0 ? (
           <div className="space-y-3">
-            {displayCodes.map((item) => (
-              <div
-                key={item.id}
-                className="w-full bg-white rounded-xl border border-emerald-300 hover:border-emerald-400 p-4 sm:p-5 transition-all shadow-2xs"
-              >
-                <div className="flex items-center justify-between gap-4">
-                  {/* Right side (RTL Start): Title + Code on line 1, Activation date on line 2 */}
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-2.5 sm:gap-4 flex-wrap">
-                      <h4 className="text-sm sm:text-base font-extrabold text-slate-900 tracking-tight">
-                        {item.courseName}
-                      </h4>
-                      <span className="text-xs sm:text-sm font-bold font-mono text-blue-600 tracking-wider">
-                        {formatDisplayCode(item.code)}
-                      </span>
-                    </div>
-                    <p className="text-[11px] sm:text-xs text-slate-600 font-medium mt-1">
-                      فُعّل في {formatActivationDate(item.activatedAt)}
-                    </p>
-                  </div>
+            {displayCodes.map((item) => {
+              const isBundle =
+                item.courseCode === 'ALL-L3-S1' ||
+                item.courseCode === 'ALL-L2-S1' ||
+                item.courseCode === 'ALL-L1-S1' ||
+                item.courseName.includes('كل مقررات') ||
+                item.courseName.includes('كافة مقررات') ||
+                item.courseName.includes('جميع مقررات');
 
-                  {/* Left side (RTL End): Badge 'مُفعّل' matching Image 2 */}
-                  <span className="inline-flex items-center justify-center px-3.5 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs sm:text-sm font-bold border border-emerald-200/60 shrink-0">
-                    مُفعّل
-                  </span>
+              return (
+                <div
+                  key={item.id}
+                  className="w-full bg-white rounded-2xl border border-emerald-300/80 hover:border-emerald-400 p-4 sm:p-5 transition-all shadow-2xs hover:shadow-sm group"
+                >
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3.5 sm:gap-4">
+                    {/* Right side (RTL Start): Icon + Course Info + Code Badge + Date */}
+                    <div className="flex items-start sm:items-center gap-3 sm:gap-3.5 min-w-0 flex-1">
+                      {/* Icon */}
+                      <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-emerald-50 text-emerald-600 border border-emerald-200/70 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                        {isBundle ? (
+                          <Sparkles className="w-5 h-5 text-emerald-600" />
+                        ) : (
+                          <BookOpen className="w-5 h-5 text-emerald-600" />
+                        )}
+                      </div>
+
+                      {/* Info & Badges */}
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
+                          <h4 className="text-sm sm:text-base font-extrabold text-slate-900 tracking-tight">
+                            {item.courseName}
+                          </h4>
+
+                          {/* Code Badge with Copy button */}
+                          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-blue-50 text-blue-700 border border-blue-200/80 font-mono text-xs font-bold tracking-wider">
+                            <span dir="ltr">{formatDisplayCode(item.code)}</span>
+                            <button
+                              type="button"
+                              onClick={() => handleCopyCode(item.id, item.code)}
+                              className="text-blue-500 hover:text-blue-700 cursor-pointer transition-colors p-0.5 rounded hover:bg-blue-100/80"
+                              title={copiedId === item.id ? 'تم نسخ الكود' : 'نسخ الكود'}
+                              aria-label={copiedId === item.id ? 'تم نسخ الكود' : 'نسخ كود التفعيل'}
+                            >
+                              {copiedId === item.id ? (
+                                <Check className="w-3.5 h-3.5 text-emerald-600" />
+                              ) : (
+                                <Copy className="w-3.5 h-3.5" />
+                              )}
+                            </button>
+                          </div>
+
+                          {isBundle && (
+                            <span className="hidden md:inline-flex items-center text-[10px] sm:text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-md border border-emerald-200/70">
+                              كامل مقررات الفصل
+                            </span>
+                          )}
+                        </div>
+
+                        {/* Date & Metadata */}
+                        <div className="flex items-center gap-2 text-[11px] sm:text-xs text-slate-500 font-medium mt-1.5 flex-wrap">
+                          <div className="flex items-center gap-1.5">
+                            <Calendar className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                            <span>فُعّل في:</span>
+                            <span dir="ltr" className="font-mono font-bold text-slate-700">
+                              {formatActivationDate(item.activatedAt)}
+                            </span>
+                          </div>
+
+                          {item.receiptNumber && (
+                            <>
+                              <span className="text-slate-300">•</span>
+                              <div className="flex items-center gap-1 text-slate-500">
+                                <span>إيصال:</span>
+                                <span className="font-mono font-semibold text-slate-700">{item.receiptNumber}</span>
+                              </div>
+                            </>
+                          )}
+
+                          {item.doctorName && !isBundle && (
+                            <>
+                              <span className="text-slate-300">•</span>
+                              <span className="text-slate-600">{item.doctorName}</span>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Left side (RTL End): Status Badge + Browse Courses Action */}
+                    <div className="flex items-center justify-between sm:justify-end gap-2.5 sm:gap-3 shrink-0 pt-2.5 sm:pt-0 border-t sm:border-t-0 border-slate-100">
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs sm:text-sm font-bold border border-emerald-200/80 shrink-0">
+                        <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block animate-pulse" />
+                        <span>مُفعّل</span>
+                      </span>
+
+                      <Link
+                        href={isBundle ? '/courses' : `/courses/${item.courseId}`}
+                        className="inline-flex items-center justify-center gap-1.5 px-3.5 py-1.5 sm:py-2 rounded-xl bg-blue-600 hover:bg-blue-700 active:scale-98 text-white text-xs sm:text-sm font-bold shadow-xs shadow-blue-600/20 transition-all group/btn shrink-0"
+                      >
+                        <span>{isBundle ? 'تصفح المقررات' : 'فتح المقرر'}</span>
+                        <ArrowLeft className="w-3.5 h-3.5 transition-transform group-hover/btn:-translate-x-1" />
+                      </Link>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         ) : (
           <div className="bg-white rounded-2xl p-8 sm:p-10 border border-slate-200/90 text-center max-w-md mx-auto shadow-xs animate-fadeIn">

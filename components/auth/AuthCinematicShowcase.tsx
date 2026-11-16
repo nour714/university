@@ -67,7 +67,7 @@ export function AuthCinematicShowcase() {
       onMouseLeave={() => setIsPaused(false)}
     >
       {/* ============================================================== */}
-      {/* 1. CRYSTAL-CLEAR SLIDE IMAGES (SMOOTH CROSSFADE TRANSITION)   */}
+      {/* 1. CRYSTAL-CLEAR SLIDE IMAGES (SMOOTH CROSSFADE & NO CROPPING)*/}
       {/* ============================================================== */}
       <div className="absolute inset-0 overflow-hidden">
         {SLIDES.map((slide, idx) => {
@@ -75,18 +75,35 @@ export function AuthCinematicShowcase() {
           return (
             <div
               key={slide.id}
-              className={`absolute inset-0 transition-opacity duration-700 ease-in-out ${
+              className={`absolute inset-0 flex items-center justify-center transition-opacity duration-700 ease-in-out ${
                 isActive ? 'opacity-100 z-10' : 'opacity-0 z-0 pointer-events-none'
               }`}
             >
-              <Image
-                src={slide.imageSrc}
-                alt={slide.altText}
-                fill
-                sizes="(max-width: 1024px) 100vw, 50vw"
-                className="object-cover object-center scale-100"
-                priority={idx === 0}
-              />
+              {/* Ambient Blurred Glow Backdrop to seamlessly blend aspect ratio */}
+              <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
+                <Image
+                  src={slide.imageSrc}
+                  alt=""
+                  fill
+                  sizes="50vw"
+                  className="object-cover object-center scale-110 blur-2xl opacity-40 brightness-75"
+                  priority={idx === 0}
+                  unoptimized
+                />
+                <div className="absolute inset-0 bg-slate-950/40" />
+              </div>
+
+              {/* Foreground Image - Object-contain preserves 100% of the image without cropping side badges */}
+              <div className="relative w-full h-full p-2 sm:p-3 flex items-center justify-center">
+                <Image
+                  src={slide.imageSrc}
+                  alt={slide.altText}
+                  fill
+                  sizes="(max-width: 1024px) 100vw, 60vw"
+                  className="object-contain object-center drop-shadow-2xl"
+                  priority={idx === 0}
+                />
+              </div>
             </div>
           );
         })}

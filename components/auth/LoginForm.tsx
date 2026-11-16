@@ -252,13 +252,13 @@ export function LoginForm() {
         </span>
       </div>
 
-      {/* Main Container Card (Compact Form 46% & Expanded Showcase 54% with Timeline Divider) */}
-      <div className="w-full max-w-sm sm:max-w-md lg:max-w-4xl bg-white rounded-2xl sm:rounded-3xl shadow-2xl border border-slate-200/90 overflow-hidden flex flex-col lg:flex-row relative z-10">
+      {/* Main Container Card (Compact Form & Expanded Showcase with Timeline Divider) */}
+      <div className="w-full max-w-sm sm:max-w-md lg:max-w-5xl xl:max-w-[1080px] bg-white rounded-2xl sm:rounded-3xl shadow-2xl border border-slate-200/90 overflow-hidden flex flex-col lg:flex-row relative z-10">
         
         {/* ========================================================= */}
-        {/* RIGHT COLUMN: Interactive Login Form (Reduced to 46%)     */}
+        {/* RIGHT COLUMN: Interactive Login Form                      */}
         {/* ========================================================= */}
-        <div className="w-full lg:w-[46%] p-3.5 sm:p-5 lg:p-6 flex flex-col justify-between bg-white shrink-0">
+        <div className="w-full lg:w-[390px] xl:w-[410px] p-3.5 sm:p-5 lg:p-6 flex flex-col justify-between bg-white shrink-0">
           <div>
             {/* Form Title (Centered) */}
             <div className="mb-2 sm:mb-3 text-center flex flex-col items-center">

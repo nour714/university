@@ -67,7 +67,7 @@ export function AuthCinematicShowcase() {
       onMouseLeave={() => setIsPaused(false)}
     >
       {/* ============================================================== */}
-      {/* 1. CRYSTAL-CLEAR SLIDE IMAGES (SMOOTH CROSSFADE & NO CROPPING)*/}
+      {/* 1. CRYSTAL-CLEAR SLIDE IMAGES (SMOOTH CROSSFADE & EXACT FIT)  */}
       {/* ============================================================== */}
       <div className="absolute inset-0 overflow-hidden">
         {SLIDES.map((slide, idx) => {
@@ -75,37 +75,18 @@ export function AuthCinematicShowcase() {
           return (
             <div
               key={slide.id}
-              className={`absolute inset-0 flex items-center justify-center transition-opacity duration-700 ease-in-out ${
+              className={`absolute inset-0 transition-opacity duration-700 ease-in-out ${
                 isActive ? 'opacity-100 z-10' : 'opacity-0 z-0 pointer-events-none'
               }`}
             >
-              {/* Ambient Blurred Glow Backdrop to seamlessly blend aspect ratio */}
-              <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
-                <Image
-                  src={slide.imageSrc}
-                  alt=""
-                  fill
-                  sizes="50vw"
-                  className="object-cover object-center scale-110 blur-2xl opacity-40 brightness-75"
-                  priority={idx === 0}
-                  unoptimized
-                />
-                <div className="absolute inset-0 bg-slate-950/40" />
-              </div>
-
-              {/* Foreground Image - Object-contain with controlled scale so all side badges & edges fit gracefully */}
-              <div className="relative w-full h-full p-4 sm:p-5 lg:p-6 flex items-center justify-center">
-                <div className="relative w-full h-full flex items-center justify-center">
-                  <Image
-                    src={slide.imageSrc}
-                    alt={slide.altText}
-                    fill
-                    sizes="(max-width: 1024px) 100vw, 50vw"
-                    className="object-contain object-center scale-[0.92] drop-shadow-2xl transition-transform duration-500"
-                    priority={idx === 0}
-                  />
-                </div>
-              </div>
+              <Image
+                src={slide.imageSrc}
+                alt={slide.altText}
+                fill
+                sizes="(max-width: 1024px) 100vw, 50vw"
+                className="object-cover object-center scale-100"
+                priority={idx === 0}
+              />
             </div>
           );
         })}

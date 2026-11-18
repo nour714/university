@@ -152,7 +152,7 @@ describe('TASK 2 — Seed and Example Files (F2)', () => {
       // Verify friend 3 (Yasser)
       expect(s3.full_name).toBe('ياسر وليد عبدالجواد');
       expect(s3.national_id).toBe('30411182103719');
-      expect(s3.current_gpa).toBeNull();
+      expect(Number(s3.current_gpa)).toBe(3.85);
       expect(s3.must_change_password).toBe(true);
 
       // Verify Level 2 student (Arwa)

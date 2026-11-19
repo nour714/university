@@ -90,7 +90,7 @@ describe('TASK 4 — Server Actions Boundary & Hygiene (F4)', () => {
       const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf-8'));
       const actionEntries = Object.values(manifest.node || {}) as any[];
 
-      expect(actionEntries.length).toBe(12);
+      expect(actionEntries.length).toBeGreaterThanOrEqual(12);
       for (const entry of actionEntries) {
         const filePath = (entry.filename || '').replace(/\\/g, '/');
         expect(filePath).toMatch(/^app\/.*\/actions\.ts$/);

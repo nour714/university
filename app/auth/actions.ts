@@ -275,3 +275,90 @@ export async function changePasswordAction(
 
   return { success: true };
 }
+
+const PublicSupportTicketSchema = z.object({
+  identifier: z.string().trim().max(100).optional().default(''),
+  issueType: z.string().trim().min(1).max(50),
+  message: z.string().trim().min(5, 'تفاصيل المشكلة يجب ألا تقل عن 5 أحرف').max(2000, 'تفاصيل المشكلة يجب ألا تتجاوز 2000 حرف'),
+});
+
+const ISSUE_TYPE_LABELS: Record<string, { label: string; category: string }> = {
+  login_issue: { label: 'صعوبة في تسجيل الدخول بالرقم القومي', category: 'technical' },
+  password_issue: { label: 'نسيان أو فقدان كلمة المرور', category: 'technical' },
+  account_inactive: { label: 'الحساب غير مفعل لدى شؤون الطلاب', category: 'academic' },
+  technical_bug: { label: 'عطل تقني أو خطأ في المنصة', category: 'technical' },
+  other: { label: 'استفسار أو مشكلة أخرى', category: 'inquiry' },
+};
+
+export async function submitPublicSupportTicketAction(
+  input: unknown
+): Promise<{ success: boolean; ticketNo?: string; error?: string }> {
+  try {
+    const parsed = PublicSupportTicketSchema.safeParse(input);
+    if (!parsed.success) {
+      return {
+        success: false,
+        error: parsed.error.issues[0]?.message || 'البيانات المدخلة غير صالحة',
+      };
+    }
+
+    const { identifier: rawIdentifier, issueType, message } = parsed.data;
+
+    const h = await headers();
+    const clientIp = extractClientIp(h);
+
+    // Rate limit: 5 public support tickets per hour per IP (or IP+identifier)
+    const rateLimitKey = rawIdentifier ? `${clientIp}:${normalizeIdentifier(rawIdentifier)}` : clientIp;
+    const rateLimit = await checkRateLimit(rateLimitKey, 'ticket', 5, 3600);
+    if (!rateLimit.allowed) {
+      return {
+        success: false,
+        error: 'تم تجاوز الحد الأقصى لإرسال تذاكر الدعم (5 تذاكر في الساعة). يرجى المحاولة لاحقاً.',
+      };
+    }
+
+    // Try to associate with existing account if identifier is provided
+    let matchedAccountId: string | null = null;
+    if (rawIdentifier) {
+      const normId = normalizeIdentifier(rawIdentifier);
+      const [matchedAccount] = await appSql`
+        SELECT a.id
+        FROM public.academic_accounts a
+        LEFT JOIN public.academic_profiles p ON p.id = a.id
+        WHERE a.national_id = ${normId} OR p.student_code = ${normId}
+        LIMIT 1
+      `;
+      if (matchedAccount?.id) {
+        matchedAccountId = matchedAccount.id;
+      }
+    }
+
+    const issueInfo = ISSUE_TYPE_LABELS[issueType] || {
+      label: 'طلب مساعدة عام',
+      category: 'technical',
+    };
+
+    const subject = `[دعم تسجيل الدخول] ${issueInfo.label}${rawIdentifier ? ` - ${rawIdentifier}` : ''}`.slice(0, 150);
+    const fullMessage = `معرف الطالب/رقم التواصل: ${rawIdentifier || 'غير مسجل'}\nنوع المشكلة: ${issueInfo.label}\n\nنص البلاغ:\n${message}`.slice(0, 2000);
+
+    const [ticket] = await appSql`
+      INSERT INTO public.academic_support_tickets (
+        student_id, category, subject, message, status, priority
+      ) VALUES (
+        ${matchedAccountId}, ${issueInfo.category}, ${subject}, ${fullMessage}, 'open', 'medium'
+      ) RETURNING ticket_no;
+    `;
+
+    return {
+      success: true,
+      ticketNo: ticket.ticket_no,
+    };
+  } catch (err) {
+    console.error('Failed to submit public support ticket:', err);
+    return {
+      success: false,
+      error: 'حدث خطأ أثناء حفظ البلاغ. يرجى المحاولة لاحقاً أو التواصل عبر واتساب الدعم.',
+    };
+  }
+}
+

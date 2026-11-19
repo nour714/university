@@ -1,11 +1,24 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useSyncExternalStore } from 'react';
 import { usePathname } from 'next/navigation';
 import { Sidebar } from '@/components/layout/Sidebar';
 import { Header } from '@/components/layout/Header';
 import { BottomNav } from '@/components/layout/BottomNav';
 import { NotificationToast } from '@/components/notifications/NotificationToast';
+
+function subscribe(callback: () => void) {
+  window.addEventListener('storage', callback);
+  return () => window.removeEventListener('storage', callback);
+}
+
+function getClientSnapshot(): boolean {
+  return typeof window !== 'undefined' && sessionStorage.getItem('academic_tab_active') === '1';
+}
+
+function getServerSnapshot(): boolean {
+  return false;
+}
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -15,24 +28,23 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   // Per-tab session verification:
   // Requires user to have logged in within this specific browser tab.
   // Closing the tab destroys sessionStorage, requiring fresh login upon reopening.
-  const [isTabVerified, setIsTabVerified] = useState(false);
+  const isTabVerified = useSyncExternalStore(
+    subscribe,
+    getClientSnapshot,
+    getServerSnapshot
+  );
 
   useEffect(() => {
     if (isAuthPage) {
-      setIsTabVerified(true);
       return;
     }
 
-    const isActive = sessionStorage.getItem('academic_tab_active');
-    if (!isActive) {
+    if (!isTabVerified) {
       // The tab does not have an active session (tab was closed or opened directly).
       // Redirect to /auth/clear to wipe the cookie and show /login.
       window.location.replace('/auth/clear');
-      return;
     }
-
-    setIsTabVerified(true);
-  }, [pathname, isAuthPage]);
+  }, [pathname, isAuthPage, isTabVerified]);
 
   // Standalone Full-Screen Pages (Auth)
   if (isAuthPage) {

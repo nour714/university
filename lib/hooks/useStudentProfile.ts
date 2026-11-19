@@ -13,8 +13,6 @@ export function useStudentProfile() {
   useEffect(() => {
     let mounted = true;
     if (cachedProfile) {
-      setStudent(cachedProfile);
-      setLoading(false);
       return;
     }
 

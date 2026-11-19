@@ -30,6 +30,7 @@ import { changePasswordAction } from '@/app/auth/actions';
 import { useStudentProfile } from '@/lib/hooks/useStudentProfile';
 import { StudentProfile } from '@/types/student';
 import { CustomSelect, SelectOption } from '@/components/ui/CustomSelect';
+import { getWhatsAppSupportUrl } from '@/lib/config/support';
 
 export function SettingsView({ student: initialStudent }: { student?: StudentProfile } = {}) {
   const [activeTab, setActiveTab] = useState<'password' | 'support'>('password');
@@ -570,7 +571,7 @@ export function SettingsView({ student: initialStudent }: { student?: StudentPro
             <div className="grid grid-cols-2 gap-2 sm:gap-3">
               {/* WhatsApp direct chat button */}
               <a
-                href="https://wa.me/201000000000"
+                href={getWhatsAppSupportUrl()}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center justify-center gap-1.5 h-11 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-xs active:scale-95 transition-all cursor-pointer"

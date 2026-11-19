@@ -20,8 +20,9 @@ import {
   Check
 } from 'lucide-react';
 import { useNotifications } from '@/context/NotificationContext';
-import { loginAction } from '@/app/auth/actions';
+import { loginAction, submitPublicSupportTicketAction } from '@/app/auth/actions';
 import { AuthCinematicShowcase } from '@/components/auth/AuthCinematicShowcase';
+import { getWhatsAppSupportUrl } from '@/lib/config/support';
 
 const ISSUE_TYPES = [
   { id: 'login_issue', label: 'صعوبة في تسجيل الدخول بالرقم القومي', icon: User },
@@ -62,24 +63,45 @@ export function LoginForm() {
     }
   }, [router]);
 
-  const handleHelpSubmit = (e: React.FormEvent) => {
+  const handleHelpSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!helpMessage.trim()) return;
+    if (!helpMessage.trim() || isSubmittingHelp) return;
 
     setIsSubmittingHelp(true);
-    const generatedNo = `TK-${Date.now().toString(36).toUpperCase()}-${Math.floor(100 + Math.random() * 900)}`;
-    setSubmittedTicketNo(generatedNo);
-
-    setTimeout(() => {
-      setIsSubmittingHelp(false);
-      setIsHelpSubmitted(true);
-      addNotification({
-        title: 'تم استلام طلب المساعدة',
-        message: `تم إنشاء التذكرة رقم #${generatedNo} وسيقوم الدعم الفني بمتابعتها.`,
-        type: 'announcement',
-        priority: 'normal',
+    try {
+      const res = await submitPublicSupportTicketAction({
+        identifier: helpIdentifier,
+        issueType: helpIssueType,
+        message: helpMessage,
       });
-    }, 400);
+
+      if (res.success && res.ticketNo) {
+        setSubmittedTicketNo(res.ticketNo);
+        setIsHelpSubmitted(true);
+        addNotification({
+          title: 'تم استلام طلب المساعدة',
+          message: `تم إنشاء التذكرة رقم #${res.ticketNo} وسيقوم الدعم الفني بمتابعتها.`,
+          type: 'announcement',
+          priority: 'normal',
+        });
+      } else {
+        addNotification({
+          title: 'تعذر إرسال التذكرة',
+          message: res.error || 'حدث خطأ أثناء إرسال طلب المساعدة. يرجى المحاولة لاحقاً.',
+          type: 'system',
+          priority: 'urgent',
+        });
+      }
+    } catch {
+      addNotification({
+        title: 'خطأ في الاتصال',
+        message: 'تعذر الاتصال بالخادم. يرجى التحقق من اتصالك بالإنترنت وإعادة المحاولة.',
+        type: 'system',
+        priority: 'urgent',
+      });
+    } finally {
+      setIsSubmittingHelp(false);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -468,7 +490,7 @@ export function LoginForm() {
 
             <div className="flex items-center gap-2.5">
               <a
-                href="https://wa.me/201000000000"
+                href={getWhatsAppSupportUrl()}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex-1 h-11 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-xs transition-colors"
@@ -646,7 +668,7 @@ export function LoginForm() {
                     </button>
 
                     <a
-                      href="https://wa.me/201000000000"
+                      href={getWhatsAppSupportUrl()}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="w-full h-10 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 font-bold text-xs flex items-center justify-center gap-2 transition-colors"
@@ -673,9 +695,9 @@ export function LoginForm() {
                 </div>
                 <div className="space-y-2 mb-4">
                   <a
-                    href={`https://wa.me/201000000000?text=${encodeURIComponent(
+                    href={getWhatsAppSupportUrl(
                       `طلب دعم فني - تذكرة #${submittedTicketNo}\nالمعرف: ${helpIdentifier || 'غير مسجل'}\nالمشكلة: ${selectedIssue.label}\nالتفاصيل: ${helpMessage}`
-                    )}`}
+                    )}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="w-full h-10 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-xs transition-colors"

@@ -1,144 +1,85 @@
-# 🎓 بوابة المقررات الأكاديمية | كلية الذكاء الاصطناعي - جامعة كفر الشيخ
-> **Faculty of Artificial Intelligence — Kafrelsheikh University — Academic Course Portal (v2.1 Architecture)**  
-> منصة أكاديمية تفاعلية حديثة، فائقة السرعة والأمان، مبنية على بنية Next.js 16 + PostgreSQL 16 المتطورة مع عزل الصلاحيات الدقيق (Least-Privilege)، وإدارة الامتحانات الآمنة، وحماية المحتويات الأكاديمية.
+<div align="center">
+
+# 🎓 البوابة الأكاديمية — كلية الذكاء الاصطناعي (جامعة كفر الشيخ)
+### Faculty of Artificial Intelligence — Academic Course Portal
+
+[![CI](https://github.com/nour714/university/actions/workflows/ci.yml/badge.svg)](https://github.com/nour714/university/actions/workflows/ci.yml)
+[![Live Portal](https://img.shields.io/badge/Live%20Portal-Vercel-000000?style=flat&logo=vercel&logoColor=white)](https://university-gules-zeta.vercel.app/)
+[![Next.js](https://img.shields.io/badge/Next.js-16-000000?style=flat&logo=nextdotjs&logoColor=white)](https://nextjs.org/)
+[![React](https://img.shields.io/badge/React-19-149ECA?style=flat&logo=react&logoColor=white)](https://react.dev/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?style=flat&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?style=flat&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-v4-06B6D4?style=flat&logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
+
+منصة أكاديمية جامعية حديثة لإدارة المقررات الدراسية، والمحاضرات، والاختبارات الإلكترونية، وأكواد التفعيل — مصممة بواجهة عربية كاملة (**RTL**) ومتجاوبة مع جميع الأجهزة (**Mobile-First**).
+
+[🌐 زيارة المنصة المباشرة](https://university-gules-zeta.vercel.app/)
+
+</div>
 
 ---
 
-## 🌟 نظرة عامة (Overview)
+## المميزات الرئيسية (Key Features)
 
-بوابة إلكترونية متطورة مخصصة لطلاب وأعضاء هيئة التدريس بكلية الذكاء الاصطناعي بجامعة كفر الشيخ:
-- ⚡ **أداء فائق**: Next.js 16.4.4 App Router مع Partial Prerendering وTurbopack.
-- 📱 **تصميم متجاوب بالكامل (Mobile-First)**: تجربة تصفح مثالية وسلسة على مختلف مقاسات الهواتف والأجهزة اللوحية.
-- 🔒 **بنية أمنية متقدمة**: عزل تام للصلاحيات عبر دورين منفصلين بقاعدة البيانات (`academic_app` و `academic_grader`) وسياسات Row-Level Security (RLS) صارمة.
-- 📝 **نظام تصحيح امتحانات منيع**: عزل مفاتيح الإجابة في مخطط خاص `academic_private.exam_keys` متاح حصرياً لدور المصحح، مع التحقق الصارم ضد ساعة الخادم ومنع القراءة المسبقة لأسئلة الامتحان.
-- 🛡️ **حماية المحتويات والأكواد**: حجب روابط التخزين السحابي `storage_key` والمواد التعليمية عن غير المسجلين، مع دعم الروابط الموقعة مؤقتاً (Cloudflare R2 Presigned URLs) وقفل المنافسة الذري (FOR UPDATE) للأكواد.
-- ♿ **دعم كامل للغة العربية (RTL)**: استخدام خط **Cairo** واعتماد الخصائص المنطقية للـ CSS ومطابقة معايير **WCAG 2.1 AA**.
+- **لوحة تحكم الطالب:** عرض البيانات الأكاديمية، والمعدل التراكمي (GPA)، والساعات المسجلة، والوصول السريع للمقررات.
+- **المقررات والمحتوى العلمي:** تصفح المقررات المفعّلة مع البحث والفلترة حسب نوع المحتوى (محاضرات PDF، فيديوهات مسجلة، مخططات، وروابط علمية) مع تنزيل آمن للملفات.
+- **الاختبارات الإلكترونية:** أداء اختبارات الميدتيرم والكويزات بوقت محدد، وحفظ تلقائي للإجابات، وتسليم آمن، ومتابعة النتائج.
+- **إدارة الأكواد والصلاحيات:** تفعيل أكواد المقررات الدراسية بسهولة مع سجل للأكواد المفعّلة ونسخ فوري للكود.
+- **الإشعارات والدعم الفني:** مركز إشعارات أكاديمية فوري، وإعدادات للحساب وكلمة المرور، ونظام تذاكر دعم فني مع تواصل مباشر مع وحدة الدعم.
+- **تصميم عصري ومتجاوب:** دعم كامل للغة العربية (RTL)، والوضع الليلي والنهاري، ومعايير إمكانية الوصول (WCAG 2.1 AA).
 
 ---
 
-## 🛠️ البنية التقنية (Tech Stack)
+## التقنيات المستخدمة (Tech Stack)
 
-| التقنية | الاستخدام |
+| الطبقة | التقنية |
 | :--- | :--- |
-| **Next.js 16.4.4 (App Router)** | إطار العمل الأساسي، Partial Prerendering، Server Actions، `proxy.ts` |
-| **React 19** | مكتبة واجهة المستخدم وأحدث الـ Hooks التفاعلية |
-| **PostgreSQL 16 / 17** | قاعدة البيانات الأساسية مع أدوار منفصلة وسياسات RLS |
-| **Postgres.js** | عميل اتصال بقاعدة البيانات فائق السرعة ومعاملات ذرية |
-| **@node-rs/argon2** | تشفير كلمات المرور بحماية ضد Timing Attacks |
-| **Zod** | التحقق الصارم من المدخلات وبيئة التشغيل (Fail-Closed) |
-| **Cloudflare R2 (AWS SDK)** | تخزين سحابي للملفات الأكاديمية بروابط موقعة قصيرة الأجل |
-| **Tailwind CSS v4** | تنسيق وتصميم الواجهات العصرية |
-| **Vitest & Embedded-Postgres** | بيئة اختبارات مؤتمتة متكاملة على Postgres 16 حقيقي |
+| **إطار العمل** | Next.js (App Router + Turbopack) |
+| **واجهة المستخدم** | React 19 • Tailwind CSS v4 • Lucide Icons |
+| **اللغة والتحقق** | TypeScript • Zod |
+| **قاعدة البيانات والتخزين** | PostgreSQL • Cloudflare R2 |
+| **الاختبارات والجودة** | Vitest • ESLint • GitHub Actions CI |
 
 ---
 
-## 💻 التشغيل والتثبيت المحلي (Getting Started)
+## التشغيل المحلي (Quick Start)
 
-### 1. المتطلبات الأساسية
-- بيئة **Node.js 22** أو أحدث.
-- مدير الحزم `npm`.
-- اختياري: **Docker** لتشغيل قاعدة بيانات Postgres 16 محلياً (أو الاعتماد على `embedded-postgres` المدمج تلقائياً في الاختبارات).
+> **المتطلبات:** `Node.js 22+` و `npm` و `Docker`.
 
-### 2. إعداد متغيرات البيئة
-انسخ ملف الإعداد النموذجي:
 ```bash
+# 1. استنساخ المشروع وتثبيت الحزم
+git clone https://github.com/nour714/university.git
+cd university
+npm install
+
+# 2. إعداد ملف البيئة المحلي بناءً على القالب المرفق
 cp .env.example .env.local
-```
 
-قيم المتغيرات الأساسية المطلوبة:
-```env
-DATABASE_URL_OWNER=postgres://postgres:postgres@localhost:5432/postgres?sslmode=disable
-DATABASE_URL_APP=postgres://academic_app:<your-app-password>@localhost:5432/postgres?sslmode=disable
-DATABASE_URL_GRADER=postgres://academic_grader:<your-grader-password>@localhost:5432/postgres?sslmode=disable
-CODE_PEPPER=your-64-character-hex-code-pepper-min-32
-APP_SECRET=your-64-character-hex-app-secret-min-32
-CRON_SECRET=your-cron-secret-token-min-16
-DB_SSL=disable
-DB_POOL_MAX=10
-```
-
-> [!WARNING]
-> لا يتم تشغيل النظام بأي قيم افتراضية غير صالحة؛ يتحقق ملف `lib/env.ts` عند بدء التشغيل فوراً ويرفض الإقلاع (Fail-Closed) في حال نقص أو عدم صلاحية أي متغير.
-
-### 3. تشغيل قاعدة البيانات المحلية (Docker Compose)
-لتشغيل Postgres 16 المحلي للتطوير:
-```bash
+# 3. تشغيل قاعدة البيانات المحلية ثم الترحيلات
 docker compose up -d
-```
-لقاعدة بيانات الاختبارات المنفصلة (المنفذ 5433):
-```bash
-docker compose -f docker-compose.test.yml up -d
-```
-
-### 4. تطبيق الترحيلات (Migrations)
-يتم تطبيق ترحيلات قاعدة البيانات بالترتيب الزمني `000 -> 001 -> 002 -> 003` عبر:
-```bash
 npm run migrate
-```
 
-### 5. إدخال البيانات الأولية (Seeding)
-لتغذية البيانات الأكاديمية التجريبية (مقررات، محتويات، حساب تجريبي):
-```bash
-SEED_DEMO_PASSWORD=MyLocalTestPassword123! npm run seed
-```
-
-### 6. تشغيل خادم التطوير
-```bash
+# 4. تشغيل خادم التطوير
 npm run dev
 ```
-يعمل التطبيق على المنفذ المخصص: [http://localhost:5500](http://localhost:5500)
+
+*(تُضبط جميع متغيرات البيئة محلياً داخل `.env.local` أو عبر إعدادات الاستضافة، ولا تُرفع أي مفاتيح أو بيانات اتصال إلى المستودع).*
 
 ---
 
-## 🧪 الاختبارات وضمان الجودة (Testing & Verification)
+## الأوامر الأساسية (Scripts)
 
-تم تزويد المشروع بجناح اختبارات شامل مؤتمت يعمل على قاعدة بيانات PostgreSQL 16 حقيقية (`embedded-postgres`) دون أي محاكاة وهمية (Zero Mocks):
-
-### 1. تشغيل جناح الاختبارات الكامل
-```bash
-npm test
-```
-يشمل 40 اختباراً شاملاً يغطي:
-- `test/hygiene.test.ts`: الفحص الأمني لخلو المستودع من أي مفاتيح مسربة أو نصوص غير مشفرة.
-- `test/parameterizedSql.test.ts`: التأكد من خلو كافة الاستعلامات من الثغرات (SQL Injection) واعتماد استعلامات مجهزة فقط.
-- `test/databasePermissions.test.ts`: مصفوفة صلاحيات أدوار `academic_app` و `academic_grader`.
-- `test/auth.test.ts`: مقاومة استنتاج الحسابات، قفل الحساب الذري، وتدوير الجلسات عند تغيير كلمة المرور.
-- `test/exams.test.ts`: حجب الأسئلة قبل بدء التوقيت، تصحيح الامتحانات، وتخزين الإجابات والدرجات بدقة.
-- `test/cron.test.ts`: التحقق المستمر ومقارنة التوكنات الآمنة زمنياً (`crypto.timingSafeEqual`) والمعالجة التلقائية للجلسات منتهية الصلاحية.
-- `test/courses.test.ts`: حظر الوصول للمحتويات والملفات لغير المسجلين، وعدم تسريب أي `storage_key`.
-- `test/codes.test.ts`: اختبار سباق التزامن (Concurrency Race) على الأكواد وضمان عدم حرق الكود عند التكرار.
-- `test/responseLeak.test.ts`: ماسح الاستجابات لمنع تسريب بيانات الاعتماد ومفاتيح التخزين.
-
-### 2. اختبار مصفوفة الصلاحيات بالـ SQL
-```bash
-npm run test:permissions
-```
-
-### 3. اختبار الطفرات والتكسير المتعمد (14 Mutation Checks)
-```bash
-npm run test:mutations
-```
-يقوم بتطبيق 14 تكسيراً أمنياً وبرمجياً متعمداً في الشيفرة والتأكد من نجاح جناح الاختبارات في رصدها وإسقاطها بنسبة 100% (14/14 KILLED).
-
-### 4. الفحص البرمجي والأنماط
-```bash
-npm run lint
-npx tsc --noEmit
-```
-
-### 5. بناء نسخة الإنتاج
-```bash
-npm run build
-```
+| الأمر | الوظيفة |
+| :--- | :--- |
+| `npm run dev` | تشغيل خادم التطوير المحلي |
+| `npm run build` | بناء نسخة الإنتاج |
+| `npm run start` | تشغيل نسخة الإنتاج محلياً |
+| `npm run lint` | فحص جودة الكود (ESLint) |
+| `npx tsc --noEmit` | التحقق من أنواع TypeScript |
+| `npm test` | تشغيل الاختبارات الآلية (Vitest) |
 
 ---
 
-## 🔒 دليل تدوير المفاتيح وإجراءات الأمان (Security Rotation)
+## الترخيص (License)
 
-> [!IMPORTANT]
-> في حال الاشتباه بأي تسريب لمفاتيح سابقة على المستودعات العامة، راجع دليل العمليات اليدوي في [`docs/SECURITY-ROTATION.md`](docs/SECURITY-ROTATION.md) الموجه لمدير النظام لتغيير كلمات مرور الأدوار، وتوليد `CODE_PEPPER` جديد، وتعطيل الحسابات التجريبية على بيئة الإنتاج.
-
----
-
-## 🏛️ الترخيص والحقوق (License)
-مشروع تم تطويره لصالح **كلية الذكاء الاصطناعي - جامعة كفر الشيخ** © 2026. جميع الحقوق محفوظة.
+جميع الحقوق محفوظة © 2026 — البوابة الأكاديمية لكلية الذكاء الاصطناعي، جامعة كفر الشيخ.

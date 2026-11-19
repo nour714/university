@@ -36,12 +36,12 @@ export function validateScriptDbUrl(name: string, urlStr: string) {
 }
 
 const ScriptEnvSchema = z.object({
-  DATABASE_URL_OWNER: ***REMOVED*** 'DATABASE_URL_OWNER is required for migration/seed scripts'),
-  DATABASE_URL_APP: ***REMOVED***
-  DATABASE_URL_GRADER: ***REMOVED***
+  DATABASE_URL_OWNER: z.string().min(1, 'DATABASE_URL_OWNER is required for migration/seed scripts'),
+  DATABASE_URL_APP: z.string().optional(),
+  DATABASE_URL_GRADER: z.string().optional(),
   CODE_PEPPER: z.string().min(32, 'CODE_PEPPER must be at least 32 characters').optional(),
-  SEED_DEMO_PASSWORD: ***REMOVED***
-  ALLOW_REMOTE_DB: ***REMOVED***
+  SEED_DEMO_PASSWORD: z.string().optional(),
+  ALLOW_REMOTE_DB: z.string().optional(),
 });
 
 export function loadScriptEnv() {

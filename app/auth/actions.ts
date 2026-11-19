@@ -28,8 +28,8 @@ import { env } from '@/lib/env';
 
 const LoginSchema = z.object({
   identifier: z.string().trim().min(3, 'يرجى إدخال الرقم القومي أو الرقم الأكاديمي').max(50),
-  password: ***REMOVED*** 'يرجى إدخال كلمة المرور').max(128),
-  turnstileToken: ***REMOVED***
+  password: z.string().min(1, 'يرجى إدخال كلمة المرور').max(128),
+  turnstileToken: z.string().optional(),
 });
 
 export type LoginActionResult =
@@ -187,7 +187,7 @@ export async function logoutAction(): Promise<{ success: boolean }> {
 }
 
 const ChangePasswordSchema = z.object({
-  currentPassword: ***REMOVED*** 'يرجى إدخال كلمة المرور الحالية').max(128),
+  currentPassword: z.string().min(1, 'يرجى إدخال كلمة المرور الحالية').max(128),
   newPassword: z.string().min(10, 'كلمة المرور الجديدة يجب أن لا تقل عن 10 أحرف').max(128),
 });
 

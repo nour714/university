@@ -4,7 +4,7 @@ services:
     container_name: university-postgres-test
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
-      POSTGRES_PASSWORD: ***REMOVED***
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres_test_password}
       POSTGRES_DB: ${POSTGRES_DB:-university_test}
     ports:
       - "${POSTGRES_TEST_PORT:-5433}:5432"

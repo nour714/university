@@ -4,21 +4,21 @@ import { z } from 'zod';
 const isProduction = process.env.NODE_ENV === 'production';
 
 const EnvSchema = z.object({
-  DATABASE_URL_APP: ***REMOVED*** 'DATABASE_URL_APP is required'),
-  DATABASE_URL_GRADER: ***REMOVED*** 'DATABASE_URL_GRADER is required'),
+  DATABASE_URL_APP: z.string().min(1, 'DATABASE_URL_APP is required'),
+  DATABASE_URL_GRADER: z.string().min(1, 'DATABASE_URL_GRADER is required'),
   CODE_PEPPER: z.string().min(32, 'CODE_PEPPER must be at least 32 characters'),
   APP_SECRET: z.string().min(32, 'APP_SECRET must be at least 32 characters'),
   CRON_SECRET: z.string().min(16, 'CRON_SECRET must be at least 16 characters'),
 
   // Optional Cloudflare R2 / S3
-  R2_ACCOUNT_ID: ***REMOVED***
-  R2_ACCESS_KEY_ID: ***REMOVED***
-  R2_SECRET_ACCESS_KEY: ***REMOVED***
+  R2_ACCOUNT_ID: z.string().optional(),
+  R2_ACCESS_KEY_ID: z.string().optional(),
+  R2_SECRET_ACCESS_KEY: z.string().optional(),
   R2_BUCKET: z.string().default('academic-files'),
 
   // Optional Cloudflare Turnstile
-  TURNSTILE_SECRET_KEY: ***REMOVED***
-  NEXT_PUBLIC_TURNSTILE_SITE_KEY: ***REMOVED***
+  TURNSTILE_SECRET_KEY: z.string().optional(),
+  NEXT_PUBLIC_TURNSTILE_SITE_KEY: z.string().optional(),
 
   // Database Connection Configuration
   DB_SSL: z
@@ -27,7 +27,7 @@ const EnvSchema = z.object({
   DB_POOL_MAX: z.coerce.number().int().positive().default(isProduction ? 10 : 10),
 
   // Server Actions Configuration
-  ALLOWED_ORIGINS: ***REMOVED***
+  ALLOWED_ORIGINS: z.string().optional(),
 });
 
 export type AppEnv = z.infer<typeof EnvSchema>;

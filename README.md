@@ -48,11 +48,11 @@ cp .env.example .env.local
 قيم المتغيرات الأساسية المطلوبة:
 ```env
 DATABASE_URL_OWNER=postgres://postgres:postgres@localhost:5432/postgres?sslmode=disable
-DATABASE_URL_APP=postgres://academic_app:***REMOVED***@localhost:5432/postgres?sslmode=disable
-DATABASE_URL_GRADER=postgres://academic_grader:***REMOVED***@localhost:5432/postgres?sslmode=disable
-CODE_PEPPER=***REMOVED***
-APP_SECRET=***REMOVED***
-CRON_SECRET=***REMOVED***
+DATABASE_URL_APP=postgres://academic_app:<your-app-password>@localhost:5432/postgres?sslmode=disable
+DATABASE_URL_GRADER=postgres://academic_grader:<your-grader-password>@localhost:5432/postgres?sslmode=disable
+CODE_PEPPER=your-64-character-hex-code-pepper-min-32
+APP_SECRET=your-64-character-hex-app-secret-min-32
+CRON_SECRET=your-cron-secret-token-min-16
 DB_SSL=disable
 DB_POOL_MAX=10
 ```

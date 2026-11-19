@@ -45,16 +45,16 @@ export async function setupTestDatabase(): Promise<TestDbClients> {
   }
 
   const ownerUrl = `postgres://postgres:postgres@localhost:${testPort}/postgres?sslmode=disable`;
-  const appUrl = `postgres://academic_app:***REMOVED***@localhost:${testPort}/postgres?sslmode=disable`;
-  const graderUrl = `postgres://academic_grader:***REMOVED***@localhost:${testPort}/postgres?sslmode=disable`;
+  const appUrl = `postgres://academic_app:test_app_pass_32_chars_minimum@localhost:${testPort}/postgres?sslmode=disable`;
+  const graderUrl = `postgres://academic_grader:test_grader_pass_32_chars_minimum@localhost:${testPort}/postgres?sslmode=disable`;
 
   // Set environment variables for services under test
   process.env.DATABASE_URL_OWNER = ownerUrl;
   process.env.DATABASE_URL_APP = appUrl;
   process.env.DATABASE_URL_GRADER = graderUrl;
-  process.env.APP_SECRET = '***REMOVED***';
-  process.env.CODE_PEPPER = '***REMOVED***';
-  process.env.CRON_SECRET = '***REMOVED***';
+  process.env.APP_SECRET = 'test_app_secret_32_characters_minimum_length';
+  process.env.CODE_PEPPER = 'test_code_pepper_32_characters_minimum_length';
+  process.env.CRON_SECRET = 'test_cron_secret_16_min';
   process.env.DB_SSL = 'disable';
   process.env.DB_POOL_MAX = '5';
 
@@ -63,8 +63,8 @@ export async function setupTestDatabase(): Promise<TestDbClients> {
 
   // Set role passwords
   ownerSql = postgres(ownerUrl, { prepare: false });
-  await ownerSql`ALTER ROLE academic_app WITH PASSWORD '***REMOVED***';`;
-  await ownerSql`ALTER ROLE academic_grader WITH PASSWORD '***REMOVED***';`;
+  await ownerSql`ALTER ROLE academic_app WITH PASSWORD 'test_app_pass_32_chars_minimum';`;
+  await ownerSql`ALTER ROLE academic_grader WITH PASSWORD 'test_grader_pass_32_chars_minimum';`;
 
   // Run permissions test
   await runPermissionsTest(ownerUrl);

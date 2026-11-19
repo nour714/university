@@ -13,11 +13,11 @@ jobs:
     env:
       NODE_ENV: test
       DATABASE_URL_OWNER: postgres://postgres:postgres@localhost:5434/postgres?sslmode=disable
-      DATABASE_URL_APP: postgres://academic_app:***REMOVED***@localhost:5434/postgres?sslmode=disable
-      DATABASE_URL_GRADER: postgres://academic_grader:***REMOVED***@localhost:5434/postgres?sslmode=disable
-      APP_SECRET: ***REMOVED***
-      CODE_PEPPER: ***REMOVED***
-      CRON_SECRET: ***REMOVED***
+      DATABASE_URL_APP: "postgres://academic_app:academic_app_ci_test_password@localhost:5434/postgres?sslmode=disable"
+      DATABASE_URL_GRADER: "postgres://academic_grader:academic_grader_ci_test_password@localhost:5434/postgres?sslmode=disable"
+      APP_SECRET: "ci_test_app_secret_at_least_32_characters_long"
+      CODE_PEPPER: "ci_test_code_pepper_at_least_32_characters_long"
+      CRON_SECRET: "ci_test_cron_secret_min_16"
       DB_SSL: disable
       DB_POOL_MAX: 5
 

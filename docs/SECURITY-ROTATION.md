@@ -66,7 +66,7 @@ UPDATE public.academic_sessions
 1. In GitHub Repository Settings, change visibility from **Public** to **Private**.
 2. Even after making the repository private, purge historical commits containing the leaks using `git-filter-repo` or BFG Repo-Cleaner:
    ```bash
-   git filter-repo --replace-text <(echo "***REMOVED***==>REDACTED")
+   git filter-repo --replace-text expressions.txt
    ```
 3. **Note:** Treat all leaked credentials as permanently compromised regardless of history purging.
 

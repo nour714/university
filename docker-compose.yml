@@ -5,7 +5,7 @@ services:
     restart: unless-stopped
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
-      POSTGRES_PASSWORD: ***REMOVED***
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres_local_dev_password}
       POSTGRES_DB: ${POSTGRES_DB:-university_dev}
     ports:
       - "${POSTGRES_PORT:-5432}:5432"

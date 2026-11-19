@@ -24,7 +24,7 @@ import { INITIAL_NOTIFICATIONS } from './data/notifications';
 import { SEED_STUDENTS } from './data/student';
 
 const ExamKeyEntrySchema = z.object({
-  correctOptionId: ***REMOVED*** 'correctOptionId is required'),
+  correctOptionId: z.string().min(1, 'correctOptionId is required'),
   explanation: z.string().default(''),
 });
 

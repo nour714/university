@@ -11,10 +11,10 @@ export interface FinalizeSummary {
 
 /**
  * Sweeps unsubmitted sessions that have expired at least 15 seconds ago.
- * - Uses SKIP LOCKED so concurrent cron instances do not collide.
  * - Orders by end_at ASC so oldest expired sessions are processed first.
  * - Filters by finalize_attempts < 5 to prevent poison sessions from starving the queue.
- * - Executes each session in its own independent transaction.
+ * - Validates session state before grading to ensure concurrency safety.
+ * - Relies on submitAndGradeExam's atomic row lock (SELECT ... FOR UPDATE) and idempotent submission handling.
  */
 export async function finalizeExpiredSessions(limit = 200): Promise<FinalizeSummary> {
   const expiredSessions = await graderSql`
@@ -25,13 +25,23 @@ export async function finalizeExpiredSessions(limit = 200): Promise<FinalizeSumm
       AND finalize_attempts < 5
     ORDER BY end_at ASC
     LIMIT ${limit}
-    FOR UPDATE SKIP LOCKED
   `;
 
   let finalizedCount = 0;
   let failedCount = 0;
 
   for (const s of expiredSessions) {
+    // Quick re-check: if submitted already (e.g. by student action or concurrent worker), skip gracefully
+    const [fresh] = await graderSql`
+      SELECT submitted, finalize_attempts
+      FROM public.academic_exam_sessions
+      WHERE id = ${s.id}
+    `;
+
+    if (!fresh || fresh.submitted || fresh.finalize_attempts >= 5) {
+      continue;
+    }
+
     try {
       await submitAndGradeExam(s.exam_id, s.student_id, undefined, true);
       finalizedCount++;

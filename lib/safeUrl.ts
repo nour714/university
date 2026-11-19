@@ -17,7 +17,19 @@ export function isSafeExternalUrl(u: unknown): u is string {
   }
   try {
     const parsed = new URL(u);
-    return parsed.protocol === 'https:';
+    // Protocol must strictly be https:
+    if (parsed.protocol !== 'https:') {
+      return false;
+    }
+    // Disallow userinfo (e.g. https://user:pass@evil.com)
+    if (parsed.username || parsed.password) {
+      return false;
+    }
+    // Hostname must be valid and non-empty
+    if (!parsed.hostname || parsed.hostname.includes(' ') || parsed.hostname.startsWith('.')) {
+      return false;
+    }
+    return true;
   } catch {
     return false;
   }

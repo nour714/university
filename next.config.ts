@@ -51,9 +51,9 @@ const nextConfig: NextConfig = {
             key: 'Strict-Transport-Security',
             value: 'max-age=63072000; includeSubDomains; preload',
           },
-          // Switch to Content-Security-Policy once the console shows no violations.
+          // Production Content-Security-Policy (Enforced)
           {
-            key: 'Content-Security-Policy-Report-Only',
+            key: 'Content-Security-Policy',
             value: cspHeader,
           },
         ],

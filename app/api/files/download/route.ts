@@ -3,6 +3,7 @@ import { S3Client, GetObjectCommand } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { appSql } from '@/lib/db/app.server';
 import { env } from '@/lib/env';
+import { isSafeExternalUrl } from '@/lib/safeUrl';
 import { requireAuth } from '@/server/auth/requireAuth';
 import { checkRateLimit } from '@/server/security/rateLimit';
 import { resolveContentDownload } from '@/server/courses/service';
@@ -97,12 +98,10 @@ export async function GET(request: Request) {
     }
 
     // 5. Validated HTTPS external URL redirect if present
-    if (content.externalUrl) {
+    if (content.externalUrl && isSafeExternalUrl(content.externalUrl)) {
       try {
         const parsedUrl = new URL(content.externalUrl);
-        if (parsedUrl.protocol === 'https:') {
-          return NextResponse.redirect(parsedUrl.toString());
-        }
+        return NextResponse.redirect(parsedUrl.toString());
       } catch {
         // Malformed URL falls through
       }

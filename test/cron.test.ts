@@ -90,14 +90,14 @@ describe('Cron Finalize & Timed Auto-Submission (Finding E3)', () => {
       expect(json.success).toBe(true);
     });
 
-    it('accepts correct Bearer token matching env.APP_SECRET as fallback', async () => {
+    it('strictly rejects Bearer token matching env.APP_SECRET (must use dedicated CRON_SECRET)', async () => {
       const req = new Request('http://localhost:3000/api/cron/finalize', {
         headers: { authorization: `Bearer ${env.APP_SECRET}` },
       });
       const res = await GET(req);
-      expect(res.status).toBe(200);
+      expect(res.status).toBe(401);
       const json = await res.json();
-      expect(json.success).toBe(true);
+      expect(json.error).toBe('Unauthorized');
     });
 
     it('uses crypto.timingSafeEqual rather than string comparison for secret auth', async () => {

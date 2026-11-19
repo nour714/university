@@ -58,7 +58,19 @@ export async function checkRateLimit(
     return { allowed, remaining };
   } catch (err) {
     console.error('[checkRateLimit warning]:', err);
-    // Fail-open on transient rate-limiting errors to prevent blocking legitimate students
+    // Fail-closed on authentication & anti-bruteforce buckets to prevent rate-limit bypass under DB error
+    const criticalBuckets: RateLimitBucket[] = [
+      'login',
+      'login_ip_id',
+      'login_fail_ip',
+      'login_fail_id',
+      'redeem',
+      'password_change',
+    ];
+    if (criticalBuckets.includes(bucket)) {
+      return { allowed: false, remaining: 0 };
+    }
+    // Fail-open on non-critical buckets (download, api, ticket) to avoid blocking students on transient errors
     return { allowed: true, remaining: maxRequests };
   }
 }

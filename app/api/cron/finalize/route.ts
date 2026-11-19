@@ -16,10 +16,8 @@ function verifyToken(authHeader: string, secret: string): boolean {
 function verifyCronAuth(authHeader: string | null): boolean {
   if (!authHeader) return false;
   const env = getEnv();
+  // Strictly enforce dedicated CRON_SECRET for cron triggers
   if (env.CRON_SECRET && verifyToken(authHeader, env.CRON_SECRET)) {
-    return true;
-  }
-  if (env.APP_SECRET && verifyToken(authHeader, env.APP_SECRET)) {
     return true;
   }
   return false;

@@ -50,6 +50,7 @@ export function LoginForm() {
   const [helpMessage, setHelpMessage] = useState('');
   const [isHelpSubmitted, setIsHelpSubmitted] = useState(false);
   const [isSubmittingHelp, setIsSubmittingHelp] = useState(false);
+  const [submittedTicketNo, setSubmittedTicketNo] = useState('');
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -66,16 +67,19 @@ export function LoginForm() {
     if (!helpMessage.trim()) return;
 
     setIsSubmittingHelp(true);
+    const generatedNo = `TK-${Date.now().toString(36).toUpperCase()}-${Math.floor(100 + Math.random() * 900)}`;
+    setSubmittedTicketNo(generatedNo);
+
     setTimeout(() => {
       setIsSubmittingHelp(false);
       setIsHelpSubmitted(true);
       addNotification({
         title: 'تم استلام طلب المساعدة',
-        message: 'تم تسجيل بلاغك وسيقوم الدعم الفني بمتابعته وحله في أسرع وقت.',
+        message: `تم إنشاء التذكرة رقم #${generatedNo} وسيقوم الدعم الفني بمتابعتها.`,
         type: 'announcement',
         priority: 'normal',
       });
-    }, 600);
+    }, 400);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -664,16 +668,29 @@ export function LoginForm() {
                 <p className="text-xs text-slate-500 leading-relaxed mb-4 max-w-xs mx-auto">
                   تم تسجيل بلاغك وسيقوم مشرفو الدعم الفني بمراجعة البيانات والتواصل معك لحل المشكلة فوراً.
                 </p>
-                <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-700 font-mono mb-4">
-                  رقم البلاغ: #TKT-8492
+                <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-700 font-mono mb-3">
+                  رقم البلاغ: #{submittedTicketNo || 'TK-PENDING'}
                 </div>
-                <button
-                  type="button"
-                  onClick={() => setIsHelpModalOpen(false)}
-                  className="w-full h-10 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs transition-colors cursor-pointer"
-                >
-                  حسناً، إغلاق
-                </button>
+                <div className="space-y-2 mb-4">
+                  <a
+                    href={`https://wa.me/201000000000?text=${encodeURIComponent(
+                      `طلب دعم فني - تذكرة #${submittedTicketNo}\nالمعرف: ${helpIdentifier || 'غير مسجل'}\nالمشكلة: ${selectedIssue.label}\nالتفاصيل: ${helpMessage}`
+                    )}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full h-10 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-xs transition-colors"
+                  >
+                    <MessageSquare className="w-3.5 h-3.5" />
+                    <span>إرسال ومتابعة البلاغ عبر واتساب فوراً</span>
+                  </a>
+                  <button
+                    type="button"
+                    onClick={() => setIsHelpModalOpen(false)}
+                    className="w-full h-10 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition-colors cursor-pointer"
+                  >
+                    حسناً، إغلاق
+                  </button>
+                </div>
               </div>
             )}
           </div>

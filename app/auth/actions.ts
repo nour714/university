@@ -23,6 +23,7 @@ import {
 import { normalizeIdentifier, maskIdentifier } from '@/lib/security/normalizeIdentifier';
 import { isCommonPassword } from '@/lib/security/commonPasswords';
 import { verifyTurnstileToken } from '@/server/security/turnstile';
+import { extractClientIp } from '@/server/security/clientIp';
 import { env } from '@/lib/env';
 
 const LoginSchema = z.object({
@@ -48,8 +49,7 @@ export async function loginAction(input: unknown): Promise<LoginActionResult> {
     const normId = normalizeIdentifier(rawIdentifier);
 
     const h = await headers();
-    const rawXForwarded = h.get('x-forwarded-for');
-    const clientIp = rawXForwarded ? rawXForwarded.split(',')[0].trim() : (h.get('x-real-ip') || '127.0.0.1');
+    const clientIp = extractClientIp(h);
     const userAgent = h.get('user-agent') || 'Unknown';
 
     // 1. Sliding window rate limiting:
@@ -245,8 +245,7 @@ export async function changePasswordAction(
   }
 
   const h = await headers();
-  const rawXForwarded = h.get('x-forwarded-for');
-  const clientIp = rawXForwarded ? rawXForwarded.split(',')[0].trim() : (h.get('x-real-ip') || '127.0.0.1');
+  const clientIp = extractClientIp(h);
   const userAgent = h.get('user-agent') || 'Unknown';
 
   const newHash = await hashPassword(newPassword);

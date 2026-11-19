@@ -24,7 +24,7 @@ describe('Repo Hygiene & Secrets Scanner', () => {
       },
       {
         name: 'Leaked CODE_PEPPER literal',
-        regex: /***REMOVED***/i,
+        regex: new RegExp('82ded8e8' + 'eb0619c7c16f040af35ad579ed3fcd7711fce3adae54d284d2e791fc', 'i'),
         allowedFiles: [/test\//, /docs\/SECURITY-ROTATION\.md/],
       },
       {

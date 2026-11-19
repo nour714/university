@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeAll, afterAll, vi } from 'vitest';
 import { setupTestDatabase, teardownTestDatabase, TestDbClients } from './setupTestDb';
+import * as passwordModule from '@/server/auth/password';
 import { hashPassword, verifyPassword, verifyDummyPassword } from '@/server/auth/password';
 import { createSession, validateSession, revokeSession, revokeAllAccountSessions } from '@/server/auth/session';
 import { normalizeIdentifier, maskIdentifier } from '@/lib/security/normalizeIdentifier';
@@ -93,6 +94,16 @@ describe('Auth & Session Security Tests (Finding F8 / Task 7)', () => {
         WHERE a.national_id = '99999999999999'
       `;
       expect(nonExisting).toBeUndefined();
+
+      const dummySpy = vi.spyOn(passwordModule, 'verifyDummyPassword');
+      const nonExistingRes = await loginAction({
+        identifier: '99999999999999',
+        password: 'WrongPassword123!',
+      });
+      expect(nonExistingRes.success).toBe(false);
+      expect(dummySpy).toHaveBeenCalled();
+      dummySpy.mockRestore();
+
       const t0 = Date.now();
       await verifyDummyPassword();
       const elapsed = Date.now() - t0;

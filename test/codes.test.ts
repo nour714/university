@@ -154,7 +154,7 @@ describe('Codes Redemption & Concurrency Locking (Finding S1 & Concurrency)', ()
     });
 
     it('returns alreadyEnrolled: false and course info if code is unredeemed and student not enrolled', async () => {
-      const unEnrolledStudent = studentIds[1]; // didn't win second code
+      const unEnrolledStudent = studentIds.find((sid) => sid !== concurrentWinnerStudentId) || studentIds[1];
       const checkRes = await checkEnrollmentKey('CS101-SECOND-CODE-2026', unEnrolledStudent);
       expect(checkRes.valid).toBe(true);
       expect(checkRes.alreadyEnrolled).toBe(false);

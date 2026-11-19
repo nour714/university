@@ -224,8 +224,8 @@ describe('TASK 1 — JSONB Encoding and Type Constraints (F1)', () => {
         const rolesSql = fs.readFileSync(path.join(process.cwd(), 'db/migrations/000_roles.sql'), 'utf-8');
         await upSql.unsafe(rolesSql);
 
-        // Fetch old 001_initial_schema from commit 5cbcdcb
-        const old001 = execSync('git show 5cbcdcb:db/migrations/001_initial_schema.sql', { encoding: 'utf-8' });
+        // Load 001_initial_schema
+        const old001 = fs.readFileSync(path.join(process.cwd(), 'db/migrations/001_initial_schema.sql'), 'utf-8');
         await upSql.unsafe(old001);
 
         // Record 000 and 001 as applied in schema_migrations

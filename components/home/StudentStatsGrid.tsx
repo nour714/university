@@ -75,7 +75,7 @@ export function StudentStatsGrid({ student }: StudentStatsGridProps) {
           <TrendingUp className="w-5 h-5 text-blue-600" />
           المؤشرات والبيانات الأكاديمية
         </h2>
-        <span className="text-xs text-slate-500 font-medium">محدّث لحظياً</span>
+        <span className="text-xs text-slate-700 font-medium">محدّث لحظياً</span>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
@@ -104,7 +104,7 @@ export function StudentStatsGrid({ student }: StudentStatsGridProps) {
               </div>
 
               {/* Title */}
-              <p className="text-xs sm:text-sm font-bold text-slate-600 mb-1.5">
+              <p className="text-xs sm:text-sm font-bold text-slate-700 mb-1.5">
                 {stat.title}
               </p>
 
@@ -114,14 +114,14 @@ export function StudentStatsGrid({ student }: StudentStatsGridProps) {
                   {stat.value}
                 </span>
                 {stat.unit && (
-                  <span className="text-xs sm:text-sm font-bold text-slate-500">
+                  <span className="text-xs sm:text-sm font-bold text-slate-700">
                     {stat.unit}
                   </span>
                 )}
               </div>
 
               {/* Bottom Subtle Note */}
-              <div className="flex items-center gap-1.5 pt-2 border-t border-slate-100 text-[11px] text-slate-500 font-medium">
+              <div className="flex items-center gap-1.5 pt-2 border-t border-slate-100 text-[11px] text-slate-700 font-medium">
                 <CheckCircle2 className="w-3.5 h-3.5 text-blue-600 shrink-0" />
                 <span className="truncate">{stat.description}</span>
               </div>

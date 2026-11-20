@@ -7,8 +7,8 @@ const SESSION_COOKIE_NAME =
 const MUST_CHANGE_COOKIE_NAME =
   process.env.NODE_ENV === 'production' ? '__Host-mcp' : 'academic_mcp';
 
-// Public routes that never require a session
-const PUBLIC_PATHS = ['/login', '/auth/clear', '/favicon.ico'];
+// Routes requiring authenticated session
+const PROTECTED_PREFIXES = ['/courses', '/exams', '/codes', '/settings', '/account', '/notifications'];
 
 /**
  * NOTE: The proxy is a routing hint, not a security boundary.
@@ -28,12 +28,14 @@ export function proxy(request: NextRequest) {
   }
 
   const sessionCookie = request.cookies.get(SESSION_COOKIE_NAME)?.value;
-  const isPublicPath = PUBLIC_PATHS.some(
-    (path) => pathname === path || pathname.startsWith(path + '/')
-  );
+  const isProtectedPath =
+    pathname === '/' ||
+    PROTECTED_PREFIXES.some(
+      (prefix) => pathname === prefix || pathname.startsWith(prefix + '/')
+    );
 
   // 2. Unauthenticated user without cookie trying to access a protected route -> redirect to /login
-  if (!sessionCookie && !isPublicPath) {
+  if (!sessionCookie && isProtectedPath) {
     const loginUrl = new URL('/login', request.url);
     return NextResponse.redirect(loginUrl);
   }
@@ -43,18 +45,13 @@ export function proxy(request: NextRequest) {
   if (sessionCookie && mustChangeCookie === '1') {
     const isAllowedForPasswordChange =
       pathname === '/account/change-password' ||
-      pathname.startsWith('/account/change-password/') ||
-      isPublicPath;
+      pathname.startsWith('/account/change-password/');
 
-    if (!isAllowedForPasswordChange) {
+    if (!isAllowedForPasswordChange && isProtectedPath) {
       const changePasswordUrl = new URL('/account/change-password', request.url);
       return NextResponse.redirect(changePasswordUrl);
     }
   }
-
-  // NOTE: Removed the "cookie present + /login -> /" redirect.
-  // Stale/expired/must-change cookies must be allowed to reach /login or /account/change-password
-  // without triggering an infinite redirect loop. Verification happens in the page Server Component.
 
   return NextResponse.next();
 }

@@ -12,12 +12,13 @@ function isCrossSiteRequest(request: Request): boolean {
   }
 
   const reqUrl = new URL(request.url);
+  const normalizeHost = (host: string) => host.replace(/^127\.0\.0\.1/, 'localhost');
 
   const origin = request.headers.get('origin');
   if (origin) {
     try {
       const originUrl = new URL(origin);
-      if (originUrl.host !== reqUrl.host) {
+      if (normalizeHost(originUrl.host) !== normalizeHost(reqUrl.host)) {
         return true;
       }
     } catch {
@@ -29,7 +30,7 @@ function isCrossSiteRequest(request: Request): boolean {
   if (referer) {
     try {
       const refUrl = new URL(referer);
-      if (refUrl.host !== reqUrl.host) {
+      if (normalizeHost(refUrl.host) !== normalizeHost(reqUrl.host)) {
         return true;
       }
     } catch {

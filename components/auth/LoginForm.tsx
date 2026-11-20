@@ -61,16 +61,6 @@ export function LoginForm({ reason: propReason }: LoginFormProps = {}) {
   const [isSubmittingHelp, setIsSubmittingHelp] = useState(false);
   const [submittedTicketNo, setSubmittedTicketNo] = useState('');
 
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      if (sessionStorage.getItem('academic_tab_active') === '1') {
-        router.replace('/');
-      } else if (reason !== 'logged_out') {
-        fetch('/auth/clear', { method: 'POST' }).catch(() => {});
-      }
-    }
-  }, [router, reason]);
-
   const handleHelpSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setHelpMessageError('');

@@ -10,6 +10,7 @@ export default defineConfig({
     fileParallelism: false,
     maxConcurrency: 1,
     setupFiles: ['./test/setupEnv.ts'],
+    include: ['test/**/*.test.ts'],
   },
   resolve: {
     alias: {

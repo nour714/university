@@ -1,23 +1,21 @@
 'use client';
 
-import { useEffect, useSyncExternalStore } from 'react';
 import { usePathname } from 'next/navigation';
 import { Sidebar } from '@/components/layout/Sidebar';
 import { Header } from '@/components/layout/Header';
 import { BottomNav } from '@/components/layout/BottomNav';
 import { NotificationToast } from '@/components/notifications/NotificationToast';
 
-function subscribe(callback: () => void) {
-  window.addEventListener('storage', callback);
-  return () => window.removeEventListener('storage', callback);
-}
+const PROTECTED_PREFIXES = ['/courses', '/exams', '/codes', '/settings', '/account', '/notifications'];
 
-function getClientSnapshot(): boolean {
-  return typeof window !== 'undefined' && sessionStorage.getItem('academic_tab_active') === '1';
-}
-
-function getServerSnapshot(): boolean {
-  return false;
+function isRouteProtected(pathname: string | null): boolean {
+  if (!pathname) return false;
+  return (
+    pathname === '/' ||
+    PROTECTED_PREFIXES.some(
+      (prefix) => pathname === prefix || pathname.startsWith(prefix + '/')
+    )
+  );
 }
 
 export function AppShell({ children }: { children: React.ReactNode }) {
@@ -27,27 +25,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     pathname === '/account/change-password' ||
     pathname.startsWith('/account/change-password/');
   const isExamSession = pathname?.startsWith('/exams/') && pathname !== '/exams';
-
-  // Per-tab session verification:
-  // Requires user to have logged in within this specific browser tab.
-  // Closing the tab destroys sessionStorage, requiring fresh login upon reopening.
-  const isTabVerified = useSyncExternalStore(
-    subscribe,
-    getClientSnapshot,
-    getServerSnapshot
-  );
-
-  useEffect(() => {
-    if (isAuthPage) {
-      return;
-    }
-
-    if (!isTabVerified) {
-      // The tab does not have an active session (tab was closed or opened directly).
-      // Redirect to /auth/clear to wipe the cookie and show /login.
-      window.location.replace('/auth/clear');
-    }
-  }, [pathname, isAuthPage, isTabVerified]);
+  const isProtected = isRouteProtected(pathname);
 
   // Standalone Full-Screen Pages (Auth)
   if (isAuthPage) {
@@ -61,11 +39,14 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     );
   }
 
-  // Prevent flashing protected content before verifying this tab's session
-  if (!isTabVerified) {
+  // Standalone Public / Non-Protected / 404 Pages
+  if (!isProtected) {
     return (
-      <div className="min-h-[100dvh] w-full flex items-center justify-center bg-[#f8fafc]">
-        <div className="w-8 h-8 border-3 border-blue-600/20 border-t-blue-600 rounded-full animate-spin" />
+      <div className="min-h-[100dvh] w-full flex flex-col bg-[#f8fafc] text-slate-900 justify-center">
+        <NotificationToast />
+        <main id="main-content" tabIndex={-1} className="flex-1 w-full flex flex-col outline-hidden justify-center items-center">
+          {children}
+        </main>
       </div>
     );
   }

@@ -36,9 +36,11 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Production Dependency Security Audit
+        run: npm audit --audit-level=high --omit=dev
+
       - name: Run Gitleaks secrets detection
         uses: gitleaks/gitleaks-action@v2
-        continue-on-error: true
 
       - name: Repo Hygiene & Secrets Scan
         run: npx vitest run test/hygiene.test.ts
@@ -57,3 +59,41 @@ jobs:
 
       - name: Run Mutation Checks (8 Targeted Regressions)
         run: npm run mutation-check
+
+  e2e:
+    runs-on: ubuntu-latest
+    needs: verify
+
+    env:
+      NODE_ENV: production
+      DATABASE_URL_OWNER: postgres://postgres:postgres@localhost:5434/postgres?sslmode=disable
+      DATABASE_URL_APP: "postgres://academic_app:test_app_pass_32_chars_minimum@localhost:5434/postgres?sslmode=disable"
+      DATABASE_URL_GRADER: "postgres://academic_grader:test_grader_pass_32_chars_minimum@localhost:5434/postgres?sslmode=disable"
+      APP_SECRET: "test_app_secret_32_characters_minimum_length"
+      CODE_PEPPER: "test_code_pepper_32_characters_minimum_length"
+      CRON_SECRET: "test_cron_secret_16_min"
+      DB_SSL: disable
+      DB_POOL_MAX: 5
+      PORT: 5500
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Next.js Production Build
+        run: npm run build
+
+      - name: Run Playwright E2E & Accessibility Tests
+        run: npx playwright test

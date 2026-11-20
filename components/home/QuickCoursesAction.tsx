@@ -33,21 +33,21 @@ export function QuickCoursesAction({ coursesCount }: QuickCoursesActionProps) {
             استعرض مقرراتك ومحاضراتك التعليمية
           </h3>
 
-          <p className="text-sm text-slate-600 leading-relaxed font-medium">
+          <p className="text-sm text-slate-700 leading-relaxed font-medium">
             تصفح المحتوى الكامل لجميع مقرراتك المسجلة ({coursesCount} مقررات)، وحمّل مذكرات الـ PDF، وشاهد تسجيلات الفيديو التعليمية مع إمكانية الوصول السريع لمصادر التعلم.
           </p>
 
           {/* Feature tags */}
-          <div className="flex flex-wrap items-center gap-2 pt-1 text-xs text-slate-600">
-            <span className="inline-flex items-center gap-1.5 bg-white px-2.5 py-1 rounded-xl border border-slate-200 font-semibold shadow-2xs">
+          <div className="flex flex-wrap items-center gap-2 pt-1 text-xs text-slate-700">
+            <span className="inline-flex items-center gap-1.5 bg-white px-2.5 py-1 rounded-xl border border-slate-200 font-semibold shadow-2xs text-slate-800">
               <FileText className="w-3.5 h-3.5 text-blue-600" />
               مذكرات وملخصات PDF
             </span>
-            <span className="inline-flex items-center gap-1.5 bg-white px-2.5 py-1 rounded-xl border border-slate-200 font-semibold shadow-2xs">
+            <span className="inline-flex items-center gap-1.5 bg-white px-2.5 py-1 rounded-xl border border-slate-200 font-semibold shadow-2xs text-slate-800">
               <Video className="w-3.5 h-3.5 text-indigo-600" />
               تسجيلات ومحاضرات مرئية
             </span>
-            <span className="inline-flex items-center gap-1.5 bg-white px-2.5 py-1 rounded-xl border border-slate-200 font-semibold shadow-2xs">
+            <span className="inline-flex items-center gap-1.5 bg-white px-2.5 py-1 rounded-xl border border-slate-200 font-semibold shadow-2xs text-slate-800">
               <ExternalLink className="w-3.5 h-3.5 text-emerald-600" />
               روابط ومراجع داعمة
             </span>

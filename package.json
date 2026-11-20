@@ -8,6 +8,7 @@
     "start": "next start -p 5500",
     "lint": "eslint",
     "test": "vitest run",
+    "test:e2e": "playwright test",
     "test:permissions": "tsx scripts/test-permissions.ts",
     "test:mutations": "tsx scripts/mutation-check.ts",
     "mutation-check": "tsx scripts/mutation-check.ts",
@@ -27,6 +28,8 @@
     "zod": "^4.6.7"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.14.0",
+    "@playwright/test": "^1.65.1",
     "@tailwindcss/turbopack": "^4",
     "@types/node": "^22.20.5",
     "@types/react": "^19",

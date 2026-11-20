@@ -15,12 +15,12 @@ describe('Repo Hygiene & Secrets Scanner', () => {
       {
         name: 'Hardcoded postgres credentials with password in tracked files',
         regex: /postgres(ql)?:\/\/[a-zA-Z0-9_-]+:[a-zA-Z0-9_-]{4,}@/i,
-        allowedFiles: [/docker-compose/, /test\//, /scripts\//, /\.github\//, /README\.md/],
+        allowedFiles: [/docker-compose/, /test\//, /e2e\//, /playwright\.config\.ts/, /scripts\//, /\.github\//, /README\.md/],
       },
       {
         name: 'Demo default password literal (Student@2026)',
         regex: /Student@2026/,
-        allowedFiles: [/test\//, /docs\/SECURITY-ROTATION\.md/, /scripts\//],
+        allowedFiles: [/test\//, /e2e\//, /docs\/SECURITY-ROTATION\.md/, /scripts\//],
       },
       {
         name: 'Leaked CODE_PEPPER literal',

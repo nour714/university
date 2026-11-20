@@ -16,6 +16,18 @@ export async function GET() {
     return NextResponse.json({ student: null }, { status: 401 });
   }
 
+  if (session.mustChangePassword) {
+    return NextResponse.json(
+      { student: null, mustChangePassword: true },
+      {
+        status: 403,
+        headers: {
+          'Cache-Control': 'private, no-cache, no-store, must-revalidate',
+        },
+      }
+    );
+  }
+
   return NextResponse.json(
     { student: session.studentProfile },
     {

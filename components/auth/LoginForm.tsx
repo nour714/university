@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { 
   Lock, 
   User, 
@@ -32,14 +32,19 @@ const ISSUE_TYPES = [
   { id: 'other', label: 'استفسار أو مشكلة أخرى', icon: HelpCircle },
 ];
 
-export function LoginForm() {
+interface LoginFormProps {
+  reason?: string;
+}
+
+export function LoginForm({ reason: propReason }: LoginFormProps = {}) {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const reason = propReason || searchParams?.get('reason') || '';
   const { addNotification } = useNotifications();
 
   const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [rememberMe, setRememberMe] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [isForgotModalOpen, setIsForgotModalOpen] = useState(false);
@@ -57,11 +62,11 @@ export function LoginForm() {
     if (typeof window !== 'undefined') {
       if (sessionStorage.getItem('academic_tab_active') === '1') {
         router.replace('/');
-      } else {
+      } else if (reason !== 'logged_out') {
         fetch('/auth/clear', { method: 'POST' }).catch(() => {});
       }
     }
-  }, [router]);
+  }, [router, reason]);
 
   const handleHelpSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -297,9 +302,25 @@ export function LoginForm() {
               </h2>
             </div>
 
+            {/* Logged Out Success Banner */}
+            {reason === 'logged_out' && (
+              <div className="mb-2.5 p-2.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs flex items-center gap-2 animate-fadeIn" role="status">
+                <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                <span className="font-bold">تم تسجيل الخروج بنجاح</span>
+              </div>
+            )}
+
+            {/* Session Expired Warning Notice */}
+            {reason === 'expired' && (
+              <div className="mb-2.5 p-2.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-xs flex items-center gap-2 animate-fadeIn" role="status">
+                <AlertCircle className="w-4 h-4 text-amber-600 shrink-0" />
+                <span className="font-bold">انتهت صلاحية الجلسة، يُرجى تسجيل الدخول مجدداً</span>
+              </div>
+            )}
+
             {/* Error Message */}
             {errorMessage && (
-              <div className="mb-2.5 p-2 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs flex items-start gap-2 animate-fadeIn">
+              <div className="mb-2.5 p-2 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs flex items-start gap-2 animate-fadeIn" role="alert">
                 <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
                 <span className="font-bold">{errorMessage}</span>
               </div>
@@ -364,22 +385,6 @@ export function LoginForm() {
                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
                 </div>
-              </div>
-
-              {/* Remember Me Checkbox */}
-              <div className="flex items-center justify-between pt-0.5">
-                <label htmlFor="loginRememberMe" className="flex items-center gap-2 cursor-pointer select-none">
-                  <input
-                    id="loginRememberMe"
-                    type="checkbox"
-                    checked={rememberMe}
-                    onChange={(e) => setRememberMe(e.target.checked)}
-                    className="w-3.5 h-3.5 rounded text-blue-600 border-slate-300 focus:ring-blue-500 cursor-pointer"
-                  />
-                  <span className="text-xs font-medium text-slate-600">
-                    تذكر تسجيل دخولي على هذا الجهاز
-                  </span>
-                </label>
               </div>
 
               {/* Submit Button */}

@@ -25,8 +25,9 @@ vi.mock('next/headers', () => ({
   }),
 }));
 
-// Import loginAction after vi.mock
-import { loginAction } from '@/app/auth/actions';
+// Import loginAction & logoutAction after vi.mock
+import { loginAction, logoutAction } from '@/app/auth/actions';
+import { SESSION_COOKIE_NAME, MUST_CHANGE_COOKIE_NAME } from '@/server/auth/cookies';
 
 describe('Auth & Session Security Tests (Finding F8 / Task 7)', () => {
   let clients: TestDbClients;
@@ -34,6 +35,9 @@ describe('Auth & Session Security Tests (Finding F8 / Task 7)', () => {
   const testNationalId = '30101010101011';
   const testStudentCode = '20260001';
   const testPassword = 'StrongPassword2026!';
+  const mustChangeAccountId = 'a0000000-0000-0000-0000-000000000099';
+  const mustChangeNationalId = '30101010101099';
+  const mustChangeStudentCode = '20260099';
 
   beforeAll(async () => {
     clients = await setupTestDatabase();
@@ -54,6 +58,23 @@ describe('Auth & Session Security Tests (Finding F8 / Task 7)', () => {
         id, student_code, full_name, email, department, level, level_number
       ) VALUES (
         ${testStudentId}, ${testStudentCode}, 'طالب اختبار تجريبي', 'student@test.edu.eg', 'الذكاء الاصطناعي', 'المستوى الأول', 1
+      ) ON CONFLICT (id) DO NOTHING;
+    `;
+
+    // Seed test account requiring password change
+    await clients.ownerSql`
+      INSERT INTO public.academic_accounts (
+        id, national_id, password_hash, must_change_password, is_active
+      ) VALUES (
+        ${mustChangeAccountId}, ${mustChangeNationalId}, ${passwordHash}, true, true
+      ) ON CONFLICT (id) DO UPDATE SET password_hash = ${passwordHash}, must_change_password = true;
+    `;
+
+    await clients.ownerSql`
+      INSERT INTO public.academic_profiles (
+        id, student_code, full_name, email, department, level, level_number
+      ) VALUES (
+        ${mustChangeAccountId}, ${mustChangeStudentCode}, 'طالب تغيير كلمة المرور', 'mustchange@test.edu.eg', 'الذكاء الاصطناعي', 'المستوى الأول', 1
       ) ON CONFLICT (id) DO NOTHING;
     `;
 
@@ -253,6 +274,42 @@ describe('Auth & Session Security Tests (Finding F8 / Task 7)', () => {
       const authRotated = await validateSession(rotatedNewToken);
       expect(authRotated).not.toBeNull();
       expect(authRotated?.accountId).toBe(testStudentId);
+    });
+
+    it('should set must-change-password cookie when mustChangePassword is true, and clear on normal login or logout', async () => {
+      mockCookies.clear();
+      mockClientIp = '10.200.1.1';
+
+      // 1. Login with account requiring password change
+      const mustChangeRes = await loginAction({
+        identifier: mustChangeNationalId,
+        password: testPassword,
+      });
+      expect(mustChangeRes.success).toBe(true);
+      if (mustChangeRes.success) {
+        expect(mustChangeRes.mustChangePassword).toBe(true);
+      }
+      expect(mockCookies.get(SESSION_COOKIE_NAME)).toBeDefined();
+      expect(mockCookies.get(MUST_CHANGE_COOKIE_NAME)?.value).toBe('1');
+
+      // 2. Intentional Logout
+      const logoutRes = await logoutAction();
+      expect(logoutRes.success).toBe(true);
+      expect(mockCookies.get(SESSION_COOKIE_NAME)?.options?.maxAge).toBe(0);
+      expect(mockCookies.get(MUST_CHANGE_COOKIE_NAME)?.options?.maxAge).toBe(0);
+
+      // 3. Login with normal account
+      mockClientIp = '10.200.1.2';
+      const normalRes = await loginAction({
+        identifier: testNationalId,
+        password: testPassword,
+      });
+      expect(normalRes.success).toBe(true);
+      if (normalRes.success) {
+        expect(normalRes.mustChangePassword).toBe(false);
+      }
+      expect(mockCookies.get(SESSION_COOKIE_NAME)).toBeDefined();
+      expect(mockCookies.get(MUST_CHANGE_COOKIE_NAME)?.options?.maxAge).toBe(0);
     });
 
     it('should reject weak and common passwords on change', () => {

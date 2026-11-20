@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { revokeSession } from '@/server/auth/session';
-import { SESSION_COOKIE_NAME } from '@/server/auth/cookies';
+import { SESSION_COOKIE_NAME, MUST_CHANGE_COOKIE_NAME } from '@/server/auth/cookies';
 
 export const maxDuration = 30;
 
@@ -57,10 +57,16 @@ async function handleClear(request: Request) {
   }
 
   cookieStore.delete(SESSION_COOKIE_NAME);
+  cookieStore.delete(MUST_CHANGE_COOKIE_NAME);
 
-  const url = new URL('/login?reason=expired', request.url);
+  const reqUrl = new URL(request.url);
+  const reasonParam = reqUrl.searchParams.get('reason');
+  const reason = reasonParam === 'logged_out' ? 'logged_out' : 'expired';
+
+  const url = new URL(`/login?reason=${reason}`, request.url);
   const response = NextResponse.redirect(url, 303);
   response.cookies.delete(SESSION_COOKIE_NAME);
+  response.cookies.delete(MUST_CHANGE_COOKIE_NAME);
   return response;
 }
 

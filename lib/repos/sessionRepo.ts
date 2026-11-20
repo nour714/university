@@ -1,3 +1,5 @@
+import { clearCachedProfile } from '@/lib/hooks/useStudentProfile';
+
 // TODO(backend): Session destruction must be performed on the server by invalidating the HTTP-only session cookie/token and revoking active refresh tokens.
 export function clearSession(): void {
   if (typeof window === 'undefined') {
@@ -5,6 +7,7 @@ export function clearSession(): void {
   }
 
   try {
+    clearCachedProfile();
     sessionStorage.removeItem('academic_tab_active');
     const keysToRemove: string[] = [];
     for (let i = 0; i < localStorage.length; i++) {

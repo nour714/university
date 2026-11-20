@@ -64,7 +64,7 @@ export function MoreMenuSheet({ isOpen, onClose }: MoreMenuSheetProps) {
       resetAll();
       setLogoutLoading(false);
       onClose();
-      router.push('/login');
+      router.push('/login?reason=logged_out');
     }
   };
 

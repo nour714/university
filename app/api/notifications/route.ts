@@ -14,7 +14,7 @@ export async function GET() {
   }
 
   const student = await validateSession(token);
-  if (!student) {
+  if (!student || student.mustChangePassword) {
     return NextResponse.json({ notifications: [] });
   }
 

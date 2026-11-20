@@ -6,6 +6,11 @@ import { StudentProfile } from '@/types/student';
 let cachedProfile: StudentProfile | null = null;
 let inFlightPromise: Promise<StudentProfile | null> | null = null;
 
+export function clearCachedProfile(): void {
+  cachedProfile = null;
+  inFlightPromise = null;
+}
+
 export function useStudentProfile() {
   const [student, setStudent] = useState<StudentProfile | null>(cachedProfile);
   const [loading, setLoading] = useState<boolean>(!cachedProfile);
@@ -18,8 +23,22 @@ export function useStudentProfile() {
 
     if (!inFlightPromise) {
       inFlightPromise = fetch('/api/student/profile')
-        .then((res) => (res.ok ? res.json() : null))
+        .then((res) => {
+          if (res.status === 403) {
+            if (typeof window !== 'undefined' && !window.location.pathname.startsWith('/account/change-password')) {
+              window.location.replace('/account/change-password');
+            }
+            return null;
+          }
+          return res.ok ? res.json() : null;
+        })
         .then((data) => {
+          if (data?.mustChangePassword) {
+            if (typeof window !== 'undefined' && !window.location.pathname.startsWith('/account/change-password')) {
+              window.location.replace('/account/change-password');
+            }
+            return null;
+          }
           if (data?.student) {
             cachedProfile = data.student;
             return data.student as StudentProfile;

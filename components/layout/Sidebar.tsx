@@ -262,7 +262,7 @@ export function Sidebar({ currentPath }: { currentPath?: string }) {
               await logoutAction();
               clearSession();
               resetAll();
-              router.push('/login');
+              router.push('/login?reason=logged_out');
             }}
             className={`h-11 rounded-xl flex items-center justify-center text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 transition-all cursor-pointer shrink-0 ${
               isExpanded ? 'w-10' : 'w-full'

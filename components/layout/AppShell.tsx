@@ -22,7 +22,10 @@ function getServerSnapshot(): boolean {
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const isAuthPage = pathname === '/login' || pathname === '/account/change-password';
+  const isAuthPage =
+    pathname === '/login' ||
+    pathname === '/account/change-password' ||
+    pathname.startsWith('/account/change-password/');
   const isExamSession = pathname?.startsWith('/exams/') && pathname !== '/exams';
 
   // Per-tab session verification:

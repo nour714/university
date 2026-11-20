@@ -4,6 +4,9 @@ import type { NextRequest } from 'next/server';
 const SESSION_COOKIE_NAME =
   process.env.NODE_ENV === 'production' ? '__Host-sid' : 'academic_sid';
 
+const MUST_CHANGE_COOKIE_NAME =
+  process.env.NODE_ENV === 'production' ? '__Host-mcp' : 'academic_mcp';
+
 // Public routes that never require a session
 const PUBLIC_PATHS = ['/login', '/auth/clear', '/favicon.ico'];
 
@@ -33,6 +36,20 @@ export function proxy(request: NextRequest) {
   if (!sessionCookie && !isPublicPath) {
     const loginUrl = new URL('/login', request.url);
     return NextResponse.redirect(loginUrl);
+  }
+
+  // 3. User with active session but required password change -> deterministically enforce /account/change-password
+  const mustChangeCookie = request.cookies.get(MUST_CHANGE_COOKIE_NAME)?.value;
+  if (sessionCookie && mustChangeCookie === '1') {
+    const isAllowedForPasswordChange =
+      pathname === '/account/change-password' ||
+      pathname.startsWith('/account/change-password/') ||
+      isPublicPath;
+
+    if (!isAllowedForPasswordChange) {
+      const changePasswordUrl = new URL('/account/change-password', request.url);
+      return NextResponse.redirect(changePasswordUrl);
+    }
   }
 
   // NOTE: Removed the "cookie present + /login -> /" redirect.

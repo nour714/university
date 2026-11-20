@@ -77,7 +77,7 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
 
   // Load from repo once when authenticated (reset on logout)
   useEffect(() => {
-    if (pathname === '/login') {
+    if (pathname === '/login' || pathname.startsWith('/account/change-password')) {
       isLoadedRef.current = false;
       return;
     }

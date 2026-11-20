@@ -12,7 +12,13 @@ import {
   validatePasswordStrength,
 } from '@/server/auth/password';
 import { createSession, revokeSession, revokeAllAccountSessions } from '@/server/auth/session';
-import { setSessionCookie, clearSessionCookie, getSessionCookie } from '@/server/auth/cookies';
+import {
+  setSessionCookie,
+  clearSessionCookie,
+  getSessionCookie,
+  setMustChangePasswordCookie,
+  clearMustChangePasswordCookie,
+} from '@/server/auth/cookies';
 import { requireAuth } from '@/server/auth/requireAuth';
 import {
   checkRateLimit,
@@ -154,6 +160,12 @@ export async function loginAction(input: unknown): Promise<LoginActionResult> {
     const token = await createSession(account.id, { ip: clientIp, userAgent });
     await setSessionCookie(token);
 
+    if (account.must_change_password) {
+      await setMustChangePasswordCookie();
+    } else {
+      await clearMustChangePasswordCookie();
+    }
+
     // Record audit log with masked identifier
     try {
       await appSql`
@@ -181,6 +193,7 @@ export async function logoutAction(): Promise<{ success: boolean }> {
     // Continue cleanup even if DB is temporarily unreachable
   } finally {
     await clearSessionCookie();
+    await clearMustChangePasswordCookie();
   }
 
   return { success: true };
@@ -262,6 +275,7 @@ export async function changePasswordAction(
 
     const newToken = await createSession(student.accountId, { ip: clientIp, userAgent });
     await setSessionCookie(newToken);
+    await clearMustChangePasswordCookie();
     await revokeAllAccountSessions(student.accountId, newToken);
 
     await sql`

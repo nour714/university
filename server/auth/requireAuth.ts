@@ -1,6 +1,10 @@
 import 'server-only';
 import { redirect } from 'next/navigation';
-import { getSessionCookie } from './cookies';
+import {
+  getSessionCookie,
+  setMustChangePasswordCookie,
+  clearMustChangePasswordCookie,
+} from './cookies';
 import { validateSession, AuthenticatedStudent } from './session';
 
 export interface RequireAuthOptions {
@@ -28,7 +32,13 @@ export async function requireAuth(options: RequireAuthOptions = {}): Promise<Aut
 
   // Account requires forced password change
   if (student.mustChangePassword && !options.allowMustChangePassword) {
+    await setMustChangePasswordCookie();
     redirect('/account/change-password');
+  }
+
+  // Account completed password change -> ensure cookie is cleared
+  if (!student.mustChangePassword && !options.allowMustChangePassword) {
+    await clearMustChangePasswordCookie();
   }
 
   return student;

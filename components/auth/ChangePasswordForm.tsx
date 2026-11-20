@@ -68,7 +68,7 @@ export function ChangePasswordForm({ student }: ChangePasswordFormProps) {
       setTimeout(() => {
         router.push('/');
         router.refresh();
-      }, 1200);
+      }, 1000);
     } catch {
       setErrorMessage('حدث خطأ في الاتصال بالخادم. يرجى إعادة المحاولة.');
     } finally {
@@ -83,7 +83,7 @@ export function ChangePasswordForm({ student }: ChangePasswordFormProps) {
         sessionStorage.removeItem('academic_tab_active');
       }
       await logoutAction();
-      router.push('/login');
+      router.push('/login?reason=logged_out');
     } finally {
       setIsLoading(false);
     }

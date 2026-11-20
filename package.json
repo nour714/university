@@ -34,7 +34,7 @@
     "@types/node": "^22.20.5",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "embedded-postgres": "^16.15.0-beta.19",
+    "embedded-postgres": "^17.0.0-beta.14",
     "eslint": "^9",
     "eslint-config-next": "16.4.6",
     "tailwindcss": "^4",

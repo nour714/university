@@ -320,8 +320,8 @@ export function NotificationBell() {
         aria-haspopup="dialog"
         aria-expanded={isOpen}
         onClick={() => setIsOpen((prev) => !prev)}
-        className="relative w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-slate-50 hover:bg-slate-100 text-slate-700 hover:text-blue-600 flex items-center justify-center border border-slate-200/90 shadow-2xs transition-all duration-200 active:scale-95 cursor-pointer group"
-        aria-label="الإشعارات الأكاديمية"
+        className="relative w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-slate-50 hover:bg-slate-100 text-slate-700 hover:text-blue-600 flex items-center justify-center border border-slate-200/90 shadow-2xs transition-all duration-200 active:scale-95 cursor-pointer group focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-hidden"
+        aria-label={unreadCount > 0 ? `الإشعارات الأكاديمية: ${unreadCount} إشعار جديد` : 'الإشعارات الأكاديمية'}
         title="الإشعارات الأكاديمية"
       >
         <Bell className="w-4.5 h-4.5 sm:w-5 sm:h-5 group-hover:rotate-12 transition-transform duration-200" />

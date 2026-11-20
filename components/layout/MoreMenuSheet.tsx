@@ -108,9 +108,9 @@ export function MoreMenuSheet({ isOpen, onClose }: MoreMenuSheetProps) {
           <button
             type="button"
             onClick={onClose}
-            className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors cursor-pointer"
+            className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors cursor-pointer focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-blue-400"
             title="إغلاق"
-            aria-label="إغلاق النافذة"
+            aria-label="إغلاق قائمة المزيد"
           >
             <X className="w-4 h-4" />
           </button>
@@ -123,7 +123,7 @@ export function MoreMenuSheet({ isOpen, onClose }: MoreMenuSheetProps) {
             <Link
               href="/settings"
               onClick={onClose}
-              className="w-full text-right p-4 rounded-2xl bg-gradient-to-r from-blue-50 to-indigo-50/70 hover:from-blue-100/80 hover:to-indigo-100/80 border border-blue-200/90 transition-all flex items-center justify-between group cursor-pointer shadow-xs active:scale-[0.99]"
+              className="w-full text-right p-4 rounded-2xl bg-gradient-to-r from-blue-50 to-indigo-50/70 hover:from-blue-100/80 hover:to-indigo-100/80 border border-blue-200/90 transition-all flex items-center justify-between group cursor-pointer shadow-xs active:scale-[0.99] focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-blue-500"
             >
               <div className="flex items-center gap-3.5">
                 <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-700 text-white flex items-center justify-center shadow-md shadow-blue-600/30 group-hover:scale-105 transition-transform shrink-0">
@@ -148,7 +148,7 @@ export function MoreMenuSheet({ isOpen, onClose }: MoreMenuSheetProps) {
               type="button"
               onClick={handleLogout}
               disabled={logoutLoading}
-              className="w-full text-right p-4 rounded-2xl bg-gradient-to-r from-rose-50 to-red-50/60 hover:from-rose-100/70 hover:to-red-100/70 border border-rose-200/80 transition-all flex items-center justify-between group cursor-pointer shadow-xs active:scale-[0.99] disabled:opacity-60"
+              className="w-full text-right p-4 rounded-2xl bg-gradient-to-r from-rose-50 to-red-50/60 hover:from-rose-100/70 hover:to-red-100/70 border border-rose-200/80 transition-all flex items-center justify-between group cursor-pointer shadow-xs active:scale-[0.99] disabled:opacity-60 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-rose-500"
             >
               <div className="flex items-center gap-3.5">
                 <div className="w-11 h-11 rounded-2xl bg-rose-600 text-white flex items-center justify-center shadow-md shadow-rose-600/30 group-hover:scale-105 transition-transform shrink-0">

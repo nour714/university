@@ -45,6 +45,13 @@ export default function RootLayout({
   return (
     <html lang="ar" dir="rtl" className={`${cairo.variable} ${cairo.className} h-full antialiased`}>
       <body className={`${cairo.className} min-h-full flex flex-col bg-[#f8fafc] text-slate-900`}>
+        {/* Skip to Main Content Link (WCAG 2.1 AA) */}
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:right-4 focus:z-50 focus:px-4 focus:py-2.5 focus:bg-blue-600 focus:text-white focus:font-bold focus:rounded-xl focus:shadow-2xl focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 focus:outline-hidden transition-all"
+        >
+          تخطي إلى المحتوى الرئيسي
+        </a>
         <NotificationProvider>
           <AppShell>
             {children}

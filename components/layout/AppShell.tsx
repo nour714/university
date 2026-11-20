@@ -54,7 +54,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     return (
       <div className="min-h-[100dvh] w-full flex flex-col bg-slate-900 text-slate-100 justify-center">
         <NotificationToast />
-        <main className="flex-1 w-full flex flex-col">
+        <main id="main-content" tabIndex={-1} className="flex-1 w-full flex flex-col outline-hidden">
           {children}
         </main>
       </div>
@@ -75,7 +75,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     return (
       <div className="min-h-[100dvh] w-full flex flex-col">
         <NotificationToast />
-        <main className="flex-1 w-full flex flex-col">
+        <main id="main-content" tabIndex={-1} className="flex-1 w-full flex flex-col outline-hidden">
           {children}
         </main>
       </div>
@@ -94,7 +94,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col min-w-0 min-h-screen">
         <Header />
-        <main className="flex-1 p-3 sm:p-6 lg:p-8 pb-28 sm:pb-24 lg:pb-8 max-w-7xl w-full mx-auto">
+        <main id="main-content" tabIndex={-1} className="flex-1 p-3 sm:p-6 lg:p-8 pb-28 sm:pb-24 lg:pb-8 max-w-7xl w-full mx-auto outline-hidden">
           {children}
         </main>
         {/* Floating Mobile Bottom Navigation Bar */}

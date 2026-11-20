@@ -32,12 +32,13 @@ export function BottomNav() {
         <div className="flex items-center justify-center">
           <Link
             href="/courses"
-            className={`w-12 h-12 rounded-full flex flex-col items-center justify-center transition-all shrink-0 ${
+            className={`w-12 h-12 rounded-full flex flex-col items-center justify-center transition-all shrink-0 focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:outline-hidden ${
               isCoursesActive
                 ? 'bg-blue-600 text-white font-bold shadow-md shadow-blue-600/40 border border-blue-400/50'
                 : 'text-slate-300 hover:text-white active:scale-95'
             }`}
             title="مكتبة المقررات"
+            aria-label="مكتبة المقررات"
           >
             <BookOpen className="w-4.5 h-4.5 stroke-[2.2]" />
             <span className="text-[9px] font-bold mt-0.5 leading-none">المقررات</span>
@@ -48,12 +49,13 @@ export function BottomNav() {
         <div className="flex items-center justify-center">
           <Link
             href="/exams"
-            className={`w-12 h-12 rounded-full flex flex-col items-center justify-center transition-all shrink-0 ${
+            className={`w-12 h-12 rounded-full flex flex-col items-center justify-center transition-all shrink-0 focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:outline-hidden ${
               isExamsActive
                 ? 'bg-blue-600 text-white font-bold shadow-md shadow-blue-600/40 border border-blue-400/50'
                 : 'text-slate-300 hover:text-white active:scale-95'
             }`}
             title="الاختبارات"
+            aria-label="الاختبارات والتقييمات"
           >
             <ClipboardCheck className="w-4.5 h-4.5 stroke-[2.2]" />
             <span className="text-[9px] font-bold mt-0.5 leading-none">الاختبارات</span>
@@ -64,8 +66,9 @@ export function BottomNav() {
         <div className="flex items-center justify-center">
           <Link
             href="/"
-            className="relative -mt-3.5 shrink-0 flex items-center justify-center group"
+            className="relative -mt-3.5 shrink-0 flex items-center justify-center group focus-visible:ring-2 focus-visible:ring-amber-300 focus-visible:outline-hidden rounded-full"
             title="الرئيسية (لوحة التحكم)"
+            aria-label="الرئيسية (لوحة التحكم)"
           >
             {/* Ambient Pulsing Radar Halo */}
             <span
@@ -90,12 +93,13 @@ export function BottomNav() {
         <div className="flex items-center justify-center">
           <Link
             href="/codes"
-            className={`w-12 h-12 rounded-full flex flex-col items-center justify-center transition-all shrink-0 ${
+            className={`w-12 h-12 rounded-full flex flex-col items-center justify-center transition-all shrink-0 focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:outline-hidden ${
               isCodesActive
                 ? 'bg-blue-600 text-white font-bold shadow-md shadow-blue-600/40 border border-blue-400/50'
                 : 'text-slate-300 hover:text-white active:scale-95'
             }`}
             title="أكوادي الأكاديمية"
+            aria-label="أكوادي الأكاديمية"
           >
             <KeyRound className="w-4.5 h-4.5 stroke-[2.2]" />
             <span className="text-[9px] font-bold mt-0.5 leading-none">أكوادي</span>
@@ -107,10 +111,11 @@ export function BottomNav() {
           <button
             type="button"
             onClick={() => setIsMoreOpen(true)}
-            className={`w-12 h-12 rounded-full flex flex-col items-center justify-center transition-colors cursor-pointer group shrink-0 active:scale-95 ${
+            className={`w-12 h-12 rounded-full flex flex-col items-center justify-center transition-colors cursor-pointer group shrink-0 active:scale-95 focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:outline-hidden ${
               isMoreOpen ? 'text-white bg-white/10' : 'text-slate-400 hover:text-white'
             }`}
             title="المزيد من الخيارات"
+            aria-label="المزيد من الخيارات"
             aria-expanded={isMoreOpen}
           >
             <MoreHorizontal className="w-4.5 h-4.5 group-hover:scale-105 transition-transform" />

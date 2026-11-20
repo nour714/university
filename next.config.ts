@@ -3,13 +3,13 @@ import type { NextConfig } from "next";
 const isDev = process.env.NODE_ENV !== "production";
 
 // Switch to Content-Security-Policy once the console shows no violations.
-const cspHeader = `default-src 'self'; img-src 'self' data: https://images.unsplash.com; media-src 'self' https:; font-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""}; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none'`;
+const cspHeader = `default-src 'self'; img-src 'self' data:; media-src 'self' https:; font-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""}; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none'`;
 
 const nextConfig: NextConfig = {
   /* config options here */
   poweredByHeader: false,
   images: {
-    unoptimized: true,
+    formats: ['image/avif', 'image/webp'],
   },
   allowedDevOrigins: ['192.168.1.4', 'localhost:5500', '192.168.4.6'],
   turbopack: {

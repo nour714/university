@@ -21,6 +21,7 @@ import { useStudentProfile } from '@/lib/hooks/useStudentProfile';
 
 export function Sidebar({ currentPath }: { currentPath?: string }) {
   const [isExpanded, setIsExpanded] = useState(false);
+  const [logoError, setLogoError] = useState(false);
   const router = useRouter();
   const { resetAll } = useNotifications();
   const { student } = useStudentProfile();
@@ -81,8 +82,10 @@ export function Sidebar({ currentPath }: { currentPath?: string }) {
             <button
               type="button"
               onClick={() => setIsExpanded(!isExpanded)}
-              className="flex-1 flex items-center gap-3 outline-hidden cursor-pointer text-right min-w-0"
+              className="flex-1 flex items-center gap-3 outline-hidden cursor-pointer text-right min-w-0 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[#172554] rounded-2xl"
               title={isExpanded ? 'طي القائمة الجانبية' : 'اضغط لفتح القائمة الجانبية'}
+              aria-label={isExpanded ? 'طي القائمة الجانبية' : 'فتح القائمة الجانبية'}
+              aria-expanded={isExpanded}
             >
               {/* University Emblem Logo (Always stationary, smoothly centered when collapsed) */}
               <div className="relative shrink-0 flex items-center justify-center">
@@ -90,16 +93,26 @@ export function Sidebar({ currentPath }: { currentPath?: string }) {
                   className="absolute inset-0 rounded-full bg-white/20 animate-white-wave pointer-events-none"
                   aria-hidden="true"
                 />
-                <div className="w-12 h-12 rounded-full bg-white border-2 border-white flex items-center justify-center p-1.5 shrink-0 shadow-lg shadow-blue-950/40 ring-2 ring-blue-400/40 ring-offset-2 ring-offset-[#172554] hover:scale-105 hover:shadow-blue-400/60 transition-all duration-300 overflow-hidden animate-white-pulse">
-                  <Image
-                    src="/logo.png"
-                    alt="شعار كلية الذكاء الاصطناعي"
-                    width={40}
-                    height={40}
-                    className="w-full h-full object-contain filter drop-shadow-xs select-none"
-                    priority
-                    unoptimized
-                  />
+                <div className="w-12 h-12 rounded-full bg-white border-2 border-blue-400/40 flex items-center justify-center p-1.5 shrink-0 shadow-lg shadow-blue-950/40 ring-2 ring-blue-400/40 ring-offset-2 ring-offset-[#172554] hover:scale-105 hover:shadow-blue-400/60 transition-all duration-300 overflow-hidden">
+                  {!logoError ? (
+                    <Image
+                      src="/logo.svg"
+                      alt="شعار كلية الذكاء الاصطناعي - جامعة كفر الشيخ"
+                      width={40}
+                      height={40}
+                      className="w-full h-full object-contain filter drop-shadow-xs select-none"
+                      priority
+                      onError={() => setLogoError(true)}
+                    />
+                  ) : (
+                    <div
+                      className="w-full h-full rounded-full bg-gradient-to-br from-blue-600 via-indigo-600 to-blue-800 flex items-center justify-center text-white"
+                      title="شعار كلية الذكاء الاصطناعي"
+                      aria-label="شعار كلية الذكاء الاصطناعي"
+                    >
+                      <Sparkles className="w-5 h-5 text-amber-300 animate-pulse" />
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -130,7 +143,7 @@ export function Sidebar({ currentPath }: { currentPath?: string }) {
               <button
                 type="button"
                 onClick={() => setIsExpanded(false)}
-                className="w-7 h-7 rounded-xl bg-blue-900/60 hover:bg-blue-800 text-blue-300 hover:text-white flex items-center justify-center transition-colors cursor-pointer"
+                className="w-7 h-7 rounded-xl bg-blue-900/60 hover:bg-blue-800 text-blue-300 hover:text-white flex items-center justify-center transition-colors cursor-pointer focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-blue-400"
                 title="طي القائمة"
                 aria-label="طي القائمة الجانبية"
               >
@@ -183,7 +196,7 @@ export function Sidebar({ currentPath }: { currentPath?: string }) {
               </>
             );
 
-            const commonClasses = `w-full h-12 rounded-2xl flex items-center transition-all duration-200 cursor-pointer overflow-hidden ${
+            const commonClasses = `w-full h-12 rounded-2xl flex items-center transition-all duration-200 cursor-pointer overflow-hidden focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[#172554] ${
               item.isActive
                 ? 'bg-blue-600 text-white font-bold shadow-lg shadow-blue-600/40 border border-blue-400/60'
                 : 'text-slate-300 hover:text-white hover:bg-blue-900/40 border border-transparent'
@@ -264,11 +277,11 @@ export function Sidebar({ currentPath }: { currentPath?: string }) {
               resetAll();
               router.push('/login?reason=logged_out');
             }}
-            className={`h-11 rounded-xl flex items-center justify-center text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 transition-all cursor-pointer shrink-0 ${
+            className={`h-11 rounded-xl flex items-center justify-center text-slate-300 hover:text-rose-400 hover:bg-rose-500/10 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-rose-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[#172554] transition-all cursor-pointer shrink-0 ${
               isExpanded ? 'w-10' : 'w-full'
             }`}
             title="تسجيل الخروج"
-            aria-label="تسجيل الخروج"
+            aria-label="تسجيل الخروج من البوابة الأكاديمية"
           >
             <LogOut className="w-5 h-5 -scale-x-100" />
           </button>

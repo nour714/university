@@ -318,7 +318,7 @@ export function CodesManager({ initialCodes }: CodesManagerProps = {}) {
 
         {/* Card Form Body */}
         <div className="p-4 sm:p-6">
-          <form onSubmit={handleRedeem} className="space-y-3">
+          <form onSubmit={handleRedeem} noValidate className="space-y-3">
             <div>
               <label 
                 htmlFor="accessCodeInput" 

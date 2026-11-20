@@ -11,6 +11,7 @@ import {
   Sparkles,
   User
 } from 'lucide-react';
+import { useStudentProfile } from '@/lib/hooks/useStudentProfile';
 
 interface MobileNavProps {
   navLinks: {
@@ -24,13 +25,14 @@ interface MobileNavProps {
 export function MobileNav({ navLinks }: MobileNavProps) {
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
+  const { student } = useStudentProfile();
 
   return (
     <>
       <button
         type="button"
         onClick={() => setIsOpen(true)}
-        className="lg:hidden p-2 text-slate-700 hover:text-blue-600 rounded-xl hover:bg-slate-100 transition-colors focus:ring-2 focus:ring-blue-500/20 active:scale-95"
+        className="lg:hidden p-2 text-slate-700 hover:text-blue-600 rounded-xl hover:bg-slate-100 transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-blue-500 active:scale-95 cursor-pointer"
         aria-label="فتح القائمة الرئيسية"
       >
         <Menu className="w-5 h-5 sm:w-6 sm:h-6" />
@@ -64,7 +66,7 @@ export function MobileNav({ navLinks }: MobileNavProps) {
                 <button
                   type="button"
                   onClick={() => setIsOpen(false)}
-                  className="p-2 text-blue-300 hover:text-white rounded-xl hover:bg-blue-900/60 transition-colors"
+                  className="p-2 text-blue-300 hover:text-white rounded-xl hover:bg-blue-900/60 transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-blue-400 cursor-pointer"
                   aria-label="إغلاق القائمة"
                 >
                   <X className="w-5 h-5" />
@@ -109,8 +111,8 @@ export function MobileNav({ navLinks }: MobileNavProps) {
                   <User className="w-4 h-4" />
                 </div>
                 <div className="truncate text-right">
-                  <p className="text-xs font-bold text-white truncate">عبد الرحمن خالد</p>
-                  <p className="text-[10px] text-blue-200">طالب • المستوى الثالث</p>
+                  <p className="text-xs font-bold text-white truncate">{student?.fullName || 'الملف الأكاديمي'}</p>
+                  <p className="text-[10px] text-blue-200 truncate mt-0.5">{student ? `${student.level} • ${student.department}` : 'طالب جامعي'}</p>
                 </div>
               </div>
             </div>

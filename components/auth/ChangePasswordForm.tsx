@@ -122,7 +122,7 @@ export function ChangePasswordForm({ student }: ChangePasswordFormProps) {
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} noValidate className="space-y-4">
           {/* Current Password Field */}
           <div>
             <label htmlFor="changeCurrentPassword" className="block text-xs font-bold text-slate-700 mb-1.5">

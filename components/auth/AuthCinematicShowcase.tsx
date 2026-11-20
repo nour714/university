@@ -13,17 +13,17 @@ interface Slide {
 const SLIDES: Slide[] = [
   {
     id: 1,
-    imageSrc: '/onboarding/slide-1.jpg',
+    imageSrc: '/images/slide-1.jpg',
     altText: 'بوابة كلية الذكاء الاصطناعي - تسجيل الدخول إلى حسابك الأكاديمي',
   },
   {
     id: 2,
-    imageSrc: '/onboarding/slide-2.jpg',
+    imageSrc: '/images/slide-2.jpg',
     altText: 'تحديث وتعيين كلمة المرور الجديدة وتأمين الحساب',
   },
   {
     id: 3,
-    imageSrc: '/onboarding/slide-3.jpg',
+    imageSrc: '/images/slide-3.jpg',
     altText: 'تفعيل أكواد المقررات الدراسية والصلاحيات الأكاديمية',
   },
 ];
@@ -75,7 +75,7 @@ export function AuthCinematicShowcase() {
           return (
             <div
               key={slide.id}
-              className={`absolute inset-0 transition-opacity duration-700 ease-in-out ${
+              className={`absolute inset-0 transition-opacity duration-700 ease-in-out bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900 ${
                 isActive ? 'opacity-100 z-10' : 'opacity-0 z-0 pointer-events-none'
               }`}
             >
@@ -85,7 +85,7 @@ export function AuthCinematicShowcase() {
                 fill
                 sizes="(max-width: 1024px) 100vw, 50vw"
                 className="object-cover object-center scale-100"
-                priority={idx === 0}
+                priority
               />
             </div>
           );
@@ -100,7 +100,7 @@ export function AuthCinematicShowcase() {
         <button
           type="button"
           onClick={prevSlide}
-          className="w-10 h-10 rounded-full bg-slate-900/60 hover:bg-slate-900/90 text-white backdrop-blur-md border border-white/25 flex items-center justify-center transition-all cursor-pointer shadow-xl active:scale-90 hover:scale-105"
+          className="w-10 h-10 rounded-full bg-slate-900/60 hover:bg-slate-900/90 text-white backdrop-blur-md border border-white/25 flex items-center justify-center transition-all cursor-pointer shadow-xl active:scale-90 hover:scale-105 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-blue-400"
           title="الصورة السابقة"
           aria-label="الصورة السابقة"
         >
@@ -113,7 +113,7 @@ export function AuthCinematicShowcase() {
         <button
           type="button"
           onClick={nextSlide}
-          className="w-10 h-10 rounded-full bg-slate-900/60 hover:bg-slate-900/90 text-white backdrop-blur-md border border-white/25 flex items-center justify-center transition-all cursor-pointer shadow-xl active:scale-90 hover:scale-105"
+          className="w-10 h-10 rounded-full bg-slate-900/60 hover:bg-slate-900/90 text-white backdrop-blur-md border border-white/25 flex items-center justify-center transition-all cursor-pointer shadow-xl active:scale-90 hover:scale-105 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-blue-400"
           title="الصورة التالية"
           aria-label="الصورة التالية"
         >
@@ -133,7 +133,7 @@ export function AuthCinematicShowcase() {
                 key={slide.id}
                 type="button"
                 onClick={() => goToSlide(idx)}
-                className={`transition-all duration-300 rounded-full cursor-pointer ${
+                className={`transition-all duration-300 rounded-full cursor-pointer focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-amber-400 ${
                   isActive 
                     ? 'w-6 h-2 bg-gradient-to-r from-amber-400 to-blue-400' 
                     : 'w-2 h-2 bg-white/40 hover:bg-white/80'

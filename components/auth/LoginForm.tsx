@@ -25,7 +25,7 @@ import { AuthCinematicShowcase } from '@/components/auth/AuthCinematicShowcase';
 import { getWhatsAppSupportUrl } from '@/lib/config/support';
 
 const ISSUE_TYPES = [
-  { id: 'login_issue', label: 'صعوبة في تسجيل الدخول بالرقم القومي', icon: User },
+  { id: 'login_issue', label: 'صعوبة في تسجيل الدخول بالرقم الأكاديمي أو القومي', icon: User },
   { id: 'password_issue', label: 'نسيان أو فقدان كلمة المرور', icon: Lock },
   { id: 'account_inactive', label: 'الحساب غير مفعل لدى شؤون الطلاب', icon: GraduationCap },
   { id: 'technical_bug', label: 'عطل تقني أو خطأ في المنصة', icon: AlertCircle },
@@ -47,6 +47,8 @@ export function LoginForm({ reason: propReason }: LoginFormProps = {}) {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const [identifierError, setIdentifierError] = useState('');
+  const [passwordError, setPasswordError] = useState('');
   const [isForgotModalOpen, setIsForgotModalOpen] = useState(false);
   const [isHelpModalOpen, setIsHelpModalOpen] = useState(false);
   const [helpIdentifier, setHelpIdentifier] = useState('');
@@ -54,6 +56,7 @@ export function LoginForm({ reason: propReason }: LoginFormProps = {}) {
   const [isIssueTypeDropdownOpen, setIsIssueTypeDropdownOpen] = useState(false);
   const selectedIssue = ISSUE_TYPES.find(item => item.id === helpIssueType) || ISSUE_TYPES[0];
   const [helpMessage, setHelpMessage] = useState('');
+  const [helpMessageError, setHelpMessageError] = useState('');
   const [isHelpSubmitted, setIsHelpSubmitted] = useState(false);
   const [isSubmittingHelp, setIsSubmittingHelp] = useState(false);
   const [submittedTicketNo, setSubmittedTicketNo] = useState('');
@@ -70,7 +73,12 @@ export function LoginForm({ reason: propReason }: LoginFormProps = {}) {
 
   const handleHelpSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!helpMessage.trim() || isSubmittingHelp) return;
+    setHelpMessageError('');
+    if (!helpMessage.trim()) {
+      setHelpMessageError('يرجى كتابة تفاصيل المشكلة أو الاستفسار لمساعدتك.');
+      return;
+    }
+    if (isSubmittingHelp) return;
 
     setIsSubmittingHelp(true);
     try {
@@ -112,16 +120,23 @@ export function LoginForm({ reason: propReason }: LoginFormProps = {}) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMessage('');
+    let hasError = false;
 
     if (!identifier.trim()) {
-      setErrorMessage('يرجى إدخال الرقم الأكاديمي أو الرقم القومي');
-      return;
+      setIdentifierError('يرجى إدخال الرقم الأكاديمي أو الرقم القومي');
+      hasError = true;
+    } else {
+      setIdentifierError('');
     }
 
     if (!password) {
-      setErrorMessage('يرجى إدخال كلمة المرور');
-      return;
+      setPasswordError('يرجى إدخال كلمة المرور');
+      hasError = true;
+    } else {
+      setPasswordError('');
     }
+
+    if (hasError) return;
 
     setIsLoading(true);
 
@@ -245,9 +260,9 @@ export function LoginForm({ reason: propReason }: LoginFormProps = {}) {
               src="/logo.png"
               alt="شعار الكلية بالخلفية"
               fill
+              sizes="(max-width: 1024px) 280px, 680px"
               className="object-contain"
               priority
-              unoptimized
             />
           </div>
         </div>
@@ -263,7 +278,6 @@ export function LoginForm({ reason: propReason }: LoginFormProps = {}) {
             height={64}
             className="w-full h-full object-contain select-none drop-shadow-[0_2px_16px_rgba(59,130,246,0.85)]"
             priority
-            unoptimized
           />
         </div>
         <div className="flex flex-col text-right">
@@ -327,11 +341,11 @@ export function LoginForm({ reason: propReason }: LoginFormProps = {}) {
             )}
 
             {/* Login Form */}
-            <form onSubmit={handleSubmit} className="space-y-2.5 sm:space-y-3.5">
-              {/* Field 1: National ID */}
+            <form onSubmit={handleSubmit} noValidate className="space-y-2.5 sm:space-y-3.5">
+              {/* Field 1: Academic or National ID */}
               <div>
                 <label htmlFor="loginIdentifier" className="block text-xs font-bold text-slate-700 mb-1">
-                  الرقم القومي <span className="text-rose-500">*</span>
+                  الرقم الأكاديمي أو الرقم القومي <span className="text-rose-500">*</span>
                 </label>
                 <div className="relative">
                   <input
@@ -340,13 +354,25 @@ export function LoginForm({ reason: propReason }: LoginFormProps = {}) {
                     inputMode="numeric"
                     autoComplete="username"
                     value={identifier}
-                    onChange={(e) => setIdentifier(e.target.value)}
-                    placeholder="مثال: الرقم القومي 14 رقم"
-                    className="w-full h-10 sm:h-11 px-3.5 ps-9 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 text-xs sm:text-sm text-slate-900 transition-all outline-hidden font-medium"
-                    required
+                    onChange={(e) => {
+                      setIdentifier(e.target.value);
+                      if (identifierError) setIdentifierError('');
+                    }}
+                    placeholder="مثال: 20230814 أو الرقم القومي المكون من 14 رقم"
+                    aria-invalid={!!identifierError}
+                    aria-describedby={identifierError ? "loginIdentifierError" : undefined}
+                    className={`w-full h-10 sm:h-11 px-3.5 ps-9 rounded-xl bg-slate-50 border ${
+                      identifierError ? 'border-rose-500 bg-rose-50/20' : 'border-slate-200'
+                    } focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 text-xs sm:text-sm text-slate-900 transition-all outline-hidden font-medium`}
                   />
                   <User className="w-4 h-4 text-slate-600 absolute start-3 top-1/2 -translate-y-1/2 pointer-events-none" />
                 </div>
+                {identifierError && (
+                  <p id="loginIdentifierError" role="alert" className="mt-1 text-[11px] font-bold text-rose-600 flex items-center gap-1 animate-fadeIn">
+                    <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                    <span>{identifierError}</span>
+                  </p>
+                )}
               </div>
 
               {/* Field 2: Password */}
@@ -358,7 +384,7 @@ export function LoginForm({ reason: propReason }: LoginFormProps = {}) {
                   <button
                     type="button"
                     onClick={() => setIsForgotModalOpen(true)}
-                    className="text-[11px] font-bold text-blue-600 hover:text-blue-800 transition-colors cursor-pointer py-0.5"
+                    className="text-[11px] font-bold text-blue-600 hover:text-blue-800 transition-colors cursor-pointer py-0.5 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-blue-500 rounded-sm"
                   >
                     نسيت كلمة المرور؟
                   </button>
@@ -369,29 +395,41 @@ export function LoginForm({ reason: propReason }: LoginFormProps = {}) {
                     type={showPassword ? 'text' : 'password'}
                     autoComplete="current-password"
                     value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    onChange={(e) => {
+                      setPassword(e.target.value);
+                      if (passwordError) setPasswordError('');
+                    }}
                     placeholder="أدخل كلمة المرور الخاصة بحسابك"
-                    className="w-full h-10 sm:h-11 px-3.5 ps-9 pe-9 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 text-xs sm:text-sm text-slate-900 transition-all outline-hidden font-medium"
-                    required
+                    aria-invalid={!!passwordError}
+                    aria-describedby={passwordError ? "loginPasswordError" : undefined}
+                    className={`w-full h-10 sm:h-11 px-3.5 ps-9 pe-9 rounded-xl bg-slate-50 border ${
+                      passwordError ? 'border-rose-500 bg-rose-50/20' : 'border-slate-200'
+                    } focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 text-xs sm:text-sm text-slate-900 transition-all outline-hidden font-medium`}
                   />
                   <Lock className="w-4 h-4 text-slate-600 absolute start-3 top-1/2 -translate-y-1/2 pointer-events-none" />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute end-2.5 top-1/2 -translate-y-1/2 text-slate-600 hover:text-slate-800 cursor-pointer p-1"
+                    className="absolute end-2.5 top-1/2 -translate-y-1/2 text-slate-600 hover:text-slate-800 cursor-pointer p-1 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-blue-500 rounded-sm"
                     title={showPassword ? 'إخفاء' : 'إظهار'}
                     aria-label={showPassword ? 'إخفاء كلمة المرور' : 'إظهار كلمة المرور'}
                   >
                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
                 </div>
+                {passwordError && (
+                  <p id="loginPasswordError" role="alert" className="mt-1 text-[11px] font-bold text-rose-600 flex items-center gap-1 animate-fadeIn">
+                    <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                    <span>{passwordError}</span>
+                  </p>
+                )}
               </div>
 
               {/* Submit Button */}
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full h-10 sm:h-11 rounded-xl bg-blue-600 hover:bg-blue-700 active:scale-[0.99] text-white font-extrabold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-md shadow-blue-600/30 transition-all cursor-pointer disabled:opacity-60 mt-1"
+                className="w-full h-10 sm:h-11 rounded-xl bg-blue-600 hover:bg-blue-700 active:scale-[0.99] text-white font-extrabold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-md shadow-blue-600/30 transition-all cursor-pointer disabled:opacity-60 mt-1 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
               >
                 {isLoading ? (
                   <>
@@ -549,18 +587,18 @@ export function LoginForm({ reason: propReason }: LoginFormProps = {}) {
                   تواجه صعوبة في الدخول أو في بيانات حسابك؟ اكتب تفاصيل المشكلة وسيقوم فريق الدعم بمتابعتها معك فوراً دون الحاجة لتسجيل الدخول.
                 </p>
 
-                <form onSubmit={handleHelpSubmit} className="space-y-3">
+                <form onSubmit={handleHelpSubmit} noValidate className="space-y-3">
                   {/* Field: Identifier / Phone */}
                   <div>
                     <label htmlFor="helpIdentifier" className="block text-xs font-bold text-slate-700 mb-1">
-                      الرقم القومي أو رقم الهاتف للتواصل
+                      الرقم الأكاديمي أو الرقم القومي أو رقم الهاتف للتواصل
                     </label>
                     <input
                       id="helpIdentifier"
                       type="text"
                       value={helpIdentifier}
                       onChange={(e) => setHelpIdentifier(e.target.value)}
-                      placeholder="مثال: الرقم القومي 14 رقم أو 010xxxxxxxx"
+                      placeholder="مثال: 20230814 أو الرقم القومي 14 رقم أو 010xxxxxxxx"
                       className="w-full h-10 px-3.5 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 text-xs text-slate-900 transition-all outline-hidden font-medium"
                     />
                   </div>
@@ -610,6 +648,8 @@ export function LoginForm({ reason: propReason }: LoginFormProps = {}) {
                                 onClick={() => {
                                   setHelpIssueType(type.id);
                                   setIsIssueTypeDropdownOpen(false);
+                                  const button = document.querySelector('[aria-labelledby="issueTypeLabel"]') as HTMLElement | null;
+                                  button?.focus();
                                 }}
                                 className={`w-full px-3 py-2 text-xs text-right flex items-center justify-between transition-colors cursor-pointer ${
                                   isSelected 
@@ -645,19 +685,31 @@ export function LoginForm({ reason: propReason }: LoginFormProps = {}) {
                       id="helpMessage"
                       rows={3}
                       value={helpMessage}
-                      onChange={(e) => setHelpMessage(e.target.value)}
+                      onChange={(e) => {
+                        setHelpMessage(e.target.value);
+                        if (helpMessageError) setHelpMessageError('');
+                      }}
                       placeholder="اشرح المشكلة بالتفصيل لمساعدتك في أسرع وقت..."
-                      className="w-full p-3 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 text-xs text-slate-900 transition-all outline-hidden font-medium resize-none"
-                      required
+                      aria-invalid={!!helpMessageError}
+                      aria-describedby={helpMessageError ? "helpMessageError" : undefined}
+                      className={`w-full p-3 rounded-xl bg-slate-50 border ${
+                        helpMessageError ? 'border-rose-500 bg-rose-50/20' : 'border-slate-200'
+                      } focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 text-xs text-slate-900 transition-all outline-hidden font-medium resize-none`}
                     />
+                    {helpMessageError && (
+                      <p id="helpMessageError" role="alert" className="mt-1 text-[11px] font-bold text-rose-600 flex items-center gap-1 animate-fadeIn">
+                        <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                        <span>{helpMessageError}</span>
+                      </p>
+                    )}
                   </div>
 
                   {/* Buttons */}
                   <div className="pt-1 space-y-2">
                     <button
                       type="submit"
-                      disabled={isSubmittingHelp || !helpMessage.trim()}
-                      className="w-full h-10 rounded-xl bg-blue-600 hover:bg-blue-700 active:scale-[0.99] text-white font-bold text-xs flex items-center justify-center gap-2 shadow-xs transition-all cursor-pointer disabled:opacity-50"
+                      disabled={isSubmittingHelp}
+                      className="w-full h-10 rounded-xl bg-blue-600 hover:bg-blue-700 active:scale-[0.99] text-white font-bold text-xs flex items-center justify-center gap-2 shadow-xs transition-all cursor-pointer disabled:opacity-50 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
                     >
                       {isSubmittingHelp ? (
                         <>

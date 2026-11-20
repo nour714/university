@@ -156,7 +156,7 @@ export function CourseContentBrowser({ items, courseCode, isLocked }: CourseCont
 
         {/* Inline Activation Form */}
         {!activationSuccess && (
-          <form onSubmit={handleInlineActivation} className="space-y-3.5 bg-slate-50/70 p-4 rounded-2xl border border-slate-200/80">
+          <form onSubmit={handleInlineActivation} noValidate className="space-y-3.5 bg-slate-50/70 p-4 rounded-2xl border border-slate-200/80">
             <div>
               <label htmlFor="courseInlineCodeInput" className="block text-xs font-bold text-slate-700 mb-1.5 text-right">
                 أدخل كود تفعيل المقرر

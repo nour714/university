@@ -389,7 +389,7 @@ export function SettingsView({ student: initialStudent }: { student?: StudentPro
               </div>
             )}
 
-            <form onSubmit={handlePasswordSubmit} className="space-y-3.5">
+            <form onSubmit={handlePasswordSubmit} noValidate className="space-y-3.5">
               {/* Field 1: Current Password */}
               <div>
                 <label htmlFor="settingsCurrentPassword" className="block text-xs font-bold text-slate-700 mb-1">
@@ -641,7 +641,7 @@ export function SettingsView({ student: initialStudent }: { student?: StudentPro
               </div>
             )}
 
-            <form onSubmit={handleSupportSubmit} className="space-y-3">
+            <form onSubmit={handleSupportSubmit} noValidate className="space-y-3">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {/* Category Custom Select */}
                 <div>

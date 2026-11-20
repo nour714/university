@@ -19,6 +19,7 @@ const nextConfig: NextConfig = {
     },
   },
   experimental: {
+    agentUpgrade: 'security',
     serverActions: {
       bodySizeLimit: '200kb',
       allowedOrigins: process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',').map(s => s.trim()) : undefined,

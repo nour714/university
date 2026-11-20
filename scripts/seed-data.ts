@@ -154,6 +154,15 @@ async function seed(customOwnerUrl?: string) {
       WHERE id != ALL(${validCourseIds})
     `;
 
+    // Clean up obsolete content items not present in current course fixtures
+    const allValidContentIds = RAW_COURSES_DATA.flatMap((c) => (c.content || []).map((item) => item.id));
+    if (allValidContentIds.length > 0) {
+      await sql`
+        DELETE FROM public.academic_course_contents 
+        WHERE id != ALL(${allValidContentIds})
+      `;
+    }
+
     for (const course of RAW_COURSES_DATA) {
       await sql`
         INSERT INTO public.academic_courses (
@@ -197,12 +206,29 @@ async function seed(customOwnerUrl?: string) {
               ${item.type}, ${item.format || 'PDF'}, ${item.size || ''},
               ${item.duration || null}, ${item.uploadedAt || ''}, ${storageKey}, ${externalUrl}
             ) ON CONFLICT (id) DO UPDATE SET
+              course_id = EXCLUDED.course_id,
+              title = EXCLUDED.title,
+              description = EXCLUDED.description,
+              type = EXCLUDED.type,
+              format = EXCLUDED.format,
+              size_label = EXCLUDED.size_label,
+              duration = EXCLUDED.duration,
+              date_label = EXCLUDED.date_label,
               storage_key = EXCLUDED.storage_key,
               external_url = EXCLUDED.external_url;
           `;
         }
       }
     }
+
+    // Safe deduplication: ensure no duplicate lectures/materials exist by course_id and title
+    await sql`
+      DELETE FROM public.academic_course_contents a
+      USING public.academic_course_contents b
+      WHERE a.id > b.id
+        AND a.course_id = b.course_id
+        AND a.title = b.title;
+    `;
 
     // 2. Student Accounts (Conditional, Non-Production only, must_change_password = true)
     const isProd = process.env.NODE_ENV === 'production';

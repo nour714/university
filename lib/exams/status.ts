@@ -19,12 +19,12 @@ export function getExamStatus(
   const start = new Date(exam.startDate).getTime();
   const end = new Date(exam.endDate).getTime();
 
-  if (now < start) {
-    return 'upcoming';
+  if (now >= end) {
+    return 'ended';
   }
 
-  if (now > end) {
-    return 'ended';
+  if (now < start) {
+    return 'upcoming';
   }
 
   return 'live';

@@ -15,7 +15,8 @@ import {
   Sparkles,
   KeyRound,
   BookOpen,
-  X
+  X,
+  XCircle
 } from 'lucide-react';
 
 interface ExamsDashboardProps {
@@ -37,6 +38,7 @@ export function ExamsDashboard({ initialExams }: ExamsDashboardProps) {
       live: exams.filter((e) => getExamStatus(e) === 'live').length,
       upcoming: exams.filter((e) => getExamStatus(e) === 'upcoming').length,
       completed: exams.filter((e) => getExamStatus(e) === 'completed').length,
+      ended: exams.filter((e) => getExamStatus(e) === 'ended').length,
     };
   }, [exams]);
 
@@ -191,6 +193,24 @@ export function ExamsDashboard({ initialExams }: ExamsDashboardProps) {
               <span>مكتملة ومصححة</span>
               <span className={`text-[10px] px-1.5 py-0.5 rounded-md font-mono ${activeTab === 'completed' ? 'bg-blue-700 text-white' : 'bg-slate-200 text-slate-700'}`}>
                 {counts.completed}
+              </span>
+            </button>
+
+            <button
+              type="button"
+              role="tab"
+              aria-selected={activeTab === 'ended'}
+              onClick={() => setActiveTab('ended')}
+              className={`px-3 py-2 sm:px-3.5 sm:py-2 min-h-[40px] rounded-xl text-xs font-bold flex items-center gap-1.5 sm:gap-2 transition-all shrink-0 cursor-pointer ${
+                activeTab === 'ended'
+                  ? 'bg-slate-700 text-white shadow-xs'
+                  : 'bg-slate-50 text-slate-600 hover:bg-slate-100 hover:text-slate-900 border border-slate-200/70'
+              }`}
+            >
+              <XCircle className="w-3.5 h-3.5 shrink-0" />
+              <span>منتهية ومغلقة</span>
+              <span className={`text-[10px] px-1.5 py-0.5 rounded-md font-mono ${activeTab === 'ended' ? 'bg-slate-800 text-white' : 'bg-slate-200 text-slate-700'}`}>
+                {counts.ended}
               </span>
             </button>
           </div>

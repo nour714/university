@@ -92,12 +92,16 @@ export function NotificationBell() {
   const getIcon = (type: NotificationType) => {
     switch (type) {
       case 'lecture':
+      case 'course':
         return <BookOpen className="w-4 h-4 text-blue-600" />;
       case 'exam':
         return <ClipboardCheck className="w-4 h-4 text-rose-600" />;
       case 'material':
         return <FileText className="w-4 h-4 text-emerald-600" />;
+      case 'security':
+        return <Sparkles className="w-4 h-4 text-amber-600" />;
       case 'announcement':
+      case 'system':
       default:
         return <Sparkles className="w-4 h-4 text-amber-500" />;
     }
@@ -107,12 +111,20 @@ export function NotificationBell() {
     switch (type) {
       case 'lecture':
         return 'محاضرة';
+      case 'course':
+        return 'مقرر دراسي';
       case 'exam':
         return 'اختبار';
       case 'material':
         return 'محتوى';
       case 'announcement':
         return 'إعلان';
+      case 'system':
+        return 'تنبيه نظام';
+      case 'security':
+        return 'أمان الحساب';
+      default:
+        return 'تنبيه نظام';
     }
   };
 
@@ -169,7 +181,7 @@ export function NotificationBell() {
       </div>
 
       {/* Category Filter Tabs */}
-      <div role="tablist" aria-label="أقسام الإشعارات" className="flex items-center gap-1.5 px-3 py-2 border-b border-slate-100 bg-slate-50/70 shrink-0 overflow-x-auto no-scrollbar">
+      <div role="tablist" aria-label="أقسام الإشعارات" className="flex items-center gap-1.5 px-3 py-2 border-b border-slate-200 bg-slate-50 shrink-0 overflow-x-auto no-scrollbar">
         <button
           type="button"
           role="tab"
@@ -225,7 +237,7 @@ export function NotificationBell() {
       </div>
 
       {/* Notifications Scrollable List */}
-      <div className="flex-1 overflow-y-auto divide-y divide-slate-100 p-2 sm:p-2.5 space-y-1.5">
+      <div className="flex-1 overflow-y-auto divide-y divide-slate-100 p-2 sm:p-2.5 space-y-1.5 bg-white">
         {filteredNotifications.length > 0 ? (
           filteredNotifications.map((notif) => (
             <div
@@ -272,10 +284,14 @@ export function NotificationBell() {
 
                 {/* Footer Actions */}
                 <div className="flex items-center justify-between pt-1.5 border-t border-slate-100">
-                  <span className="inline-flex items-center gap-1 text-[11px] font-bold text-blue-600 group-hover:text-blue-800">
-                    <span>عرض المقرر الآن</span>
-                    <ChevronLeft className="w-3.5 h-3.5 transition-transform group-hover:-translate-x-0.5" />
-                  </span>
+                  {Boolean(notif.courseId || (notif.actionUrl && notif.actionUrl.startsWith('/courses/'))) ? (
+                    <span className="inline-flex items-center gap-1 text-[11px] font-bold text-blue-600 group-hover:text-blue-800">
+                      <span>عرض المقرر الآن</span>
+                      <ChevronLeft className="w-3.5 h-3.5 transition-transform group-hover:-translate-x-0.5" />
+                    </span>
+                  ) : (
+                    <span />
+                  )}
 
                   <button
                     type="button"
@@ -340,7 +356,7 @@ export function NotificationBell() {
           ref={desktopPanelRef}
           role="dialog"
           aria-label="الإشعارات الأكاديمية"
-          className="hidden sm:flex absolute left-0 top-12 z-50 w-[420px] max-h-[580px] bg-white rounded-3xl border border-slate-200/90 shadow-2xl flex-col overflow-hidden animate-fadeIn"
+          className="hidden sm:flex absolute left-0 top-12 z-[100] w-[420px] max-h-[580px] bg-white rounded-3xl border border-slate-200 shadow-2xl flex-col overflow-hidden animate-fadeIn"
         >
           {renderPanelBody()}
         </div>

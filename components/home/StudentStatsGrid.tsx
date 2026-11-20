@@ -45,7 +45,7 @@ export function StudentStatsGrid({ student }: StudentStatsGridProps) {
       title: 'الساعات المسجلة',
       value: student.registeredHours.toString(),
       unit: 'ساعة معتمدة',
-      badge: 'العبء الأكاديمي الكامل',
+      badge: 'العبء الكامل',
       badgeColor: 'bg-purple-500/10 text-purple-700 border-purple-300/60',
       icon: Clock,
       iconColor: 'from-purple-600 to-violet-700 text-white shadow-purple-500/30',
@@ -96,7 +96,7 @@ export function StudentStatsGrid({ student }: StudentStatsGridProps) {
                 </div>
 
                 <span
-                  className={`text-[11px] font-bold px-2.5 py-1 rounded-full border ${stat.badgeColor} max-w-[130px] truncate text-center`}
+                  className={`text-[11px] font-bold px-2.5 py-1 rounded-full border ${stat.badgeColor} shrink-0 whitespace-nowrap text-center`}
                   title={stat.badge}
                 >
                   {stat.badge}

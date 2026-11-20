@@ -69,9 +69,12 @@ export function NotificationToast() {
           <div className="flex items-center justify-between gap-2 mb-1">
             <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md border ${getBadgeStyle()}`}>
               {toast.type === 'lecture' && 'محاضرة جديدة'}
+              {toast.type === 'course' && 'مقرر دراسي'}
               {toast.type === 'exam' && 'تنبيه اختبار'}
               {toast.type === 'material' && 'محتوى أكاديمي'}
-              {toast.type === 'announcement' && 'إشعار هام'}
+              {toast.type === 'announcement' && 'إعلان'}
+              {toast.type === 'system' && 'تنبيه نظام'}
+              {toast.type === 'security' && 'أمان الحساب'}
             </span>
             <span className="text-[10px] text-slate-600 font-medium">الآن</span>
           </div>

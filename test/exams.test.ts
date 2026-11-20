@@ -2,6 +2,7 @@ import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { setupTestDatabase, teardownTestDatabase, TestDbClients } from './setupTestDb';
 import { getPublicExamById, startOrResumeExamSession, getExamResult, saveExamAnswers } from '@/server/exams/service';
 import { submitAndGradeExam } from '@/server/exams/submit';
+import { getExamStatus } from '@/lib/exams/status';
 import { AppError } from '@/lib/errors';
 
 describe('Exams Architecture & Grading Verification (Findings E1, E2)', () => {
@@ -277,6 +278,83 @@ describe('Exams Architecture & Grading Verification (Findings E1, E2)', () => {
       `;
       expect(sub).toBeDefined();
       expect(sub.auto_submitted).toBe(true);
+    });
+  });
+
+  describe('Exam Status & Tab Count Consistency', () => {
+    it('past-due exams are never classified as upcoming and resolve to ended', () => {
+      const pastExam = {
+        startDate: '2026-10-01T09:00:00Z',
+        endDate: '2026-10-01T11:00:00Z',
+      };
+      const now = new Date('2026-10-25T12:00:00Z').getTime();
+
+      const status = getExamStatus(pastExam, now);
+      expect(status).not.toBe('upcoming');
+      expect(status).toBe('ended');
+    });
+
+    it('past-due exam with submission resolves to completed rather than ended or upcoming', () => {
+      const pastExamWithSub = {
+        startDate: '2026-10-01T09:00:00Z',
+        endDate: '2026-10-01T11:00:00Z',
+        submission: { score: 15, totalMarks: 20 },
+      };
+      const now = new Date('2026-10-25T12:00:00Z').getTime();
+
+      const status = getExamStatus(pastExamWithSub, now);
+      expect(status).toBe('completed');
+    });
+
+    it('tab counts strictly sum to total exams across mixed exam cohorts', () => {
+      const now = new Date('2026-11-20T12:00:00Z').getTime();
+      const mockExams = [
+        // Live exam
+        {
+          startDate: '2026-11-20T10:00:00Z',
+          endDate: '2026-11-20T14:00:00Z',
+        },
+        // Upcoming exam
+        {
+          startDate: '2026-11-25T09:00:00Z',
+          endDate: '2026-11-25T11:00:00Z',
+        },
+        // Past exam (unsubmitted -> ended)
+        {
+          startDate: '2026-10-20T09:00:00Z',
+          endDate: '2026-10-20T11:00:00Z',
+        },
+        // Past exam (submitted -> completed)
+        {
+          startDate: '2026-10-15T09:00:00Z',
+          endDate: '2026-10-15T11:00:00Z',
+          submission: { score: 18, totalMarks: 20 },
+        },
+        // Live exam (submitted -> completed)
+        {
+          startDate: '2026-11-20T10:00:00Z',
+          endDate: '2026-11-20T14:00:00Z',
+          submission: { score: 20, totalMarks: 20 },
+        },
+      ];
+
+      const counts = {
+        all: mockExams.length,
+        live: mockExams.filter((e) => getExamStatus(e, now) === 'live').length,
+        upcoming: mockExams.filter((e) => getExamStatus(e, now) === 'upcoming').length,
+        completed: mockExams.filter((e) => getExamStatus(e, now) === 'completed').length,
+        ended: mockExams.filter((e) => getExamStatus(e, now) === 'ended').length,
+      };
+
+      expect(counts.all).toBe(5);
+      expect(counts.live).toBe(1);
+      expect(counts.upcoming).toBe(1);
+      expect(counts.completed).toBe(2);
+      expect(counts.ended).toBe(1);
+
+      // Verify strict sum equality
+      const sumTabs = counts.live + counts.upcoming + counts.completed + counts.ended;
+      expect(sumTabs).toBe(counts.all);
     });
   });
 });

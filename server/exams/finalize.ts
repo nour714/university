@@ -2,6 +2,7 @@ import 'server-only';
 import { graderSql } from '@/lib/db/grader.server';
 import { submitAndGradeExam } from '@/server/exams/submit';
 import { GradeResult } from '@/types/exam';
+import { logger } from '@/lib/log';
 
 export interface FinalizeSummary {
   attempted: number;
@@ -47,7 +48,7 @@ export async function finalizeExpiredSessions(limit = 200): Promise<FinalizeSumm
       finalizedCount++;
     } catch (err) {
       failedCount++;
-      console.error(`Failed to auto-finalize session ${s.id} for student ${s.student_id}:`, err);
+      logger.error(`Failed to auto-finalize session ${s.id} for student ${s.student_id}:`, err);
 
       try {
         await graderSql`
@@ -70,7 +71,7 @@ export async function finalizeExpiredSessions(limit = 200): Promise<FinalizeSumm
           )
         `;
       } catch (logErr) {
-        console.error('Failed to update finalize_attempts or write audit log:', logErr);
+        logger.error('Failed to update finalize_attempts or write audit log:', logErr);
       }
     }
   }
@@ -105,7 +106,7 @@ export async function finalizeSessionIfExpired(
     try {
       return await submitAndGradeExam(examId, studentAccountId, undefined, true);
     } catch (err) {
-      console.error('Lazy finalization failed:', err);
+      logger.error('Lazy finalization failed:', err);
       return null;
     }
   }

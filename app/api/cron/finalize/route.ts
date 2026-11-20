@@ -2,6 +2,7 @@ import { NextResponse, connection } from 'next/server';
 import crypto from 'node:crypto';
 import { getEnv } from '@/lib/env';
 import { finalizeExpiredSessions } from '@/server/exams/finalize';
+import { logger } from '@/lib/log';
 
 export const maxDuration = 30;
 
@@ -44,7 +45,7 @@ export async function GET(request: Request) {
       timestamp: new Date().toISOString(),
     });
   } catch (err) {
-    console.error('Cron finalize error:', err);
+    logger.error('Cron finalize error:', err);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }

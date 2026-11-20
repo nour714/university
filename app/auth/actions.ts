@@ -31,6 +31,7 @@ import { isCommonPassword } from '@/lib/security/commonPasswords';
 import { verifyTurnstileToken } from '@/server/security/turnstile';
 import { extractClientIp } from '@/server/security/clientIp';
 import { env } from '@/lib/env';
+import { logger } from '@/lib/log';
 
 const LoginSchema = z.object({
   identifier: z.string().trim().min(3, 'يرجى إدخال الرقم القومي أو الرقم الأكاديمي').max(50),
@@ -178,7 +179,7 @@ export async function loginAction(input: unknown): Promise<LoginActionResult> {
 
     return { success: true, mustChangePassword: account.must_change_password };
   } catch (err) {
-    console.error('[loginAction error]:', err);
+    logger.error('[loginAction error]:', err);
     return { success: false, error: 'حدث خطأ غير متوقع أثناء تسجيل الدخول. يرجى المحاولة مرة أخرى لاحقاً.' };
   }
 }
@@ -368,7 +369,7 @@ export async function submitPublicSupportTicketAction(
       ticketNo: ticket.ticket_no,
     };
   } catch (err) {
-    console.error('Failed to submit public support ticket:', err);
+    logger.error('Failed to submit public support ticket:', err);
     return {
       success: false,
       error: 'حدث خطأ أثناء حفظ البلاغ. يرجى المحاولة لاحقاً أو التواصل عبر واتساب الدعم.',

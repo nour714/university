@@ -23,6 +23,7 @@ import { useNotifications } from '@/context/NotificationContext';
 import { CodesSkeleton } from '@/components/skeletons/CodesSkeleton';
 import { listCodes } from '@/lib/repos/codesRepo';
 import { redeemCodeAction } from '@/app/codes/actions';
+import { logger } from '@/lib/log';
 
 interface CodesManagerProps {
   initialCodes?: StudentCode[];
@@ -65,7 +66,7 @@ export function CodesManager({ initialCodes }: CodesManagerProps = {}) {
         }
       })
       .catch((err) => {
-        console.error('Failed to list codes:', err);
+        logger.error('Failed to list codes:', err);
         if (mounted) {
           setIsLoaded(true);
         }

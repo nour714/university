@@ -2,6 +2,7 @@ import 'server-only';
 import crypto from 'node:crypto';
 import { appSql } from '@/lib/db/app.server';
 import { env } from '@/lib/env';
+import { logger } from '@/lib/log';
 
 export type RateLimitBucket =
   | 'login'
@@ -57,7 +58,7 @@ export async function checkRateLimit(
 
     return { allowed, remaining };
   } catch (err) {
-    console.error('[checkRateLimit warning]:', err);
+    logger.warn('[checkRateLimit warning]:', { error: err });
     // Fail-closed on authentication & anti-bruteforce buckets to prevent rate-limit bypass under DB error
     const criticalBuckets: RateLimitBucket[] = [
       'login',
@@ -99,7 +100,7 @@ export async function getRateLimitCount(
     }
     return Number(row.count || 0);
   } catch (err) {
-    console.error('[getRateLimitCount warning]:', err);
+    logger.warn('[getRateLimitCount warning]:', { error: err });
     return 0;
   }
 }
@@ -131,7 +132,7 @@ export async function recordFailedAttempt(
     `;
     return Number(row?.count || 1);
   } catch (err) {
-    console.error('[recordFailedAttempt warning]:', err);
+    logger.warn('[recordFailedAttempt warning]:', { error: err });
     return 1;
   }
 }
@@ -151,6 +152,6 @@ export async function resetRateLimit(
       WHERE key = ${key} AND bucket = ${bucket};
     `;
   } catch (err) {
-    console.error('[resetRateLimit warning]:', err);
+    logger.warn('[resetRateLimit warning]:', { error: err });
   }
 }

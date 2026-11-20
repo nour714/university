@@ -1,5 +1,6 @@
 import { NextResponse, connection } from 'next/server';
 import { appSql } from '@/lib/db/app.server';
+import { logger } from '@/lib/log';
 
 export const maxDuration = 30;
 
@@ -15,7 +16,7 @@ export async function GET() {
     let timeoutId: NodeJS.Timeout;
     const timeoutPromise = new Promise((_, reject) => {
       timeoutId = setTimeout(
-        () => reject(new Error('Database health check timed out after 2000ms')),
+        () => reject(new Error('Database health check timed out')),
         2000
       );
     });
@@ -28,20 +29,32 @@ export async function GET() {
 
     return NextResponse.json(
       {
+        status: 'ok',
         ok: true,
         timestamp: new Date().toISOString(),
-        commit: process.env.VERCEL_GIT_COMMIT_SHA || 'dev',
+        commit: 'production',
       },
-      { status: 200 }
+      {
+        status: 200,
+        headers: {
+          'Cache-Control': 'no-store, no-cache, must-revalidate',
+        },
+      }
     );
   } catch (err: unknown) {
-    const errorMessage = err instanceof Error ? err.message : 'Database health check failed';
+    logger.error('Database health check failed:', err);
     return NextResponse.json(
       {
+        status: 'degraded',
         ok: false,
-        error: errorMessage,
+        error: 'Service degraded',
       },
-      { status: 503 }
+      {
+        status: 503,
+        headers: {
+          'Cache-Control': 'no-store, no-cache, must-revalidate',
+        },
+      }
     );
   }
 }

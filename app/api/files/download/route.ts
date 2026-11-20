@@ -7,6 +7,7 @@ import { isSafeExternalUrl } from '@/lib/safeUrl';
 import { requireAuth } from '@/server/auth/requireAuth';
 import { checkRateLimit } from '@/server/security/rateLimit';
 import { resolveContentDownload } from '@/server/courses/service';
+import { logger } from '@/lib/log';
 
 export const maxDuration = 30;
 
@@ -253,7 +254,7 @@ export async function GET(request: Request) {
     if (errorObj?.digest?.startsWith('NEXT_REDIRECT') || errorObj?.digest?.includes('HANGING_PROMISE')) {
       throw err;
     }
-    console.error('File download authorization error:', err);
+    logger.error('File download authorization error:', err);
     return NextResponse.json({ error: 'غير مصرح بالدخول أو انتهت الجلسة' }, { status: 401 });
   }
 }

@@ -2,6 +2,7 @@ import 'server-only';
 import { cache } from 'react';
 import { appSql } from '@/lib/db/app.server';
 import { Course, CourseContentItem } from '@/types/course';
+import { logger } from '@/lib/log';
 
 export interface CourseWithEnrollment extends Course {
   enrolled?: boolean;
@@ -104,7 +105,7 @@ export const listCourses = cache(async (studentId?: string, level?: number): Pro
       content: [],
     }));
   } catch (err) {
-    console.error('listCourses error:', err);
+    logger.error('listCourses error:', err);
     return [];
   }
 });
@@ -243,7 +244,7 @@ export const getCourseById = cache(async (courseId: string, studentId?: string):
       content: contents,
     };
   } catch (err) {
-    console.error(`getCourseById(${courseId}) error:`, err);
+    logger.error(`getCourseById(${courseId}) error:`, err);
     return null;
   }
 });

@@ -1,5 +1,6 @@
 import 'server-only';
 import { env } from '@/lib/env';
+import { logger } from '@/lib/log';
 
 /**
  * Verifies Cloudflare Turnstile token on server-side.
@@ -26,7 +27,7 @@ export async function verifyTurnstileToken(token?: string, remoteIp?: string): P
     const data = await res.json();
     return Boolean(data.success);
   } catch (err) {
-    console.error('Turnstile verification failed:', err);
+    logger.error('Turnstile verification failed:', err);
     return false;
   }
 }

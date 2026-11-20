@@ -4,6 +4,7 @@ import { appSql } from '@/lib/db/app.server';
 import { env } from '@/lib/env';
 import { computeCodeHash, normalizeCode } from '@/lib/security/codeHash';
 import { StudentCode } from '@/types/code';
+import { logger } from '@/lib/log';
 
 export const CodeInputSchema = z.string().min(8).max(35);
 
@@ -153,7 +154,7 @@ export async function checkEnrollmentKey(
       doctorName: rc.doctor_name,
     };
   } catch (err) {
-    console.error('checkEnrollmentKey error:', err);
+    logger.error('checkEnrollmentKey error:', err);
     return { valid: false, error: 'حدث خطأ أثناء التحقق من الكود.' };
   }
 }
@@ -469,7 +470,7 @@ export async function redeemCodeForStudent(
 
     return { success: true, data: result.data };
   } catch (err) {
-    console.error('redeemCodeForStudent error:', err);
+    logger.error('redeemCodeForStudent error:', err);
     return { success: false, error: 'حدث خطأ في معالجة الكود، يرجى المحاولة لاحقاً.' };
   }
 }

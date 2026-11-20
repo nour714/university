@@ -4,6 +4,7 @@ import { getSessionCookie } from '@/server/auth/cookies';
 import { validateSession } from '@/server/auth/session';
 import { appSql } from '@/lib/db/app.server';
 import { NotificationType } from '@/types/notification';
+import { logger } from '@/lib/log';
 
 export const maxDuration = 30;
 
@@ -69,7 +70,7 @@ export async function GET() {
       }
     );
   } catch (err) {
-    console.error('Failed to fetch notifications:', err);
+    logger.error('Failed to fetch notifications:', err);
     return NextResponse.json({ notifications: [] });
   }
 }

@@ -2,6 +2,7 @@ import 'server-only';
 import { graderSql } from '@/lib/db/grader.server';
 import { GradeResult, QuestionResultDetail } from '@/types/exam';
 import { AppError } from '@/lib/errors';
+import { logger } from '@/lib/log';
 
 /**
  * EXCLUSIVE grading module.
@@ -218,7 +219,7 @@ export async function submitAndGradeExam(
         )
       `;
     } catch (auditErr) {
-      console.error('Audit log failed inside submitAndGradeExam:', auditErr);
+      logger.error('Audit log failed inside submitAndGradeExam:', auditErr);
     }
 
     // 8. Delayed reveal: reveal perQuestion only after the exam official end_date

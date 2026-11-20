@@ -3,8 +3,9 @@
 import { useEffect } from 'react';
 import Link from 'next/link';
 import { AlertTriangle, RefreshCw, Home } from 'lucide-react';
+import { logger } from '@/lib/log';
 
-export default function GlobalError({
+export default function AppError({
   error,
   reset,
 }: {
@@ -12,8 +13,10 @@ export default function GlobalError({
   reset: () => void;
 }) {
   useEffect(() => {
-    // Log the error to console for client-side diagnosis
-    console.error('Unhandled app error:', error);
+    // Log the error using the centralized structured logger
+    logger.error('Unhandled app error in segment boundary:', error, {
+      digest: error.digest,
+    });
   }, [error]);
 
   return (

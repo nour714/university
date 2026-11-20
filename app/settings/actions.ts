@@ -5,6 +5,7 @@ import { z } from 'zod';
 import { appSql } from '@/lib/db/app.server';
 import { requireAuth } from '@/server/auth/requireAuth';
 import { checkRateLimit } from '@/server/security/rateLimit';
+import { logger } from '@/lib/log';
 
 const SupportTicketSchema = z.object({
   category: z.enum(['technical', 'academic', 'codes', 'inquiry', 'complaint', 'code', 'exam', 'account', 'other']),
@@ -62,7 +63,7 @@ export async function submitSupportTicketAction(
 
     return { success: true, ticketNo: ticket.ticket_no };
   } catch (err) {
-    console.error('Failed to submit support ticket:', err);
+    logger.error('Failed to submit support ticket:', err);
     return { success: false, error: 'حدث خطأ أثناء حفظ التذكرة. يرجى المحاولة لاحقاً.' };
   }
 }

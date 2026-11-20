@@ -89,18 +89,25 @@ export function Sidebar({ currentPath }: { currentPath?: string }) {
             >
               {/* University Emblem Logo (Always stationary, smoothly centered when collapsed) */}
               <div className="relative shrink-0 flex items-center justify-center">
+                {/* Luminous Glow Halo */}
                 <span
-                  className="absolute inset-0 rounded-full bg-white/20 animate-white-wave pointer-events-none"
+                  className="absolute -inset-1 rounded-full bg-gradient-to-tr from-blue-400/40 via-cyan-400/35 to-amber-300/30 blur-xs animate-pulse pointer-events-none"
                   aria-hidden="true"
                 />
-                <div className="w-12 h-12 rounded-full bg-white border-2 border-blue-400/40 flex items-center justify-center p-1.5 shrink-0 shadow-lg shadow-blue-950/40 ring-2 ring-blue-400/40 ring-offset-2 ring-offset-[#172554] hover:scale-105 hover:shadow-blue-400/60 transition-all duration-300 overflow-hidden">
+                {/* Wave Ripple Animation */}
+                <span
+                  className="absolute inset-0 rounded-full bg-white/30 animate-white-wave pointer-events-none"
+                  aria-hidden="true"
+                />
+                {/* Circular Glass Capsule Frame with Refined Lighting */}
+                <div className="relative w-12 h-12 rounded-full bg-white/95 backdrop-blur-xs border-2 border-blue-300/80 flex items-center justify-center p-1.5 shrink-0 shadow-lg shadow-blue-500/25 ring-2 ring-blue-400/50 ring-offset-2 ring-offset-[#172554] hover:scale-105 hover:ring-blue-300 hover:shadow-[0_0_20px_rgba(56,189,248,0.5)] transition-all duration-300 overflow-hidden">
                   {!logoError ? (
                     <Image
-                      src="/logo.svg"
+                      src="/logo.png"
                       alt="شعار كلية الذكاء الاصطناعي - جامعة كفر الشيخ"
                       width={40}
                       height={40}
-                      className="w-full h-full object-contain filter drop-shadow-xs select-none"
+                      className="w-full h-full object-contain filter brightness-110 contrast-105 drop-shadow-[0_2px_6px_rgba(23,37,84,0.3)] select-none"
                       priority
                       onError={() => setLogoError(true)}
                     />
@@ -287,8 +294,9 @@ export function Sidebar({ currentPath }: { currentPath?: string }) {
           </button>
         </div>
 
-        {/* Ambient subtle glow */}
+        {/* Ambient subtle glow & lighting */}
         <div className="absolute -top-12 -left-12 w-28 h-28 bg-amber-500/10 rounded-full blur-2xl pointer-events-none" />
+        <div className="absolute -top-10 -right-10 w-32 h-32 bg-blue-400/20 rounded-full blur-2xl pointer-events-none" />
       </div>
     </aside>
   );

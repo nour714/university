@@ -42,6 +42,7 @@ export default async function globalSetup() {
     'DB_SSL="disable"',
     'DB_POOL_MAX="5"',
     'SEED_DEMO_PASSWORD="Student@2026"',
+    'E2E_HTTP_ONLY="1"',
   ].join('\n');
   fs.writeFileSync(envProductionLocalPath, testEnvContent, 'utf-8');
 

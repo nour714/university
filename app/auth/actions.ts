@@ -43,7 +43,7 @@ export type LoginActionResult =
   | { success: true; mustChangePassword: boolean }
   | { success: false; error: string };
 
-const GENERIC_LOGIN_ERROR = 'الرقم القومي أو كلمة المرور غير صحيحة، أو تم تقييد المحاولات مؤقتاً';
+const GENERIC_LOGIN_ERROR = 'الرقم الأكاديمي أو الرقم القومي أو كلمة المرور غير صحيحة، أو تم تقييد المحاولات مؤقتاً';
 
 export async function loginAction(input: unknown): Promise<LoginActionResult> {
   try {

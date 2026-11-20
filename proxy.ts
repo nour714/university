@@ -1,11 +1,13 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
+const isE2EHttp = process.env.E2E_HTTP_ONLY === '1';
+
 const SESSION_COOKIE_NAME =
-  process.env.NODE_ENV === 'production' ? '__Host-sid' : 'academic_sid';
+  process.env.NODE_ENV === 'production' && !isE2EHttp ? '__Host-sid' : 'academic_sid';
 
 const MUST_CHANGE_COOKIE_NAME =
-  process.env.NODE_ENV === 'production' ? '__Host-mcp' : 'academic_mcp';
+  process.env.NODE_ENV === 'production' && !isE2EHttp ? '__Host-mcp' : 'academic_mcp';
 
 // Routes requiring authenticated session
 const PROTECTED_PREFIXES = ['/courses', '/exams', '/codes', '/settings', '/account', '/notifications'];

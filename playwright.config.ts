@@ -2,7 +2,7 @@ import { defineConfig, devices } from '@playwright/test';
 
 const isCI = Boolean(process.env.CI);
 const port = 5500;
-const baseURL = `http://127.0.0.1:${port}`;
+const baseURL = `http://localhost:${port}`;
 
 export default defineConfig({
   testDir: './e2e',
@@ -47,6 +47,7 @@ export default defineConfig({
     reuseExistingServer: !isCI,
     env: {
       NODE_ENV: 'production',
+      E2E_HTTP_ONLY: '1',
       PORT: '5500',
       DATABASE_URL_OWNER: 'postgres://postgres:postgres@localhost:5434/postgres?sslmode=disable',
       DATABASE_URL_APP: 'postgres://academic_app:test_app_pass_32_chars_minimum@localhost:5434/postgres?sslmode=disable',

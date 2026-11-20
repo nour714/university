@@ -139,8 +139,8 @@ describe('Auth & Session Security Tests (Finding F8 / Task 7)', () => {
       const valid = await verifyPassword('WrongPassword123', existing.password_hash);
       expect(valid).toBe(false);
 
-      const GENERIC_ERROR = 'الرقم القومي أو كلمة المرور غير صحيحة، أو تم تقييد المحاولات مؤقتاً';
-      expect(GENERIC_ERROR).toBe('الرقم القومي أو كلمة المرور غير صحيحة، أو تم تقييد المحاولات مؤقتاً');
+      const GENERIC_ERROR = 'الرقم الأكاديمي أو الرقم القومي أو كلمة المرور غير صحيحة، أو تم تقييد المحاولات مؤقتاً';
+      expect(GENERIC_ERROR).toBe('الرقم الأكاديمي أو الرقم القومي أو كلمة المرور غير صحيحة، أو تم تقييد المحاولات مؤقتاً');
     });
 
     it('7.3(a) Attacker from IP 1 fails 20 logins on student national ID; student logs in successfully on 21st attempt from IP 2', async () => {

@@ -125,11 +125,10 @@ describe('Auth & Session Security Tests (Finding F8 / Task 7)', () => {
       expect(dummySpy).toHaveBeenCalled();
       dummySpy.mockRestore();
 
-      const t0 = Date.now();
+      const t0 = performance.now();
       await verifyDummyPassword();
-      const elapsed = Date.now() - t0;
-      expect(elapsed).toBeGreaterThanOrEqual(0);
-      expect(elapsed).toBeLessThan(1000);
+      const elapsed = performance.now() - t0;
+      expect(elapsed).toBeGreaterThan(1);
 
       // 2. Existing account with wrong password
       const [existing] = await clients.appSql`

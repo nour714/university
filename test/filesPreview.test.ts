@@ -72,8 +72,10 @@ describe('Files Download & Preview Generators (Phase 7)', () => {
     // Must NOT link to external blocked google fonts
     expect(html).not.toContain('fonts.googleapis.com');
     expect(html).not.toContain('fonts.gstatic.com');
-    // Must use local RTL-capable system font stack
+    // Must use local RTL-capable system font stack and local Cairo font assets
     expect(html).toContain("font-family: 'Cairo', 'Segoe UI', Tahoma, Arial, sans-serif;");
+    expect(html).toContain('/fonts/cairo/cairo-arabic.woff2');
+    expect(html).toContain('@font-face');
     expect(html).toContain('مذكرة المقرر الأكاديمي');
   });
 });

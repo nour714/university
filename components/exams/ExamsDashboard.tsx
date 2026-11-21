@@ -93,7 +93,9 @@ export function ExamsDashboard({ initialExams }: ExamsDashboardProps) {
           <div className="relative flex-1">
             <Search className="w-4 h-4 text-slate-600 absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
             <input
-              type="search"
+              type="text"
+              inputMode="search"
+              enterKeyHint="search"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="ابحث باسم المادة، كود المقرر، عنوان الاختبار، أو اسم الدكتور..."

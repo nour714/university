@@ -154,12 +154,14 @@ async function seed(customOwnerUrl?: string) {
       WHERE id != ALL(${validCourseIds})
     `;
 
-    // Clean up obsolete content items not present in current course fixtures
+    // Clean up obsolete content items not present in current course fixtures and legacy 2026-11-11 duplicate rows in AI302
     const allValidContentIds = RAW_COURSES_DATA.flatMap((c) => (c.content || []).map((item) => item.id));
     if (allValidContentIds.length > 0) {
       await sql`
         DELETE FROM public.academic_course_contents 
         WHERE id != ALL(${allValidContentIds})
+           OR date_label = '2026-11-11'
+           OR (course_id = 'ai-302' AND date_label = '2026-11-11');
       `;
     }
 

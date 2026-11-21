@@ -17,6 +17,11 @@ import {
 import { useNotifications } from '@/context/NotificationContext';
 import { AcademicNotification, NotificationType } from '@/types/notification';
 import { safeInternalPath } from '@/lib/safeUrl';
+import { 
+  NotificationTabKey, 
+  matchesNotificationTab, 
+  calculateNotificationTabCounts 
+} from '@/lib/notifications/tabs';
 
 const emptySubscribe = () => () => {};
 
@@ -32,10 +37,41 @@ export function NotificationBell() {
 
   const [isOpen, setIsOpen] = useState(false);
   const mounted = useSyncExternalStore(emptySubscribe, () => true, () => false);
-  const [activeTab, setActiveTab] = useState<'all' | NotificationType>('all');
+  const [activeTab, setActiveTab] = useState<NotificationTabKey>('all');
+  const [coords, setCoords] = useState<{ top: number; left: number } | null>(null);
   
   const desktopPanelRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
+
+  // Position desktop dropdown anchored to the bell button
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const updatePosition = () => {
+      if (!buttonRef.current) return;
+      const rect = buttonRef.current.getBoundingClientRect();
+      const popoverWidth = 420;
+      let left = rect.left;
+      if (left + popoverWidth > window.innerWidth - 16) {
+        left = window.innerWidth - popoverWidth - 16;
+      }
+      if (left < 16) {
+        left = 16;
+      }
+      setCoords({
+        top: rect.bottom + 8,
+        left,
+      });
+    };
+
+    updatePosition();
+    window.addEventListener('resize', updatePosition);
+    window.addEventListener('scroll', updatePosition, true);
+    return () => {
+      window.removeEventListener('resize', updatePosition);
+      window.removeEventListener('scroll', updatePosition, true);
+    };
+  }, [isOpen]);
 
   // Close when clicking outside on desktop
   useEffect(() => {
@@ -83,11 +119,9 @@ export function NotificationBell() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isOpen]);
 
-  // Filter notifications by tab
-  const filteredNotifications = notifications.filter((n) => {
-    if (activeTab === 'all') return true;
-    return n.type === activeTab;
-  });
+  // Tab filter counts & filtering
+  const tabCounts = calculateNotificationTabCounts(notifications);
+  const filteredNotifications = notifications.filter((n) => matchesNotificationTab(n.type, activeTab));
 
   const getIcon = (type: NotificationType) => {
     switch (type) {
@@ -180,7 +214,7 @@ export function NotificationBell() {
         </div>
       </div>
 
-      {/* Category Filter Tabs */}
+      {/* Category Filter Tabs with Strict Sum Math */}
       <div role="tablist" aria-label="أقسام الإشعارات" className="flex items-center gap-1.5 px-3 py-2 border-b border-slate-200 bg-slate-50 shrink-0 overflow-x-auto no-scrollbar">
         <button
           type="button"
@@ -190,10 +224,10 @@ export function NotificationBell() {
           className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer shrink-0 active:scale-95 ${
             activeTab === 'all'
               ? 'bg-blue-600 text-white shadow-xs'
-              : 'text-slate-600 bg-white hover:bg-slate-100 border border-slate-200/80'
+              : 'text-slate-600 bg-white hover:bg-slate-100 border border-slate-200'
           }`}
         >
-          الكل ({notifications.length})
+          الكل ({tabCounts.all})
         </button>
         <button
           type="button"
@@ -203,10 +237,10 @@ export function NotificationBell() {
           className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer shrink-0 active:scale-95 ${
             activeTab === 'lecture'
               ? 'bg-blue-600 text-white shadow-xs'
-              : 'text-slate-600 bg-white hover:bg-slate-100 border border-slate-200/80'
+              : 'text-slate-600 bg-white hover:bg-slate-100 border border-slate-200'
           }`}
         >
-          المحاضرات ({notifications.filter((n) => n.type === 'lecture').length})
+          المحاضرات ({tabCounts.lecture})
         </button>
         <button
           type="button"
@@ -216,10 +250,10 @@ export function NotificationBell() {
           className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer shrink-0 active:scale-95 ${
             activeTab === 'exam'
               ? 'bg-blue-600 text-white shadow-xs'
-              : 'text-slate-600 bg-white hover:bg-slate-100 border border-slate-200/80'
+              : 'text-slate-600 bg-white hover:bg-slate-100 border border-slate-200'
           }`}
         >
-          الاختبارات ({notifications.filter((n) => n.type === 'exam').length})
+          الاختبارات ({tabCounts.exam})
         </button>
         <button
           type="button"
@@ -229,14 +263,14 @@ export function NotificationBell() {
           className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer shrink-0 active:scale-95 ${
             activeTab === 'announcement'
               ? 'bg-blue-600 text-white shadow-xs'
-              : 'text-slate-600 bg-white hover:bg-slate-100 border border-slate-200/80'
+              : 'text-slate-600 bg-white hover:bg-slate-100 border border-slate-200'
           }`}
         >
-          إعلانات ({notifications.filter((n) => n.type === 'announcement').length})
+          إعلانات وتنبيهات ({tabCounts.announcement})
         </button>
       </div>
 
-      {/* Notifications Scrollable List */}
+      {/* Notifications Scrollable List - Strictly Opaque */}
       <div className="flex-1 overflow-y-auto divide-y divide-slate-100 p-2 sm:p-2.5 space-y-1.5 bg-white">
         {filteredNotifications.length > 0 ? (
           filteredNotifications.map((notif) => (
@@ -245,12 +279,12 @@ export function NotificationBell() {
               onClick={() => handleNotificationClick(notif)}
               className={`p-3 rounded-2xl transition-all cursor-pointer relative group flex items-start gap-3 active:scale-[0.99] ${
                 !notif.isRead
-                  ? 'bg-blue-50/80 border border-blue-200/80 shadow-2xs'
-                  : 'bg-white hover:bg-slate-50 border border-slate-100'
+                  ? 'bg-blue-50 border border-blue-200 shadow-2xs'
+                  : 'bg-white hover:bg-slate-50 border border-slate-200'
               }`}
             >
               {/* Icon */}
-              <div className="w-9 h-9 rounded-xl bg-white border border-slate-200/80 shadow-2xs flex items-center justify-center shrink-0 mt-0.5">
+              <div className="w-9 h-9 rounded-xl bg-white border border-slate-200 shadow-2xs flex items-center justify-center shrink-0 mt-0.5">
                 {getIcon(notif.type)}
               </div>
 
@@ -311,7 +345,7 @@ export function NotificationBell() {
           ))
         ) : (
           /* Empty state for the tab */
-          <div className="py-12 text-center">
+          <div className="py-12 text-center bg-white">
             <div className="w-12 h-12 rounded-2xl bg-slate-100 text-slate-600 flex items-center justify-center mx-auto mb-3">
               <Bell className="w-6 h-6" />
             </div>
@@ -350,16 +384,23 @@ export function NotificationBell() {
         )}
       </button>
 
-      {/* 1. Desktop Popover Dropdown (sm and up) */}
-      {isOpen && (
+      {/* 1. Desktop Popover Dropdown via React Portal directly into document.body with Strictly Opaque Surface */}
+      {mounted && isOpen && coords && createPortal(
         <div
           ref={desktopPanelRef}
           role="dialog"
           aria-label="الإشعارات الأكاديمية"
-          className="hidden sm:flex absolute left-0 top-12 z-[100] w-[420px] max-h-[580px] bg-white rounded-3xl border border-slate-200 shadow-2xl flex-col overflow-hidden animate-fadeIn"
+          style={{
+            position: 'fixed',
+            top: `${coords.top}px`,
+            left: `${coords.left}px`,
+            zIndex: 9999,
+          }}
+          className="hidden sm:flex w-[420px] max-h-[580px] bg-white rounded-3xl border border-slate-200 shadow-2xl flex-col overflow-hidden animate-fadeIn"
         >
           {renderPanelBody()}
-        </div>
+        </div>,
+        document.body
       )}
 
       {/* 2. Mobile Native Bottom Sheet via React Portal directly into document.body */}
@@ -367,13 +408,13 @@ export function NotificationBell() {
         <div className="sm:hidden" role="dialog" aria-modal="true" aria-label="الإشعارات الأكاديمية">
           {/* Backdrop Overlay covering whole viewport */}
           <div 
-            className="fixed inset-0 bg-black/60 backdrop-blur-xs z-[999] animate-fadeIn"
+            className="fixed inset-0 bg-black/60 z-[9998] animate-fadeIn"
             onClick={() => setIsOpen(false)}
           />
 
           {/* Bottom Sheet anchored to bottom of device screen */}
           <div
-            className="fixed inset-x-0 bottom-0 z-[1000] w-full max-h-[85vh] bg-white rounded-t-[28px] border-t border-slate-200/90 shadow-2xl flex flex-col overflow-hidden animate-slideUp"
+            className="fixed inset-x-0 bottom-0 z-[9999] w-full max-h-[85vh] bg-white rounded-t-[28px] border-t border-slate-200 shadow-2xl flex flex-col overflow-hidden animate-slideUp"
           >
             {/* Mobile Drag Indicator Handle */}
             <div className="w-full pt-2.5 pb-1 flex justify-center bg-gradient-to-l from-slate-900 to-[#172554] shrink-0">

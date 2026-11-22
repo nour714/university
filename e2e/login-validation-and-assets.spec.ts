@@ -6,24 +6,36 @@ test.describe('Login Validation, Arabic Errors & Asset Integrity', () => {
   });
 
   test('2.1 Form submission with empty fields shows accessible Arabic errors without native English tooltips', async ({ page }) => {
+    const inputIdentifier = page.locator('#loginIdentifier');
+    await expect(inputIdentifier).toHaveAttribute('maxlength', '14');
+
     // Attempt submit without typing any identifier
     const submitBtn = page.locator('button[type="submit"]');
     await submitBtn.click();
 
-    // Verify accessible Arabic error is displayed
+    // Verify accessible Arabic error is displayed for empty national ID
     const identifierAlert = page.locator('#loginIdentifierError');
     await expect(identifierAlert).toBeVisible();
-    await expect(identifierAlert).toContainText('يرجى إدخال الرقم الأكاديمي أو الرقم القومي');
-    await expect(page.locator('#loginIdentifier')).toHaveAttribute('aria-invalid', 'true');
+    await expect(identifierAlert).toContainText('يرجى إدخال الرقم القومي');
+    await expect(inputIdentifier).toHaveAttribute('aria-invalid', 'true');
 
-    // Fill identifier and attempt submit without password
-    await page.locator('#loginIdentifier').fill('20230814000000');
+    // Attempt submit with 8-digit academic ID (must be strictly rejected with 14-digit message)
+    await inputIdentifier.fill('20230814');
+    await submitBtn.click();
+    await expect(identifierAlert).toBeVisible();
+    await expect(identifierAlert).toContainText('يرجى إدخال الرقم القومي المكوّن من 14 رقماً');
+    await expect(inputIdentifier).toHaveAttribute('aria-invalid', 'true');
+
+    // Fill valid 14-digit national ID and attempt submit without password
+    await inputIdentifier.fill('30405120102513');
     await submitBtn.click();
 
     const passwordAlert = page.locator('#loginPasswordError');
     await expect(passwordAlert).toBeVisible();
     await expect(passwordAlert).toContainText('يرجى إدخال كلمة المرور');
     await expect(page.locator('#loginPassword')).toHaveAttribute('aria-invalid', 'true');
+    // Identifier error should be cleared
+    await expect(identifierAlert).not.toBeVisible();
   });
 
   test('2.2 All images on the login page load successfully with naturalWidth > 0', async ({ page }) => {

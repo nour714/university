@@ -3,9 +3,10 @@ import { setupTestDatabase, teardownTestDatabase, TestDbClients } from './setupT
 import * as passwordModule from '@/server/auth/password';
 import { hashPassword, verifyPassword, verifyDummyPassword } from '@/server/auth/password';
 import { createSession, validateSession, revokeSession, revokeAllAccountSessions } from '@/server/auth/session';
-import { normalizeIdentifier, maskIdentifier } from '@/lib/security/normalizeIdentifier';
+import { normalizeIdentifier, maskIdentifier, isValidNationalId } from '@/lib/security/normalizeIdentifier';
 import { isCommonPassword } from '@/lib/security/commonPasswords';
 import { checkRateLimit, getRateLimitCount } from '@/server/security/rateLimit';
+import { LoginSchema, NationalIdSchema, GENERIC_LOGIN_ERROR } from '@/lib/schemas';
 
 let mockClientIp = '127.0.0.1';
 const mockCookies = new Map<string, any>();
@@ -139,8 +140,8 @@ describe('Auth & Session Security Tests (Finding F8 / Task 7)', () => {
       const valid = await verifyPassword('WrongPassword123', existing.password_hash);
       expect(valid).toBe(false);
 
-      const GENERIC_ERROR = 'الرقم الأكاديمي أو الرقم القومي أو كلمة المرور غير صحيحة، أو تم تقييد المحاولات مؤقتاً';
-      expect(GENERIC_ERROR).toBe('الرقم الأكاديمي أو الرقم القومي أو كلمة المرور غير صحيحة، أو تم تقييد المحاولات مؤقتاً');
+      const GENERIC_ERROR = 'الرقم القومي أو كلمة المرور غير صحيحة، أو تم تقييد المحاولات مؤقتاً';
+      expect(GENERIC_ERROR).toBe(GENERIC_LOGIN_ERROR);
     });
 
     it('7.3(a) Attacker from IP 1 fails 20 logins on student national ID; student logs in successfully on 21st attempt from IP 2', async () => {
@@ -334,6 +335,112 @@ describe('Auth & Session Security Tests (Finding F8 / Task 7)', () => {
       expect(res3.allowed).toBe(true);
       expect(res4.allowed).toBe(false);
       expect(res4.remaining).toBe(0);
+    });
+  });
+
+  describe('Strict 14-Digit National ID Authentication & Normalization', () => {
+    it('should normalize Arabic-Indic digits, Persian digits, and strip spaces/hyphens', () => {
+      expect(normalizeIdentifier('٣٠٤٠٥١٢٠١٠٢٥١٣')).toBe('30405120102513');
+      expect(normalizeIdentifier('۳۰۴۰۵۱۲۰۱۰۲۵۱۳')).toBe('30405120102513');
+      expect(normalizeIdentifier(' 3040-5120-102513 ')).toBe('30405120102513');
+      expect(normalizeIdentifier('٣٠٤٠-٥١٢٠-١٠٢٥١٣')).toBe('30405120102513');
+      expect(normalizeIdentifier('')).toBe('');
+      expect(normalizeIdentifier(null as any)).toBe('');
+    });
+
+    it('should validate 14-digit national IDs with isValidNationalId', () => {
+      expect(isValidNationalId('30405120102513')).toBe(true);
+      expect(isValidNationalId('٣٠٤٠٥١٢٠١٠٢٥١٣')).toBe(true);
+      expect(isValidNationalId('۳۰۴۰۵۱۲۰۱۰۲۵۱۳')).toBe(true);
+      expect(isValidNationalId('3040-5120-102513')).toBe(true);
+      expect(isValidNationalId('20230814')).toBe(false); // 8-digit academic ID
+      expect(isValidNationalId('12345')).toBe(false);
+      expect(isValidNationalId('3040512010251399')).toBe(false); // 16 digits
+      expect(isValidNationalId('')).toBe(false);
+    });
+
+    it('should enforce 14-digit national ID in LoginSchema and NationalIdSchema', () => {
+      // 8-digit academic ID rejected with explicit Arabic error
+      const academicRes = LoginSchema.safeParse({
+        identifier: '20230814',
+        password: 'ValidPassword123!',
+      });
+      expect(academicRes.success).toBe(false);
+      if (!academicRes.success) {
+        expect(academicRes.error.issues[0]?.message).toBe('يرجى إدخال الرقم القومي المكوّن من 14 رقماً');
+      }
+
+      // Empty identifier rejected with explicit Arabic error
+      const emptyRes = LoginSchema.safeParse({
+        identifier: '',
+        password: 'ValidPassword123!',
+      });
+      expect(emptyRes.success).toBe(false);
+      if (!emptyRes.success) {
+        expect(emptyRes.error.issues[0]?.message).toBe('يرجى إدخال الرقم القومي');
+      }
+
+      // Valid 14-digit ASCII passes
+      const validAscii = LoginSchema.safeParse({
+        identifier: '30405120102513',
+        password: 'ValidPassword123!',
+      });
+      expect(validAscii.success).toBe(true);
+
+      // Valid 14-digit Arabic-Indic passes and normalizes
+      const validArabic = LoginSchema.safeParse({
+        identifier: '٣٠٤٠٥١٢٠١٠٢٥١٣',
+        password: 'ValidPassword123!',
+      });
+      expect(validArabic.success).toBe(true);
+      if (validArabic.success) {
+        expect(validArabic.data.identifier).toBe('30405120102513');
+      }
+
+      // nationalId alias passes
+      const validNationalIdField = LoginSchema.safeParse({
+        nationalId: '30405120102513',
+        password: 'ValidPassword123!',
+      });
+      expect(validNationalIdField.success).toBe(true);
+    });
+
+    it('should strictly reject attempting to log in with an 8-digit Academic ID (e.g., 20260001 or 20230814)', async () => {
+      mockClientIp = '10.99.1.1';
+      // Attempt login with valid student's 8-digit academic ID
+      const res = await loginAction({
+        identifier: testStudentCode, // '20260001'
+        password: testPassword,
+      });
+      expect(res.success).toBe(false);
+      if (!res.success) {
+        expect(res.error).toBe(GENERIC_LOGIN_ERROR);
+      }
+
+      // Attempt login with demo 8-digit academic ID 20230814
+      mockClientIp = '10.99.1.2';
+      const res2 = await loginAction({
+        identifier: '20230814',
+        password: 'AnyPassword123!',
+      });
+      expect(res2.success).toBe(false);
+      if (!res2.success) {
+        expect(res2.error).toBe(GENERIC_LOGIN_ERROR);
+      }
+    });
+
+    it('should normalize and authenticate cleanly with Arabic-Indic 14-digit National IDs (٣٠١٠...)', async () => {
+      mockClientIp = '10.99.2.1';
+      // Convert testNationalId '30101010101011' to Arabic-Indic digits
+      const arabicNationalId = '٣٠١٠١٠١٠١٠١٠١١';
+      const res = await loginAction({
+        identifier: arabicNationalId,
+        password: testPassword,
+      });
+      expect(res.success).toBe(true);
+      if (res.success) {
+        expect(res.mustChangePassword).toBe(false);
+      }
     });
   });
 });

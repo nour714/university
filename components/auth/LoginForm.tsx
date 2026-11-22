@@ -23,9 +23,10 @@ import { useNotifications } from '@/context/NotificationContext';
 import { loginAction, submitPublicSupportTicketAction } from '@/app/auth/actions';
 import { AuthCinematicShowcase } from '@/components/auth/AuthCinematicShowcase';
 import { getWhatsAppSupportUrl } from '@/lib/config/support';
+import { normalizeIdentifier } from '@/lib/security/normalizeIdentifier';
 
 const ISSUE_TYPES = [
-  { id: 'login_issue', label: 'صعوبة في تسجيل الدخول بالرقم الأكاديمي أو القومي', icon: User },
+  { id: 'login_issue', label: 'صعوبة في تسجيل الدخول بالرقم القومي', icon: User },
   { id: 'password_issue', label: 'نسيان أو فقدان كلمة المرور', icon: Lock },
   { id: 'account_inactive', label: 'الحساب غير مفعل لدى شؤون الطلاب', icon: GraduationCap },
   { id: 'technical_bug', label: 'عطل تقني أو خطأ في المنصة', icon: AlertCircle },
@@ -112,8 +113,12 @@ export function LoginForm({ reason: propReason }: LoginFormProps = {}) {
     setErrorMessage('');
     let hasError = false;
 
-    if (!identifier.trim()) {
-      setIdentifierError('يرجى إدخال الرقم الأكاديمي أو الرقم القومي');
+    const cleanId = normalizeIdentifier(identifier);
+    if (!cleanId) {
+      setIdentifierError('يرجى إدخال الرقم القومي');
+      hasError = true;
+    } else if (!/^\d{14}$/.test(cleanId)) {
+      setIdentifierError('يرجى إدخال الرقم القومي المكوّن من 14 رقماً');
       hasError = true;
     } else {
       setIdentifierError('');
@@ -332,23 +337,24 @@ export function LoginForm({ reason: propReason }: LoginFormProps = {}) {
 
             {/* Login Form */}
             <form onSubmit={handleSubmit} noValidate className="space-y-5">
-              {/* Field 1: Academic or National ID */}
+              {/* Field 1: National ID (14 digits) */}
               <div>
                 <label htmlFor="loginIdentifier" className="block text-xs font-bold text-slate-700 mb-2">
-                  الرقم الأكاديمي أو الرقم القومي <span className="text-rose-500">*</span>
+                  الرقم القومي <span className="text-rose-500">*</span>
                 </label>
                 <div className="relative">
                   <input
                     id="loginIdentifier"
                     type="text"
                     inputMode="numeric"
+                    maxLength={14}
                     autoComplete="username"
                     value={identifier}
                     onChange={(e) => {
                       setIdentifier(e.target.value);
                       if (identifierError) setIdentifierError('');
                     }}
-                    placeholder="مثال: 20230814 أو الرقم القومي المكون من 14 رقم"
+                    placeholder="مثال: 30405120102513 (14 رقم)"
                     aria-invalid={!!identifierError}
                     aria-describedby={identifierError ? "loginIdentifierError" : undefined}
                     className={`w-full h-10 sm:h-11 px-3.5 ps-9 rounded-xl bg-slate-50 border ${
@@ -581,14 +587,14 @@ export function LoginForm({ reason: propReason }: LoginFormProps = {}) {
                   {/* Field: Identifier / Phone */}
                   <div>
                     <label htmlFor="helpIdentifier" className="block text-xs font-bold text-slate-700 mb-1">
-                      الرقم الأكاديمي أو الرقم القومي أو رقم الهاتف للتواصل
+                      الرقم القومي أو رقم الهاتف للتواصل
                     </label>
                     <input
                       id="helpIdentifier"
                       type="text"
                       value={helpIdentifier}
                       onChange={(e) => setHelpIdentifier(e.target.value)}
-                      placeholder="مثال: 20230814 أو الرقم القومي 14 رقم أو 010xxxxxxxx"
+                      placeholder="مثال: 30405120102513 أو 010xxxxxxxx"
                       className="w-full h-10 px-3.5 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 text-xs text-slate-900 transition-all outline-hidden font-medium"
                     />
                   </div>
@@ -743,7 +749,7 @@ export function LoginForm({ reason: propReason }: LoginFormProps = {}) {
                 <div className="space-y-2 mb-4">
                   <a
                     href={getWhatsAppSupportUrl(
-                      `طلب دعم فني - تذكرة #${submittedTicketNo}\nالمعرف: ${helpIdentifier || 'غير مسجل'}\nالمشكلة: ${selectedIssue.label}\nالتفاصيل: ${helpMessage}`
+                      `طلب دعم فني - تذكرة #${submittedTicketNo}\nالرقم القومي/الهاتف: ${helpIdentifier || 'غير مسجل'}\nالمشكلة: ${selectedIssue.label}\nالتفاصيل: ${helpMessage}`
                     )}
                     target="_blank"
                     rel="noopener noreferrer"

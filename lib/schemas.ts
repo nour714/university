@@ -1,5 +1,51 @@
 import { z } from 'zod';
 import { safeInternalPath } from '@/lib/safeUrl';
+import { normalizeIdentifier, NATIONAL_ID_REGEX } from '@/lib/security/normalizeIdentifier';
+
+export const GENERIC_LOGIN_ERROR = 'الرقم القومي أو كلمة المرور غير صحيحة، أو تم تقييد المحاولات مؤقتاً';
+
+export const NationalIdSchema = z.preprocess(
+  (val) => (typeof val === 'string' ? val : ''),
+  z
+    .string()
+    .trim()
+    .min(1, 'يرجى إدخال الرقم القومي')
+    .transform((val) => normalizeIdentifier(val))
+    .refine((val) => NATIONAL_ID_REGEX.test(val), {
+      message: 'يرجى إدخال الرقم القومي المكوّن من 14 رقماً',
+    })
+);
+
+export const LoginSchema = z.preprocess(
+  (arg) => {
+    if (typeof arg === 'object' && arg !== null) {
+      const obj = arg as Record<string, unknown>;
+      const rawId = obj.identifier ?? obj.nationalId;
+      return {
+        ...obj,
+        identifier: typeof rawId === 'string' ? rawId : '',
+        password: typeof obj.password === 'string' ? obj.password : '',
+      };
+    }
+    return arg;
+  },
+  z.object({
+    identifier: z
+      .string()
+      .trim()
+      .min(1, 'يرجى إدخال الرقم القومي')
+      .transform((val) => normalizeIdentifier(val))
+      .refine((val) => NATIONAL_ID_REGEX.test(val), {
+        message: 'يرجى إدخال الرقم القومي المكوّن من 14 رقماً',
+      }),
+    nationalId: z.string().optional(),
+    password: z
+      .string()
+      .min(1, 'يرجى إدخال كلمة المرور')
+      .max(128),
+    turnstileToken: z.string().optional(),
+  })
+);
 
 export const StudentCodeSchema = z.object({
   id: z.string().max(500),

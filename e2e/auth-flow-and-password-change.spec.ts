@@ -28,11 +28,19 @@ test.describe('End-to-End Auth, mustChangePassword Gate, Portal Navigation & Log
     await page.goto('/login');
     await expect(page).toHaveURL(/\/login/);
 
+    const initialPassword = 'Student@2026';
+    const updatedPassword = 'NewSecurePassword2026!';
+
+    // 1.5 Verify that attempting login with 8-digit Academic ID is rejected
+    await page.locator('#loginIdentifier').fill('20230815');
+    await page.locator('#loginPassword').fill(initialPassword);
+    await page.locator('button[type="submit"]').click();
+    await expect(page.locator('#loginIdentifierError')).toBeVisible();
+    await expect(page.locator('#loginIdentifierError')).toContainText('يرجى إدخال الرقم القومي المكوّن من 14 رقماً');
+
     // 2. Login with seeded must_change_password=true student
     const testNationalId = isMobile ? '30409230104226' : '30405120102513';
     const studentName = isMobile ? 'ساره نبيل ابوالمجد' : 'نور الدين وائل عبدالرؤف';
-    const initialPassword = 'Student@2026';
-    const updatedPassword = 'NewSecurePassword2026!';
 
     await page.locator('#loginIdentifier').fill(testNationalId);
     await page.locator('#loginPassword').fill(initialPassword);

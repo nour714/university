@@ -32,18 +32,11 @@ import { verifyTurnstileToken } from '@/server/security/turnstile';
 import { extractClientIp } from '@/server/security/clientIp';
 import { env } from '@/lib/env';
 import { logger } from '@/lib/log';
-
-const LoginSchema = z.object({
-  identifier: z.string().trim().min(3, 'يرجى إدخال الرقم القومي أو الرقم الأكاديمي').max(50),
-  password: z.string().min(1, 'يرجى إدخال كلمة المرور').max(128),
-  turnstileToken: z.string().optional(),
-});
+import { LoginSchema, GENERIC_LOGIN_ERROR } from '@/lib/schemas';
 
 export type LoginActionResult =
   | { success: true; mustChangePassword: boolean }
   | { success: false; error: string };
-
-const GENERIC_LOGIN_ERROR = 'الرقم الأكاديمي أو الرقم القومي أو كلمة المرور غير صحيحة، أو تم تقييد المحاولات مؤقتاً';
 
 export async function loginAction(input: unknown): Promise<LoginActionResult> {
   try {
@@ -90,12 +83,11 @@ export async function loginAction(input: unknown): Promise<LoginActionResult> {
       }
     }
 
-    // 2. Fetch account by national_id or student_code
+    // 2. Fetch account strictly by national_id
     const [account] = await appSql`
       SELECT a.id, a.national_id, a.password_hash, a.must_change_password, a.failed_login_count, a.locked_until, a.is_active
       FROM public.academic_accounts a
-      LEFT JOIN public.academic_profiles p ON p.id = a.id
-      WHERE a.national_id = ${normId} OR p.student_code = ${normId}
+      WHERE a.national_id = ${normId}
     `;
 
     // 3. User enumeration & timing attack mitigation:
@@ -339,8 +331,7 @@ export async function submitPublicSupportTicketAction(
       const [matchedAccount] = await appSql`
         SELECT a.id
         FROM public.academic_accounts a
-        LEFT JOIN public.academic_profiles p ON p.id = a.id
-        WHERE a.national_id = ${normId} OR p.student_code = ${normId}
+        WHERE a.national_id = ${normId}
         LIMIT 1
       `;
       if (matchedAccount?.id) {
@@ -354,7 +345,7 @@ export async function submitPublicSupportTicketAction(
     };
 
     const subject = `[دعم تسجيل الدخول] ${issueInfo.label}${rawIdentifier ? ` - ${rawIdentifier}` : ''}`.slice(0, 150);
-    const fullMessage = `معرف الطالب/رقم التواصل: ${rawIdentifier || 'غير مسجل'}\nنوع المشكلة: ${issueInfo.label}\n\nنص البلاغ:\n${message}`.slice(0, 2000);
+    const fullMessage = `الرقم القومي للطالب/رقم التواصل: ${rawIdentifier || 'غير مسجل'}\nنوع المشكلة: ${issueInfo.label}\n\nنص البلاغ:\n${message}`.slice(0, 2000);
 
     const [ticket] = await appSql`
       INSERT INTO public.academic_support_tickets (

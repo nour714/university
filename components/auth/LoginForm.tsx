@@ -293,11 +293,11 @@ export function LoginForm({ reason: propReason }: LoginFormProps = {}) {
         {/* ========================================================= */}
         {/* RIGHT COLUMN: Interactive Login Form (Reduced to 46%)     */}
         {/* ========================================================= */}
-        <div className="w-full lg:w-[46%] p-3.5 sm:p-5 lg:p-6 flex flex-col justify-between bg-white shrink-0">
+        <div className="w-full lg:w-[46%] px-6 sm:px-10 py-8 sm:py-10 flex flex-col justify-center bg-white shrink-0">
           <div>
             {/* Form Title (Centered) */}
-            <div className="mb-2 sm:mb-3 text-center flex flex-col items-center">
-              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-700 text-[10px] sm:text-xs font-bold mb-1 border border-blue-200/60">
+            <div className="mb-7 text-center flex flex-col items-center space-y-3">
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-700 text-[10px] sm:text-xs font-bold border border-blue-200/60">
                 <GraduationCap className="w-3 h-3 text-blue-600" />
                 <span>العام الأكاديمي 2026/2027</span>
               </div>
@@ -331,10 +331,10 @@ export function LoginForm({ reason: propReason }: LoginFormProps = {}) {
             )}
 
             {/* Login Form */}
-            <form onSubmit={handleSubmit} noValidate className="space-y-2.5 sm:space-y-3.5">
+            <form onSubmit={handleSubmit} noValidate className="space-y-5">
               {/* Field 1: Academic or National ID */}
               <div>
-                <label htmlFor="loginIdentifier" className="block text-xs font-bold text-slate-700 mb-1">
+                <label htmlFor="loginIdentifier" className="block text-xs font-bold text-slate-700 mb-2">
                   الرقم الأكاديمي أو الرقم القومي <span className="text-rose-500">*</span>
                 </label>
                 <div className="relative">
@@ -367,7 +367,7 @@ export function LoginForm({ reason: propReason }: LoginFormProps = {}) {
 
               {/* Field 2: Password */}
               <div>
-                <div className="flex items-center justify-between mb-1">
+                <div className="flex items-center justify-between mb-2">
                   <label htmlFor="loginPassword" className="text-xs font-bold text-slate-700">
                     كلمة المرور <span className="text-rose-500">*</span>
                   </label>
@@ -419,7 +419,7 @@ export function LoginForm({ reason: propReason }: LoginFormProps = {}) {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full h-10 sm:h-11 rounded-xl bg-blue-600 hover:bg-blue-700 active:scale-[0.99] text-white font-extrabold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-md shadow-blue-600/30 transition-all cursor-pointer disabled:opacity-60 mt-1 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                className="w-full h-10 sm:h-11 rounded-xl bg-blue-600 hover:bg-blue-700 active:scale-[0.99] text-white font-extrabold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-md shadow-blue-600/30 transition-all cursor-pointer disabled:opacity-60 mt-6 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
               >
                 {isLoading ? (
                   <>
@@ -437,7 +437,7 @@ export function LoginForm({ reason: propReason }: LoginFormProps = {}) {
           </div>
 
           {/* Footer Assistance */}
-          <div className="mt-2.5 pt-2 border-t border-slate-100 flex items-center justify-center text-[11px] text-slate-500 font-medium">
+          <div className="mt-7 pt-5 border-t border-slate-100 flex items-center justify-center text-[11px] text-slate-500 font-medium">
             <div className="flex items-center gap-1.5">
               <HelpCircle className="w-3.5 h-3.5 text-slate-600" />
               <span>تواجه صعوبة في الدخول؟</span>

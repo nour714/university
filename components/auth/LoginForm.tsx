@@ -354,7 +354,7 @@ export function LoginForm({ reason: propReason }: LoginFormProps = {}) {
                       setIdentifier(e.target.value);
                       if (identifierError) setIdentifierError('');
                     }}
-                    placeholder="مثال: 30405120102513 (14 رقم)"
+                    placeholder="أدخل الرقم القومي"
                     aria-invalid={!!identifierError}
                     aria-describedby={identifierError ? "loginIdentifierError" : undefined}
                     className={`w-full h-10 sm:h-11 px-3.5 ps-9 rounded-xl bg-slate-50 border ${

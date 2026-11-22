@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef } from 'react';
-import { Exam, GradeResult } from '@/types/exam';
+import { Exam, GradeResult, ExamReviewData } from '@/types/exam';
 import { ExamSession } from '@/components/exams/ExamSession';
 import { ExamResultView } from '@/components/exams/ExamResultView';
 import { gradeExam } from '@/app/exams/actions';
@@ -11,9 +11,10 @@ interface ExamContainerProps {
   exam: Exam;
   initialView?: 'session' | 'result';
   initialResult?: GradeResult;
+  initialReview?: ExamReviewData;
 }
 
-export function ExamContainer({ exam, initialView, initialResult }: ExamContainerProps) {
+export function ExamContainer({ exam, initialView, initialResult, initialReview }: ExamContainerProps) {
   // If exam was completed previously or explicitly opened as result
   const defaultView = initialView || (exam.submission ? 'result' : 'session');
   const [view, setView] = useState<'session' | 'result'>(defaultView);
@@ -96,6 +97,7 @@ export function ExamContainer({ exam, initialView, initialResult }: ExamContaine
           result={gradeResult}
           isAutoSubmitted={isAutoSubmitted}
           submissionTime={submissionTime}
+          initialReview={initialReview}
         />
       </div>
     );

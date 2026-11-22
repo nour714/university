@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { ListExam, ExamStatus } from '@/types/exam';
 import { getExamStatus } from '@/lib/exams/status';
+import { getGradeLabel } from '@/lib/exams/grade';
 import { 
   ClipboardCheck, 
   Clock, 
@@ -213,17 +214,20 @@ export function ExamCard({ exam }: ExamCardProps) {
             </div>
           )}
 
-          {isCompleted && exam.submission && (
-            <div className="flex flex-wrap items-center gap-2 text-slate-700">
-              <span className="text-slate-500 text-xs">درجتك المحققة:</span>
-              <span className="font-extrabold text-blue-600 text-sm">
-                {exam.submission.score} / {exam.submission.totalMarks}
-              </span>
-              <span className="text-[11px] px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 font-bold">
-                {exam.submission.percentage}% ممتاز
-              </span>
-            </div>
-          )}
+          {isCompleted && exam.submission && (() => {
+            const grade = getGradeLabel(exam.submission.percentage);
+            return (
+              <div className="flex flex-wrap items-center gap-2 text-slate-700">
+                <span className="text-slate-500 text-xs">درجتك المحققة:</span>
+                <span className="font-extrabold text-blue-600 text-sm">
+                  {exam.submission.score} / {exam.submission.totalMarks}
+                </span>
+                <span className={`text-[11px] px-2 py-0.5 rounded-full border font-bold ${grade.badgeClass}`}>
+                  {exam.submission.percentage}% {grade.label}
+                </span>
+              </div>
+            );
+          })()}
         </div>
 
         {/* Buttons */}

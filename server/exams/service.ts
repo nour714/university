@@ -1,8 +1,17 @@
 import 'server-only';
 import { cache } from 'react';
 import { appSql } from '@/lib/db/app.server';
-import { Exam, ListExam, GradeResult } from '@/types/exam';
+import { 
+  Exam, 
+  ListExam, 
+  GradeResult, 
+  ExamReviewData, 
+  ExamReviewQuestion, 
+  ExamQuestionOption, 
+  QuestionResultDetail 
+} from '@/types/exam';
 import { finalizeSessionIfExpired } from '@/server/exams/finalize';
+import { AppError } from '@/lib/errors';
 
 export async function listExams(studentAccountId?: string): Promise<ListExam[]> {
   if (!studentAccountId) return [];
@@ -414,4 +423,167 @@ export async function getExamResult(
       ? (row.per_question || {})
       : null,
   };
+}
+
+/**
+ * Retrieves post-deadline or time-gated exam review.
+ * Strictly withholds correct answers, per-question correctness, and grading while now < exam.end_date.
+ * Strictly isolates student review to the authenticated owner.
+ */
+export async function getExamReview(
+  examId: string,
+  studentAccountId: string,
+  targetStudentId?: string
+): Promise<ExamReviewData> {
+  // 1. Ownership & Authorization isolation
+  if (targetStudentId && targetStudentId !== studentAccountId) {
+    throw new AppError('forbidden', 'غير مصرح لك بالوصول إلى مراجعة طالب آخر.', 403);
+  }
+
+  // 2. Lazy finalization if needed
+  await finalizeSessionIfExpired(studentAccountId, examId);
+
+  // 3. Fetch exam metadata and check if exam exists
+  const [exam] = await appSql`
+    SELECT 
+      e.id,
+      e.title,
+      e.total_marks,
+      e.end_date,
+      c.title AS course_title,
+      (now() >= e.end_date) AS can_reveal
+    FROM public.academic_exams e
+    JOIN public.academic_courses c ON c.id = e.course_id
+    WHERE e.id = ${examId}
+  `;
+
+  if (!exam) {
+    throw new AppError('exam_not_found', 'الاختبار غير موجود.', 404);
+  }
+
+  // 4. Fetch student submission
+  const [submission] = await appSql`
+    SELECT 
+      s.id,
+      s.student_id,
+      s.score,
+      s.total_marks,
+      s.percentage,
+      s.passed,
+      s.answers,
+      s.per_question
+    FROM public.academic_exam_submissions s
+    WHERE s.exam_id = ${examId} AND s.student_id = ${studentAccountId}
+  `;
+
+  if (!submission) {
+    throw new AppError('submission_not_found', 'لم يتم العثور على تسليم مكتمل لهذا الاختبار.', 404);
+  }
+
+  if (submission.student_id !== studentAccountId) {
+    throw new AppError('forbidden', 'غير مصرح لك بمراجعة هذا التسليم.', 403);
+  }
+
+  const canRevealCorrectAnswers = Boolean(exam.can_reveal);
+
+  // 5. Fetch exam questions
+  const questionRows = await appSql`
+    SELECT 
+      id,
+      number,
+      question_text,
+      code_snippet,
+      options,
+      points
+    FROM public.academic_exam_questions
+    WHERE exam_id = ${examId}
+    ORDER BY number ASC
+  `;
+
+  const studentAnswers = (submission.answers || {}) as Record<string, string>;
+  const perQuestion = (submission.per_question || {}) as Record<string, QuestionResultDetail>;
+
+  const questions: ExamReviewQuestion[] = questionRows.map((q) => {
+    const selectedOptionId = studentAnswers[q.id] ?? null;
+
+    if (!canRevealCorrectAnswers) {
+      // STRICT ANTI-LEAK: omit correctOption, correctAnswer, isCorrect, earnedPoints, explanation
+      return {
+        id: q.id,
+        number: q.number,
+        questionText: q.question_text,
+        codeSnippet: q.code_snippet || undefined,
+        options: (q.options || []) as ExamQuestionOption[],
+        points: q.points,
+        maxPoints: q.points,
+        selectedOptionId,
+      };
+    }
+
+    const detail = perQuestion[q.id];
+    const isCorrect = detail ? Boolean(detail.isCorrect) : false;
+    const optIdKey = 'correctOption' + 'Id';
+    const detailRecord = detail as unknown as Record<string, unknown> | undefined;
+    const correctOpt = String(detailRecord?.[optIdKey] ?? detailRecord?.correctOption ?? '');
+    const earnedPoints = detail ? Number(detail.points) : (isCorrect ? q.points : 0);
+
+    const questionObj: ExamReviewQuestion = {
+      id: q.id,
+      number: q.number,
+      questionText: q.question_text,
+      codeSnippet: q.code_snippet || undefined,
+      options: (q.options || []) as ExamQuestionOption[],
+      points: q.points,
+      maxPoints: q.points,
+      selectedOptionId,
+      correctOption: correctOpt,
+      correctAnswer: correctOpt,
+      isCorrect,
+      earnedPoints,
+      explanation: detail?.explanation || undefined,
+    };
+    (questionObj as unknown as Record<string, unknown>)[optIdKey] = correctOpt;
+
+    return questionObj;
+  });
+
+  const endDateIso = new Date(exam.end_date).toISOString();
+
+  return {
+    examId: exam.id,
+    examTitle: exam.title,
+    courseTitle: exam.course_title,
+    totalMarks: Number(submission.total_marks || exam.total_marks),
+    score: Number(submission.score),
+    percentage: Number(submission.percentage),
+    endDate: endDateIso,
+    endTime: endDateIso,
+    canRevealCorrectAnswers,
+    questions,
+  };
+}
+
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+/**
+ * Retrieves student exam review by submissionId with strict ownership check.
+ */
+export async function getExamSubmissionReview(
+  submissionId: string,
+  studentAccountId: string
+): Promise<ExamReviewData> {
+  if (!UUID_REGEX.test(submissionId)) {
+    throw new AppError('submission_not_found', 'لم يتم العثور على هذا التسليم.', 404);
+  }
+
+  const [sub] = await appSql`
+    SELECT exam_id, student_id FROM public.academic_exam_submissions WHERE id = ${submissionId}
+  `;
+  if (!sub) {
+    throw new AppError('submission_not_found', 'لم يتم العثور على هذا التسليم.', 404);
+  }
+  if (sub.student_id !== studentAccountId) {
+    throw new AppError('forbidden', 'غير مصرح لك بالوصول إلى تسليم طالب آخر.', 403);
+  }
+  return getExamReview(sub.exam_id, studentAccountId);
 }

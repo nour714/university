@@ -2,7 +2,8 @@ import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { setupTestDatabase, teardownTestDatabase, TestDbClients } from './setupTestDb';
 import { getStudentProfile } from '@/server/students/service';
 import { listCourses, getCourseById } from '@/server/courses/service';
-import { listExams, getPublicExamById } from '@/server/exams/service';
+import { listExams, getPublicExamById, getExamReview } from '@/server/exams/service';
+import { submitAndGradeExam } from '@/server/exams/submit';
 import { listStudentCodes } from '@/server/codes/service';
 import { listNotificationsForStudent } from '@/server/notifications/service';
 
@@ -144,6 +145,53 @@ describe('Response Leak Scanner across Services & Server Endpoints', () => {
     expect(exam).toBeDefined();
     expect(exam?.questions).toEqual([]);
     assertNoLeak(exam, 'getPublicExamById');
+  });
+
+  it('getExamReview before deadline strictly isolates review without leaking answer keys or correctness', async () => {
+    // Start session and submit exam while deadline is in the future
+    await clients.ownerSql`
+      INSERT INTO public.academic_exam_sessions (id, student_id, exam_id, end_at, answers)
+      VALUES (
+        '70000000-0000-0000-0000-000000000099'::uuid,
+        ${testStudentId},
+        ${testExamId},
+        now() + interval '1 hour',
+        '{}'::jsonb
+      ) ON CONFLICT (student_id, exam_id) DO NOTHING;
+    `;
+
+    await submitAndGradeExam(testExamId, testStudentId, { [testQId]: 'opt-leak-a' });
+
+    // Review before deadline (now < end_date)
+    const review = await getExamReview(testExamId, testStudentId);
+    expect(review).toBeDefined();
+    expect(review.canRevealCorrectAnswers).toBe(false);
+
+    // Assert serialized JSON payload has no leak of private schema, credentials, or grading
+    const jsonStr = JSON.stringify(review);
+    const LEAK_KEYS = [
+      'password_hash',
+      'passwordHash',
+      'secretpasswordhash',
+      'token_hash',
+      'tokenHash',
+      'storage_key',
+      'storageKey',
+      'postgres://',
+      'academic_private',
+      'exam_keys',
+      'correct_option_id',
+      'correctOptionId',
+      'correctOption',
+      'correctAnswer',
+      'isCorrect',
+      'earnedPoints',
+      'explanation',
+    ];
+    for (const key of LEAK_KEYS) {
+      expect(jsonStr).not.toContain(`"${key}"`);
+      expect(jsonStr).not.toContain(`${key}:`);
+    }
   });
 
   it('listStudentCodes does not leak sensitive private keys', async () => {

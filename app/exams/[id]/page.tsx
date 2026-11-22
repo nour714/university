@@ -1,10 +1,10 @@
 import { notFound, redirect } from 'next/navigation';
 import { connection } from 'next/server';
 import { requireAuth } from '@/server/auth/requireAuth';
-import { getPublicExamById, getExamResult } from '@/server/exams/service';
+import { getPublicExamById, getExamResult, getExamReview } from '@/server/exams/service';
 import { ExamContainer } from '@/components/exams/ExamContainer';
 import { getExamStatus } from '@/lib/exams/status';
-import { GradeResult } from '@/types/exam';
+import { GradeResult, ExamReviewData } from '@/types/exam';
 
 interface ExamDetailPageProps {
   params: Promise<{
@@ -63,10 +63,16 @@ export default async function ExamDetailPage({ params, searchParams }: ExamDetai
 
   // Finding E2: fetch real stored submission metrics instead of hard-coded zeros
   let initialResult: GradeResult | undefined;
+  let initialReview: ExamReviewData | undefined;
   if (currentStatus === 'completed' || exam.submission || resolvedSearchParams?.view === 'result') {
     const storedResult = await getExamResult(id, student.accountId);
     if (storedResult) {
       initialResult = storedResult;
+    }
+    try {
+      initialReview = await getExamReview(id, student.accountId);
+    } catch {
+      // Review can be fetched on demand if needed
     }
   }
 
@@ -77,6 +83,7 @@ export default async function ExamDetailPage({ params, searchParams }: ExamDetai
       exam={exam}
       initialView={initialView}
       initialResult={initialResult}
+      initialReview={initialReview}
     />
   );
 }

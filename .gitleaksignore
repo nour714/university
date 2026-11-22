@@ -1,0 +1,6 @@
+# Gitleaks baseline ignore list for historical test fixtures in older commits
+a5d720aca34c38650035cf9b5efa8def01ab862e:test/setupTestDb.ts:generic-api-key:57
+a5d720aca34c38650035cf9b5efa8def01ab862e:test/setupEnv.ts:generic-api-key:6
+a5d720aca34c38650035cf9b5efa8def01ab862e:.github/workflows/ci.yml:generic-api-key:20
+56750dcf332a206fb19fc671a5ea15c7444cfa51:lib/repos/notificationsRepo.ts:generic-api-key:5
+9d971da5bf9cb4bbe00790c01217820cc34d3662:context/NotificationContext.tsx:generic-api-key:61

@@ -51,6 +51,7 @@ export interface Exam {
   passingMarks: number;
   startDate: string; // ISO string e.g. 2026-11-06T10:00:00+02:00
   endDate: string;   // ISO string e.g. 2026-11-06T12:00:00+02:00
+  endTime?: string;  // Alias for endDate
   status?: ExamStatus;
   questions: ExamQuestion[];
   instructions: string[];
@@ -66,3 +67,34 @@ export interface Exam {
 }
 
 export type ListExam = Omit<Exam, 'questions'>;
+
+export interface ExamReviewQuestion {
+  id: string;
+  number: number;
+  questionText: string;
+  codeSnippet?: string;
+  options: ExamQuestionOption[];
+  points: number;
+  maxPoints: number;
+  selectedOptionId: string | null;
+  // Omitted before deadline (now < exam.endTime)
+  correctOptionId?: string;
+  correctOption?: string;
+  correctAnswer?: string;
+  isCorrect?: boolean;
+  earnedPoints?: number;
+  explanation?: string;
+}
+
+export interface ExamReviewData {
+  examId: string;
+  examTitle: string;
+  courseTitle: string;
+  totalMarks: number;
+  score: number;
+  percentage: number;
+  endDate: string;
+  endTime: string;
+  canRevealCorrectAnswers: boolean;
+  questions: ExamReviewQuestion[];
+}

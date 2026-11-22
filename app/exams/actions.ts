@@ -1,12 +1,17 @@
 'use server';
 
 import 'server-only';
-import { GradeResult } from '@/types/exam';
+import { GradeResult, ExamReviewData } from '@/types/exam';
 import { ExamSubmissionActionSchema, ExamAnswersSchema } from '@/lib/schemas';
 import { requireAuth } from '@/server/auth/requireAuth';
 import { submitAndGradeExam } from '@/server/exams/submit';
-import { startOrResumeExamSession, saveExamAnswers, getExamResult } from '@/server/exams/service';
-import { toSafeErrorMessage } from '@/lib/errors';
+import { 
+  startOrResumeExamSession, 
+  saveExamAnswers, 
+  getExamResult,
+  getExamReview 
+} from '@/server/exams/service';
+import { AppError, toSafeErrorMessage } from '@/lib/errors';
 
 /**
  * Starts or resumes an exam session securely on the database.
@@ -65,4 +70,25 @@ export async function gradeExam(
 export async function getExamResultAction(examId: string): Promise<GradeResult | null> {
   const student = await requireAuth();
   return await getExamResult(examId, student.accountId);
+}
+
+/**
+ * Retrieves student exam review data.
+ * Strictly withholds correct answers and per-question grading while now < exam.end_date.
+ * Strictly enforces ownership.
+ */
+export async function getExamReviewAction(
+  examId: string,
+  targetStudentId?: string
+): Promise<ExamReviewData | { error: string; code?: string }> {
+  const student = await requireAuth();
+
+  try {
+    const review = await getExamReview(examId, student.accountId, targetStudentId);
+    return review;
+  } catch (err: unknown) {
+    const message = toSafeErrorMessage(err, 'تعذر تحميل مراجعة الإجابات.');
+    const code = err instanceof AppError ? err.code : 'review_error';
+    return { error: message, code };
+  }
 }

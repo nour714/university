@@ -19,6 +19,7 @@ const EnvSchema = z.object({
   // Optional Cloudflare Turnstile
   TURNSTILE_SECRET_KEY: z.string().optional(),
   NEXT_PUBLIC_TURNSTILE_SITE_KEY: z.string().optional(),
+  TURNSTILE_DISABLED: z.enum(['true', 'false']).optional(),
 
   // Database Connection Configuration
   DB_SSL: z

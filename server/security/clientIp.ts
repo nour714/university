@@ -1,37 +1,54 @@
 import 'server-only';
+import { isIP } from 'node:net';
 
 /**
  * Extracts and sanitizes client IP address from request headers.
- * Prioritizes trusted provider headers (x-real-ip / cf-connecting-ip)
- * over client-controllable x-forwarded-for chains to prevent IP spoofing & rate limit bypasses.
+ * Prioritizes verified platform edge headers based on runtime environment.
+ * On Vercel, x-vercel-forwarded-for is set by the edge infrastructure and cannot be spoofed by clients.
  */
 export function extractClientIp(h: Headers): string {
-  // 1. Trusted provider edge headers (Vercel, Cloudflare, AWS ALB)
-  const realIp = h.get('x-real-ip')?.trim();
-  if (realIp && isValidIp(realIp)) {
-    return realIp;
-  }
+  const isVercel = process.env.VERCEL === '1';
 
-  const cfIp = h.get('cf-connecting-ip')?.trim();
-  if (cfIp && isValidIp(cfIp)) {
-    return cfIp;
-  }
+  if (isVercel) {
+    // 1. On Vercel: strictly prioritize verified edge headers
+    const vercelForwarded = h.get('x-vercel-forwarded-for');
+    if (vercelForwarded) {
+      const candidate = vercelForwarded.split(',')[0].trim();
+      if (isIP(candidate) !== 0) {
+        return candidate;
+      }
+    }
 
-  // 2. x-forwarded-for fallback
-  const rawForwarded = h.get('x-forwarded-for');
-  if (rawForwarded) {
-    const parts = rawForwarded.split(',').map((p) => p.trim()).filter(Boolean);
-    if (parts.length > 0 && isValidIp(parts[0])) {
-      return parts[0];
+    const realIp = h.get('x-real-ip')?.trim();
+    if (realIp && isIP(realIp) !== 0) {
+      return realIp;
+    }
+
+    // Do NOT trust client-spoofable cf-connecting-ip or arbitrary x-forwarded-for ahead of Vercel headers
+  } else {
+    // 2. Outside Vercel (standalone / reverse proxy):
+    const realIp = h.get('x-real-ip')?.trim();
+    if (realIp && isIP(realIp) !== 0) {
+      return realIp;
+    }
+
+    const cfIp = h.get('cf-connecting-ip')?.trim();
+    if (cfIp && isIP(cfIp) !== 0) {
+      return cfIp;
+    }
+
+    const rawForwarded = h.get('x-forwarded-for');
+    if (rawForwarded) {
+      const parts = rawForwarded.split(',').map((p) => p.trim()).filter(Boolean);
+      for (const part of parts) {
+        if (isIP(part) !== 0) {
+          return part;
+        }
+      }
     }
   }
 
-  return '127.0.0.1';
+  // 3. Fallback: in production, use distinct 'unknown' token to avoid collision with localhost test buckets
+  return process.env.NODE_ENV === 'production' ? 'unknown' : '127.0.0.1';
 }
 
-function isValidIp(ip: string): boolean {
-  // Basic IPv4 & IPv6 validation
-  const ipv4Regex = /^(\d{1,3}\.){3}\d{1,3}$/;
-  const ipv6Regex = /^[0-9a-fA-F:]+$/;
-  return ipv4Regex.test(ip) || ipv6Regex.test(ip);
-}

@@ -1,8 +1,11 @@
 import 'server-only';
 import crypto from 'node:crypto';
 import { cache } from 'react';
+import type postgres from 'postgres';
 import { appSql } from '@/lib/db/app.server';
 import { StudentProfile } from '@/types/student';
+
+export type DbClient = postgres.Sql | postgres.TransactionSql;
 
 export interface AuthenticatedStudent {
   accountId: string;
@@ -27,7 +30,8 @@ export interface AuthenticatedStudent {
  */
 export async function createSession(
   accountId: string,
-  meta?: { ip?: string | null; userAgent?: string | null }
+  meta?: { ip?: string | null; userAgent?: string | null },
+  tx: DbClient = appSql
 ): Promise<string> {
   const token = crypto.randomBytes(32).toString('hex');
   const tokenHash = crypto.createHash('sha256').update(token).digest();
@@ -42,7 +46,7 @@ export async function createSession(
     }
   }
 
-  await appSql`
+  await tx`
     INSERT INTO public.academic_sessions (
       account_id,
       token_hash,
@@ -189,11 +193,15 @@ export async function revokeSession(rawToken: string): Promise<void> {
  * Revokes active sessions for an account (e.g. upon password change).
  * If exceptToken is provided, leaves that token active.
  */
-export async function revokeAllAccountSessions(accountId: string, exceptToken?: string): Promise<void> {
+export async function revokeAllAccountSessions(
+  accountId: string,
+  exceptToken?: string,
+  tx: DbClient = appSql
+): Promise<void> {
   const exceptHash = exceptToken ? crypto.createHash('sha256').update(exceptToken).digest() : null;
 
   if (exceptHash) {
-    await appSql`
+    await tx`
       UPDATE public.academic_sessions
          SET revoked_at = now()
        WHERE account_id = ${accountId}
@@ -201,7 +209,7 @@ export async function revokeAllAccountSessions(accountId: string, exceptToken?: 
          AND revoked_at IS NULL
     `;
   } else {
-    await appSql`
+    await tx`
       UPDATE public.academic_sessions
          SET revoked_at = now()
        WHERE account_id = ${accountId}

@@ -8,10 +8,9 @@ export const maxDuration = 30;
 
 function verifyToken(authHeader: string, secret: string): boolean {
   const expected = `Bearer ${secret}`;
-  const authBuf = Buffer.from(authHeader);
-  const expBuf = Buffer.from(expected);
-  if (authBuf.length !== expBuf.length) return false;
-  return crypto.timingSafeEqual(authBuf, expBuf);
+  const authHash = crypto.createHash('sha256').update(authHeader).digest();
+  const expHash = crypto.createHash('sha256').update(expected).digest();
+  return crypto.timingSafeEqual(authHash, expHash);
 }
 
 function verifyCronAuth(authHeader: string | null): boolean {

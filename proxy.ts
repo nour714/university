@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
+import crypto from 'node:crypto';
 
 const isE2EHttp = process.env.E2E_HTTP_ONLY === '1';
 
@@ -55,7 +56,37 @@ export function proxy(request: NextRequest) {
     }
   }
 
-  return NextResponse.next();
+  // 4. Generate per-request cryptographic nonce for CSP
+  const nonce = Buffer.from(crypto.randomUUID()).toString('base64');
+  const isDev = process.env.NODE_ENV === 'development';
+
+  const cspHeader = `
+    default-src 'self';
+    script-src 'self' 'nonce-${nonce}' 'strict-dynamic' https://challenges.cloudflare.com${isDev ? " 'unsafe-eval'" : ''};
+    style-src 'self' 'unsafe-inline';
+    img-src 'self' data: blob:;
+    media-src 'self' https:;
+    font-src 'self' data:;
+    object-src 'none';
+    base-uri 'self';
+    form-action 'self';
+    frame-src 'self' https://challenges.cloudflare.com;
+    connect-src 'self' https://challenges.cloudflare.com;
+    frame-ancestors 'none';
+  `.replace(/\s{2,}/g, ' ').trim();
+
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set('x-nonce', nonce);
+  requestHeaders.set('Content-Security-Policy', cspHeader);
+
+  const response = NextResponse.next({
+    request: {
+      headers: requestHeaders,
+    },
+  });
+  response.headers.set('Content-Security-Policy', cspHeader);
+
+  return response;
 }
 
 export const config = {

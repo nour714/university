@@ -266,10 +266,10 @@ export async function changePasswordAction(
        WHERE id = ${student.accountId}
     `;
 
-    const newToken = await createSession(student.accountId, { ip: clientIp, userAgent });
+    const newToken = await createSession(student.accountId, { ip: clientIp, userAgent }, sql);
     await setSessionCookie(newToken);
     await clearMustChangePasswordCookie();
-    await revokeAllAccountSessions(student.accountId, newToken);
+    await revokeAllAccountSessions(student.accountId, newToken, sql);
 
     await sql`
       INSERT INTO academic_private.audit_log (actor, action, details)

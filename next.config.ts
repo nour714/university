@@ -1,7 +1,7 @@
 import type { NextConfig } from "next";
 
 // Hardened Content-Security-Policy (Eliminated 'unsafe-eval' completely)
-const cspHeader = `default-src 'self'; img-src 'self' data:; media-src 'self' https:; font-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none'`;
+const cspHeader = `default-src 'self'; img-src 'self' data: blob:; media-src 'self' https:; font-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com; frame-src 'self' https://challenges.cloudflare.com; connect-src 'self' https://challenges.cloudflare.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none'`;
 
 const nextConfig: NextConfig = {
   /* config options here */
@@ -22,7 +22,9 @@ const nextConfig: NextConfig = {
     agentUpgrade: 'security',
     serverActions: {
       bodySizeLimit: '200kb',
-      allowedOrigins: process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',').map(s => s.trim()) : undefined,
+      allowedOrigins: process.env.ALLOWED_ORIGINS
+        ? process.env.ALLOWED_ORIGINS.split(',').map((s) => s.trim()).filter(Boolean)
+        : undefined,
     },
   },
   async headers() {

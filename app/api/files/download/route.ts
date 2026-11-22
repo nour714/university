@@ -80,8 +80,9 @@ export async function GET(request: Request) {
       // Non-blocking audit
     }
 
-    const cleanFormat = (content.format || 'bin').toLowerCase();
-    const safeAscii = `${content.title.replace(/[^\x20-\x7E]/g, '_').substring(0, 45)}.${cleanFormat}`;
+    const cleanFormat = (content.format || 'bin').toLowerCase().replace(/["';\r\n\\]/g, '');
+    const cleanTitle = content.title.replace(/["';\r\n\\]/g, '_').replace(/[^\x20-\x7E]/g, '_');
+    const safeAscii = `${cleanTitle.substring(0, 45)}.${cleanFormat}`;
     const utf8Filename = encodeURIComponent(`${content.title}.${cleanFormat}`);
     const disposition = `inline; filename="${safeAscii}"; filename*=UTF-8''${utf8Filename}`;
 
@@ -104,7 +105,7 @@ export async function GET(request: Request) {
     // 4. Validated HTTPS external URL redirect if present
     if (content.externalUrl && isSafeExternalUrl(content.externalUrl)) {
       try {
-        const parsedUrl = new URL(content.externalUrl);
+        const parsedUrl = new URL(content.externalUrl, request.url);
         return NextResponse.redirect(parsedUrl.toString());
       } catch {
         // Malformed URL falls through to preview generator
@@ -131,7 +132,7 @@ export async function GET(request: Request) {
         headers: {
           'Content-Type': 'image/svg+xml; charset=utf-8',
           'Content-Disposition': `inline; filename="${safeAscii}.svg"; filename*=UTF-8''${utf8Filename}.svg`,
-          'Cache-Control': 'public, max-age=3600',
+          'Cache-Control': 'private, no-store',
         },
       });
     }
@@ -150,7 +151,7 @@ export async function GET(request: Request) {
         headers: {
           'Content-Type': 'application/pdf',
           'Content-Disposition': `inline; filename="${safeAscii}.pdf"; filename*=UTF-8''${utf8Filename}.pdf`,
-          'Cache-Control': 'public, max-age=3600',
+          'Cache-Control': 'private, no-store',
         },
       });
     }
@@ -167,6 +168,7 @@ export async function GET(request: Request) {
         status: 200,
         headers: {
           'Content-Type': 'text/html; charset=utf-8',
+          'Cache-Control': 'private, no-store',
         },
       });
     }

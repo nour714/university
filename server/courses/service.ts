@@ -255,6 +255,7 @@ export interface ContentDownloadResolution {
     id: string;
     courseId: string;
     title: string;
+    type?: string;
     format: string;
     storageKey?: string | null;
     externalUrl?: string | null;
@@ -270,7 +271,7 @@ export async function resolveContentDownload(
   studentAccountId: string
 ): Promise<ContentDownloadResolution> {
   const [content] = await appSql`
-    SELECT id, course_id, title, format, storage_key, external_url
+    SELECT id, course_id, title, type, format, storage_key, external_url
     FROM public.academic_course_contents
     WHERE id = ${contentId}
   `;
@@ -296,6 +297,7 @@ export async function resolveContentDownload(
       id: content.id,
       courseId: content.course_id,
       title: content.title,
+      type: content.type,
       format: content.format,
       storageKey: content.storage_key,
       externalUrl: content.external_url,

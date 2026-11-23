@@ -162,6 +162,8 @@ export async function GET(request: Request) {
       const html = renderFallbackHtml({
         title: content.title,
         courseId: content.courseId,
+        format: content.format,
+        type: content.type,
       });
 
       return new NextResponse(html, {

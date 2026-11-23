@@ -326,6 +326,8 @@ export function generateDemoSvg(content: {
 export function renderFallbackHtml(content: {
   title: string;
   courseId?: string;
+  format?: string;
+  type?: string;
 }): string {
   const safeTitle = content.title
     .replace(/&/g, '&amp;')
@@ -333,6 +335,9 @@ export function renderFallbackHtml(content: {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;');
   const courseHref = content.courseId ? `/courses/${encodeURIComponent(content.courseId)}` : '/';
+
+  // Determine crisp inline SVG icon based on content format, type, or title
+  const iconSvg = getFallbackIconSvg(content);
 
   return `<!DOCTYPE html>
 <html lang="ar" dir="rtl">
@@ -407,98 +412,109 @@ export function renderFallbackHtml(content: {
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 1.5rem;
+      padding: 16px;
       direction: rtl;
     }
     .card {
       background: #ffffff;
       border: 1px solid #e2e8f0;
-      border-radius: 1.5rem;
-      padding: 2.25rem;
-      max-width: 32rem;
+      border-radius: 20px;
+      padding: 28px 20px;
+      max-width: 420px;
       width: 100%;
       text-align: center;
-      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.04), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
     }
     .badge {
       display: inline-flex;
       align-items: center;
-      gap: 0.5rem;
-      padding: 0.35rem 0.85rem;
-      border-radius: 9999px;
+      justify-content: center;
+      gap: 6px;
+      padding: 6px 14px;
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+      max-width: 100%;
       background: #eff6ff;
       border: 1px solid #bfdbfe;
+      border-radius: 9999px;
       color: #1d4ed8;
-      font-size: 0.8125rem;
-      font-weight: 700;
-      margin-bottom: 1.5rem;
+      text-align: center;
+      line-height: 1.5;
+    }
+    @media (max-width: 339px) {
+      .badge {
+        white-space: normal;
+        border-radius: 12px;
+      }
     }
     .icon {
-      width: 4rem;
-      height: 4rem;
-      border-radius: 1rem;
+      width: 56px;
+      height: 56px;
+      border-radius: 16px;
       background: #eff6ff;
       border: 1px solid #dbeafe;
       color: #2563eb;
       display: flex;
       align-items: center;
       justify-content: center;
-      margin: 0 auto 1.25rem;
-      font-size: 2rem;
+      flex-shrink: 0;
     }
     h1 {
-      font-size: 1.25rem;
+      font-size: 1.125rem;
       font-weight: 800;
       color: #0f172a;
-      margin-bottom: 0.75rem;
       line-height: 1.4;
     }
     .file-name {
       background: #f8fafc;
       border: 1px solid #e2e8f0;
-      border-radius: 0.75rem;
-      padding: 0.75rem 1rem;
+      border-radius: 12px;
+      padding: 10px 14px;
       font-size: 0.875rem;
-      font-weight: 600;
+      font-weight: 700;
       color: #334155;
-      margin-bottom: 1.25rem;
       word-break: break-word;
       line-height: 1.5;
+      width: 100%;
+      text-align: center;
     }
     p {
-      font-size: 0.875rem;
+      font-size: 0.8125rem;
       color: #64748b;
       line-height: 1.6;
-      margin-bottom: 1.5rem;
+      width: 100%;
     }
     .btn {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 0.5rem;
+      gap: 8px;
       width: 100%;
-      padding: 0.75rem 1.25rem;
-      border-radius: 0.75rem;
+      min-height: 48px;
+      padding: 12px 20px;
+      border-radius: 12px;
       background: #2563eb;
       color: #ffffff;
       font-size: 0.875rem;
       font-weight: 700;
       text-decoration: none;
-      transition: background 0.15s ease;
+      transition: background 0.15s ease, transform 0.1s ease;
       cursor: pointer;
       border: none;
     }
     .btn:hover { background: #1d4ed8; }
+    .btn:active { transform: scale(0.98); }
   </style>
 </head>
 <body>
   <div class="card">
-    <div class="badge">
-      <span>كلية الذكاء الاصطناعي</span>
-      <span>•</span>
-      <span>جامعة كفر الشيخ</span>
-    </div>
-    <div class="icon">📄</div>
+    <div class="badge">كلية الذكاء الاصطناعي • جامعة كفر الشيخ</div>
+    <div class="icon">${iconSvg}</div>
     <h1>المحتوى الأكاديمي متاح للمعاينة والدراسة</h1>
     <div class="file-name">${safeTitle}</div>
     <p>تم التحقق من تسجيلك الأكاديمي بنجاح. يمكنك العودة لصفحة المقرر الدراسي أو متابعة المحاضرات والأنشطة المرتبطة.</p>
@@ -507,3 +523,54 @@ export function renderFallbackHtml(content: {
 </body>
 </html>`;
 }
+
+/**
+ * Derives a crisp inline Lucide-style SVG icon for the fallback preview card.
+ */
+function getFallbackIconSvg(content: {
+  title?: string;
+  format?: string;
+  type?: string;
+}): string {
+  const format = (content.format || '').toLowerCase();
+  const type = (content.type || '').toLowerCase();
+  const title = (content.title || '').toLowerCase();
+
+  const isVideo =
+    format === 'mp4' ||
+    format === 'mkv' ||
+    format === 'webm' ||
+    format === 'mov' ||
+    format === 'avi' ||
+    type === 'video' ||
+    type === 'recording' ||
+    title.includes('تسجيل') ||
+    title.includes('فيديو') ||
+    title.includes('video') ||
+    (title.includes('معمل') && !title.includes('شيت'));
+
+  const isImage =
+    format === 'png' ||
+    format === 'jpg' ||
+    format === 'jpeg' ||
+    format === 'svg' ||
+    format === 'webp' ||
+    format === 'gif' ||
+    type === 'image' ||
+    type === 'diagram' ||
+    title.includes('مخطط') ||
+    title.includes('رسم') ||
+    title.includes('صورة');
+
+  if (isVideo) {
+    return `<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m16 13 5.223 3.482a.5.5 0 0 0 .777-.416V7.934a.5.5 0 0 0-.777-.416L16 11"/><rect width="14" height="12" x="2" y="6" rx="2"/></svg>`;
+  }
+
+  if (isImage) {
+    return `<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>`;
+  }
+
+  // Default: PDF / Lecture / Document
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg>`;
+}
+

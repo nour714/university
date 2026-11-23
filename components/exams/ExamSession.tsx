@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import { Exam, ExamQuestion } from '@/types/exam';
 import { startOrResumeExamSessionAction, saveExamAnswersAction } from '@/app/exams/actions';
+import { isLatinText } from '@/lib/normalizeArabic';
 import { 
   Clock, 
   AlertTriangle, 
@@ -417,8 +418,11 @@ export function ExamSession({
               </button>
             </div>
 
-            {/* Question Statement in English (LTR) */}
-            <div dir="ltr" className="text-left mb-5 sm:mb-6">
+            {/* Question Statement */}
+            <div
+              dir="auto"
+              className={`mb-5 sm:mb-6 ${isLatinText(currentQuestion.questionText) ? 'text-left' : 'text-right'}`}
+            >
               <h2 className="text-sm sm:text-lg lg:text-xl font-bold text-white leading-relaxed font-sans">
                 {currentQuestion.questionText}
               </h2>
@@ -431,11 +435,15 @@ export function ExamSession({
               </div>
             )}
 
-            {/* Options List in English (A, B, C, D in LTR) */}
+            {/* Options List */}
             <div className="space-y-2.5 sm:space-y-3" dir="ltr" role="radiogroup" aria-label="Question options">
               {currentQuestion.options.map((option, optIdx) => {
                 const isSelected = answers[currentQuestion.id] === option.id;
-                const letter = ['A', 'B', 'C', 'D', 'E'][optIdx] || String.fromCharCode(65 + optIdx);
+                const letter =
+                  (option as { label?: string }).label &&
+                  (option as { label?: string }).label!.length === 1
+                    ? (option as { label?: string }).label!.toUpperCase()
+                    : ['A', 'B', 'C', 'D', 'E'][optIdx] || String.fromCharCode(65 + optIdx);
 
                 return (
                   <button
@@ -450,15 +458,20 @@ export function ExamSession({
                         : 'bg-slate-900/60 border-slate-800/80 text-slate-200 hover:bg-slate-800/70 hover:border-slate-700'
                     }`}
                   >
-                    <div className="flex items-start sm:items-center gap-2.5 sm:gap-3.5 min-w-0 flex-1">
-                      <span className={`w-6.5 h-6.5 sm:w-7 sm:h-7 rounded-xl text-xs font-bold font-mono flex items-center justify-center shrink-0 mt-0.5 sm:mt-0 transition-colors ${
+                    <div className="flex items-start sm:items-center gap-3 min-w-0 flex-1">
+                      <span className={`shrink-0 w-8 h-8 rounded-xl text-xs font-bold font-mono flex items-center justify-center transition-colors ${
                         isSelected
                           ? 'bg-blue-600 text-white'
                           : 'bg-slate-800 text-slate-400 group-hover:bg-slate-700 group-hover:text-slate-200'
                       }`}>
                         {letter}
                       </span>
-                      <span className="text-xs sm:text-base font-medium leading-relaxed font-sans min-w-0 break-words flex-1">
+                      <span
+                        dir="auto"
+                        className={`text-xs sm:text-base font-medium leading-relaxed font-sans min-w-0 break-words flex-1 ${
+                          isLatinText(option.text) ? 'text-left' : 'text-right'
+                        }`}
+                      >
                         {option.text}
                       </span>
                     </div>

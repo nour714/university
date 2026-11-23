@@ -44,3 +44,17 @@ export function matchesSearch(target: string | undefined | null, query: string):
   return false;
 }
 
+/**
+ * Detects whether text is predominantly Latin/English (as opposed to Arabic).
+ * Used for BiDi text direction (dir="auto") and text alignment in bilingual contexts.
+ */
+export function isLatinText(text?: string | null): boolean {
+  if (!text) return false;
+  const latinCount = (text.match(/[A-Za-z\u00C0-\u024F]/g) || []).length;
+  const arabicCount = (text.match(/[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]/g) || []).length;
+  if (latinCount === 0) return false;
+  if (arabicCount === 0) return true;
+  return latinCount >= arabicCount;
+}
+
+

@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { Exam, GradeResult, ExamReviewData } from '@/types/exam';
 import { getGradeLabel } from '@/lib/exams/grade';
 import { getExamReviewAction } from '@/app/exams/actions';
+import { isLatinText } from '@/lib/normalizeArabic';
 import { 
   ArrowRight, 
   ClipboardCheck, 
@@ -380,7 +381,12 @@ export function ExamResultView({
                           </div>
 
                           {/* Question Text */}
-                          <p className="text-slate-900 font-bold text-xs sm:text-base leading-relaxed mb-3">
+                          <p
+                            dir="auto"
+                            className={`font-bold text-xs sm:text-base leading-relaxed mb-3 text-slate-900 ${
+                              isLatinText(q.questionText) ? 'text-left' : 'text-right'
+                            }`}
+                          >
                             {q.questionText}
                           </p>
 
@@ -396,33 +402,49 @@ export function ExamResultView({
 
                           {/* Options Grid / List */}
                           <div className="space-y-2 sm:space-y-2.5 mt-3 sm:mt-4">
-                            {q.options.map((option) => {
+                            {q.options.map((option, optIdx) => {
                               const isSelected = q.selectedOptionId === option.id;
+                              const optionLetter =
+                                (option as { label?: string }).label &&
+                                (option as { label?: string }).label!.length === 1
+                                  ? (option as { label?: string }).label!.toUpperCase()
+                                  : String.fromCharCode(65 + optIdx);
 
                               // Before deadline rendering (neutral selection, zero answers leaked)
                               if (!reviewData.canRevealCorrectAnswers) {
                                 return (
                                   <div
                                     key={option.id}
+                                    dir={isLatinText(option.text) ? 'ltr' : 'rtl'}
                                     className={`p-3 sm:p-3.5 rounded-xl border transition-all flex items-center justify-between gap-3 text-xs sm:text-sm ${
                                       isSelected
                                         ? 'bg-blue-50/80 border-blue-400 text-blue-950 font-semibold shadow-2xs'
                                         : 'bg-white border-slate-200 text-slate-700'
                                     }`}
                                   >
-                                    <div className="flex items-center gap-2.5 min-w-0">
+                                    <div className="flex items-center gap-3 min-w-0 flex-1">
                                       <span
-                                        className={`w-6 h-6 rounded-md flex items-center justify-center font-bold text-[11px] shrink-0 ${
+                                        className={`shrink-0 w-8 h-8 rounded-xl flex items-center justify-center font-bold text-xs ${
                                           isSelected ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-600'
                                         }`}
                                       >
-                                        {option.id.toUpperCase()}
+                                        {optionLetter}
                                       </span>
-                                      <span className="leading-snug">{option.text}</span>
+                                      <span
+                                        dir="auto"
+                                        className={`leading-snug flex-1 min-w-0 break-words ${
+                                          isLatinText(option.text) ? 'text-left' : 'text-right'
+                                        }`}
+                                      >
+                                        {option.text}
+                                      </span>
                                     </div>
 
                                     {isSelected && (
-                                      <span className="px-2.5 py-0.5 rounded-md text-[11px] font-bold bg-blue-100 text-blue-700 shrink-0">
+                                      <span
+                                        dir="rtl"
+                                        className="px-2.5 py-0.5 rounded-md text-[11px] font-bold bg-blue-100 text-blue-700 shrink-0"
+                                      >
                                         إجابتك المسجّلة
                                       </span>
                                     )}
@@ -442,7 +464,10 @@ export function ExamResultView({
                               if (isStudentCorrectChoice) {
                                 rowStyle = 'border-emerald-500 bg-emerald-50/80 text-emerald-950 font-semibold shadow-2xs ring-1 ring-emerald-500/20';
                                 badgeElement = (
-                                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-[11px] font-bold bg-emerald-100 text-emerald-800 shrink-0 border border-emerald-200">
+                                  <span
+                                    dir="rtl"
+                                    className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-[11px] font-bold bg-emerald-100 text-emerald-800 shrink-0 border border-emerald-200"
+                                  >
                                     <Check className="w-3 h-3 stroke-[2.5]" />
                                     <span>إجابتك صحيحة</span>
                                   </span>
@@ -450,7 +475,10 @@ export function ExamResultView({
                               } else if (isStudentWrongChoice) {
                                 rowStyle = 'border-rose-500 bg-rose-50/80 text-rose-950 font-semibold shadow-2xs ring-1 ring-rose-500/20';
                                 badgeElement = (
-                                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-[11px] font-bold bg-rose-100 text-rose-800 shrink-0 border border-rose-200">
+                                  <span
+                                    dir="rtl"
+                                    className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-[11px] font-bold bg-rose-100 text-rose-800 shrink-0 border border-rose-200"
+                                  >
                                     <X className="w-3 h-3 stroke-[2.5]" />
                                     <span>إجابتك</span>
                                   </span>
@@ -458,7 +486,10 @@ export function ExamResultView({
                               } else if (isCorrectOption) {
                                 rowStyle = 'border-emerald-500 bg-emerald-50/60 text-emerald-950 font-semibold shadow-2xs';
                                 badgeElement = (
-                                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-[11px] font-bold bg-emerald-100 text-emerald-800 shrink-0 border border-emerald-200">
+                                  <span
+                                    dir="rtl"
+                                    className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-[11px] font-bold bg-emerald-100 text-emerald-800 shrink-0 border border-emerald-200"
+                                  >
                                     <Check className="w-3 h-3 stroke-[2.5]" />
                                     <span>الإجابة الصحيحة</span>
                                   </span>
@@ -468,11 +499,12 @@ export function ExamResultView({
                               return (
                                 <div
                                   key={option.id}
+                                  dir={isLatinText(option.text) ? 'ltr' : 'rtl'}
                                   className={`p-3 sm:p-3.5 rounded-xl border transition-all flex items-center justify-between gap-3 text-xs sm:text-sm ${rowStyle}`}
                                 >
-                                  <div className="flex items-center gap-2.5 min-w-0">
+                                  <div className="flex items-center gap-3 min-w-0 flex-1">
                                     <span
-                                      className={`w-6 h-6 rounded-md flex items-center justify-center font-bold text-[11px] shrink-0 ${
+                                      className={`shrink-0 w-8 h-8 rounded-xl flex items-center justify-center font-bold text-xs ${
                                         isStudentCorrectChoice || isCorrectOption
                                           ? 'bg-emerald-600 text-white'
                                           : isStudentWrongChoice
@@ -480,9 +512,16 @@ export function ExamResultView({
                                           : 'bg-slate-100 text-slate-600'
                                       }`}
                                     >
-                                      {option.id.toUpperCase()}
+                                      {optionLetter}
                                     </span>
-                                    <span className="leading-snug">{option.text}</span>
+                                    <span
+                                      dir="auto"
+                                      className={`leading-snug flex-1 min-w-0 break-words ${
+                                        isLatinText(option.text) ? 'text-left' : 'text-right'
+                                      }`}
+                                    >
+                                      {option.text}
+                                    </span>
                                   </div>
 
                                   {badgeElement}
@@ -495,11 +534,18 @@ export function ExamResultView({
                           {reviewData.canRevealCorrectAnswers && q.explanation && (
                             <div className="mt-4 p-3.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 text-xs leading-relaxed flex items-start gap-2.5">
                               <HelpCircle className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
-                              <div className="min-w-0">
-                                <span className="font-bold text-slate-900 block mb-0.5">
+                              <div className="min-w-0 flex-1">
+                                <span dir="rtl" className="font-bold text-slate-900 block mb-0.5">
                                   الشرح والتوضيح:
                                 </span>
-                                <span>{q.explanation}</span>
+                                <p
+                                  dir="auto"
+                                  className={`leading-relaxed ${
+                                    isLatinText(q.explanation) ? 'text-left' : 'text-right'
+                                  }`}
+                                >
+                                  {q.explanation}
+                                </p>
                               </div>
                             </div>
                           )}

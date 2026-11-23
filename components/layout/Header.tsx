@@ -60,12 +60,12 @@ export function Header() {
           {/* Student Profile Avatar with Hover and Focus Reveal */}
           <Link 
             href="/"
-            className="flex items-center transition-all duration-200 cursor-pointer group outline-hidden focus-visible:ring-2 focus-visible:ring-blue-500 rounded-full"
+            className="flex items-center transition-all duration-200 cursor-pointer group outline-hidden focus-visible:ring-2 focus-visible:ring-blue-500 rounded-full min-w-[44px] min-h-[44px] sm:min-w-0 sm:min-h-0 justify-center"
             title="الرئيسية - الملف الشخصي للطالب"
             aria-label={`الملف الشخصي: ${fullName} - ${subtitle}`}
           >
             {/* Circular Avatar */}
-            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br from-blue-600 to-indigo-700 text-white flex items-center justify-center font-bold text-xs shadow-sm shadow-blue-600/20 group-hover:scale-105 group-hover:shadow-md group-hover:shadow-blue-600/30 group-focus-visible:scale-105 transition-all duration-200 ease-out shrink-0">
+            <div className="w-11 h-11 sm:w-10 sm:h-10 min-w-[44px] min-h-[44px] sm:min-w-0 sm:min-h-0 rounded-full bg-gradient-to-br from-blue-600 to-indigo-700 text-white flex items-center justify-center font-bold text-xs shadow-sm shadow-blue-600/20 group-hover:scale-105 group-hover:shadow-md group-hover:shadow-blue-600/30 group-focus-visible:scale-105 transition-all duration-200 ease-out shrink-0">
               <User className="w-4.5 h-4.5 stroke-[2.5]" />
             </div>
 

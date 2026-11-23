@@ -205,7 +205,7 @@ export function NotificationBell() {
           <button
             type="button"
             onClick={() => setIsOpen(false)}
-            className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors cursor-pointer"
+            className="w-11 h-11 sm:w-8 sm:h-8 min-w-[44px] min-h-[44px] sm:min-w-0 sm:min-h-0 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors cursor-pointer"
             title="إغلاق"
             aria-label="إغلاق الإشعارات"
           >
@@ -215,59 +215,65 @@ export function NotificationBell() {
       </div>
 
       {/* Category Filter Tabs with Strict Sum Math */}
-      <div role="tablist" aria-label="أقسام الإشعارات" className="flex items-center gap-1.5 px-3 py-2 border-b border-slate-200 bg-slate-50 shrink-0 overflow-x-auto no-scrollbar">
-        <button
-          type="button"
-          role="tab"
-          aria-selected={activeTab === 'all'}
-          onClick={() => setActiveTab('all')}
-          className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer shrink-0 active:scale-95 ${
-            activeTab === 'all'
-              ? 'bg-blue-600 text-white shadow-xs'
-              : 'text-slate-600 bg-white hover:bg-slate-100 border border-slate-200'
-          }`}
-        >
-          الكل ({tabCounts.all})
-        </button>
-        <button
-          type="button"
-          role="tab"
-          aria-selected={activeTab === 'lecture'}
-          onClick={() => setActiveTab('lecture')}
-          className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer shrink-0 active:scale-95 ${
-            activeTab === 'lecture'
-              ? 'bg-blue-600 text-white shadow-xs'
-              : 'text-slate-600 bg-white hover:bg-slate-100 border border-slate-200'
-          }`}
-        >
-          المحاضرات ({tabCounts.lecture})
-        </button>
-        <button
-          type="button"
-          role="tab"
-          aria-selected={activeTab === 'exam'}
-          onClick={() => setActiveTab('exam')}
-          className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer shrink-0 active:scale-95 ${
-            activeTab === 'exam'
-              ? 'bg-blue-600 text-white shadow-xs'
-              : 'text-slate-600 bg-white hover:bg-slate-100 border border-slate-200'
-          }`}
-        >
-          الاختبارات ({tabCounts.exam})
-        </button>
-        <button
-          type="button"
-          role="tab"
-          aria-selected={activeTab === 'announcement'}
-          onClick={() => setActiveTab('announcement')}
-          className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer shrink-0 active:scale-95 ${
-            activeTab === 'announcement'
-              ? 'bg-blue-600 text-white shadow-xs'
-              : 'text-slate-600 bg-white hover:bg-slate-100 border border-slate-200'
-          }`}
-        >
-          إعلانات وتنبيهات ({tabCounts.announcement})
-        </button>
+      <div className="relative border-b border-slate-200 bg-slate-50 shrink-0">
+        <div role="tablist" aria-label="أقسام الإشعارات" className="flex items-center gap-1.5 px-3 py-2 overflow-x-auto no-scrollbar pe-6">
+          <button
+            type="button"
+            role="tab"
+            aria-selected={activeTab === 'all'}
+            onClick={() => setActiveTab('all')}
+            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer shrink-0 active:scale-95 ${
+              activeTab === 'all'
+                ? 'bg-blue-600 text-white shadow-xs'
+                : 'text-slate-600 bg-white hover:bg-slate-100 border border-slate-200'
+            }`}
+          >
+            الكل ({tabCounts.all})
+          </button>
+          <button
+            type="button"
+            role="tab"
+            aria-selected={activeTab === 'lecture'}
+            onClick={() => setActiveTab('lecture')}
+            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer shrink-0 active:scale-95 ${
+              activeTab === 'lecture'
+                ? 'bg-blue-600 text-white shadow-xs'
+                : 'text-slate-600 bg-white hover:bg-slate-100 border border-slate-200'
+            }`}
+          >
+            المحاضرات ({tabCounts.lecture})
+          </button>
+          <button
+            type="button"
+            role="tab"
+            aria-selected={activeTab === 'exam'}
+            onClick={() => setActiveTab('exam')}
+            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer shrink-0 active:scale-95 ${
+              activeTab === 'exam'
+                ? 'bg-blue-600 text-white shadow-xs'
+                : 'text-slate-600 bg-white hover:bg-slate-100 border border-slate-200'
+            }`}
+          >
+            الاختبارات ({tabCounts.exam})
+          </button>
+          <button
+            type="button"
+            role="tab"
+            aria-selected={activeTab === 'announcement'}
+            onClick={() => setActiveTab('announcement')}
+            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer shrink-0 active:scale-95 ${
+              activeTab === 'announcement'
+                ? 'bg-blue-600 text-white shadow-xs'
+                : 'text-slate-600 bg-white hover:bg-slate-100 border border-slate-200'
+            }`}
+          >
+            إعلانات وتنبيهات ({tabCounts.announcement})
+          </button>
+        </div>
+        <div
+          className="pointer-events-none absolute inset-y-0 left-0 w-8 bg-gradient-to-r from-slate-50 to-transparent"
+          aria-hidden="true"
+        />
       </div>
 
       {/* Notifications Scrollable List - Strictly Opaque */}
@@ -370,7 +376,7 @@ export function NotificationBell() {
         aria-haspopup="dialog"
         aria-expanded={isOpen}
         onClick={() => setIsOpen((prev) => !prev)}
-        className="relative w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-slate-50 hover:bg-slate-100 text-slate-700 hover:text-blue-600 flex items-center justify-center border border-slate-200/90 shadow-2xs transition-all duration-200 active:scale-95 cursor-pointer group focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-hidden"
+        className="relative w-11 h-11 sm:w-10 sm:h-10 min-w-[44px] min-h-[44px] sm:min-w-0 sm:min-h-0 rounded-full bg-slate-50 hover:bg-slate-100 text-slate-700 hover:text-blue-600 flex items-center justify-center border border-slate-200/90 shadow-2xs transition-all duration-200 active:scale-95 cursor-pointer group focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-hidden"
         aria-label={unreadCount > 0 ? `الإشعارات الأكاديمية: ${unreadCount} إشعار جديد` : 'الإشعارات الأكاديمية'}
         title="الإشعارات الأكاديمية"
       >

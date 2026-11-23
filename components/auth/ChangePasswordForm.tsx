@@ -136,13 +136,13 @@ export function ChangePasswordForm({ student }: ChangePasswordFormProps) {
                 onChange={(e) => setCurrentPassword(e.target.value)}
                 placeholder="أدخل كلمة المرور الحالية"
                 required
-                className="w-full h-11 px-3.5 ps-10 pe-10 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 text-xs text-slate-900 transition-all outline-hidden font-medium"
+                className="w-full h-11 px-3.5 ps-10 pe-11 sm:pe-10 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 text-base sm:text-sm text-slate-900 transition-all outline-hidden font-medium"
               />
               <Lock className="w-4 h-4 text-slate-600 absolute start-3 top-3.5" />
               <button
                 type="button"
                 onClick={() => setShowCurrent(!showCurrent)}
-                className="absolute end-3 top-3 text-slate-600 hover:text-slate-800 p-0.5 cursor-pointer"
+                className="absolute inset-y-0 end-0 min-w-[44px] min-h-[44px] flex items-center justify-center text-slate-600 hover:text-slate-800 cursor-pointer"
                 title={showCurrent ? 'إخفاء' : 'إظهار'}
                 aria-label={showCurrent ? 'إخفاء كلمة المرور الحالية' : 'إظهار كلمة المرور الحالية'}
               >
@@ -164,13 +164,13 @@ export function ChangePasswordForm({ student }: ChangePasswordFormProps) {
                 onChange={(e) => setNewPassword(e.target.value)}
                 placeholder="10 خانات على الأقل (حروف وأرقام)"
                 required
-                className="w-full h-11 px-3.5 ps-10 pe-10 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 text-xs text-slate-900 transition-all outline-hidden font-medium"
+                className="w-full h-11 px-3.5 ps-10 pe-11 sm:pe-10 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 text-base sm:text-sm text-slate-900 transition-all outline-hidden font-medium"
               />
               <Lock className="w-4 h-4 text-slate-600 absolute start-3 top-3.5" />
               <button
                 type="button"
                 onClick={() => setShowNew(!showNew)}
-                className="absolute end-3 top-3 text-slate-600 hover:text-slate-800 p-0.5 cursor-pointer"
+                className="absolute inset-y-0 end-0 min-w-[44px] min-h-[44px] flex items-center justify-center text-slate-600 hover:text-slate-800 cursor-pointer"
                 title={showNew ? 'إخفاء' : 'إظهار'}
                 aria-label={showNew ? 'إخفاء كلمة المرور الجديدة' : 'إظهار كلمة المرور الجديدة'}
               >
@@ -204,13 +204,13 @@ export function ChangePasswordForm({ student }: ChangePasswordFormProps) {
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 placeholder="أعد إدخال كلمة المرور الجديدة"
                 required
-                className="w-full h-11 px-3.5 ps-10 pe-10 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 text-xs text-slate-900 transition-all outline-hidden font-medium"
+                className="w-full h-11 px-3.5 ps-10 pe-11 sm:pe-10 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 text-base sm:text-sm text-slate-900 transition-all outline-hidden font-medium"
               />
               <Lock className="w-4 h-4 text-slate-600 absolute start-3 top-3.5" />
               <button
                 type="button"
                 onClick={() => setShowConfirm(!showConfirm)}
-                className="absolute end-3 top-3 text-slate-600 hover:text-slate-800 p-0.5 cursor-pointer"
+                className="absolute inset-y-0 end-0 min-w-[44px] min-h-[44px] flex items-center justify-center text-slate-600 hover:text-slate-800 cursor-pointer"
                 title={showConfirm ? 'إخفاء' : 'إظهار'}
                 aria-label={showConfirm ? 'إخفاء تأكيد كلمة المرور' : 'إظهار تأكيد كلمة المرور'}
               >

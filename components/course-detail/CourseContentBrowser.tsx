@@ -175,7 +175,7 @@ export function CourseContentBrowser({ items, courseCode, isLocked }: CourseCont
                   autoCorrect="off"
                   spellCheck={false}
                   disabled={isActivating}
-                  className="w-full h-11 px-4 rounded-xl border border-slate-300 focus:border-blue-600 focus:ring-3 focus:ring-blue-600/10 text-xs sm:text-sm font-bold font-mono tracking-wider text-slate-900 placeholder:text-slate-300 placeholder:font-mono bg-white outline-hidden text-center disabled:opacity-60"
+                  className="w-full h-11 px-4 rounded-xl border border-slate-300 focus:border-blue-600 focus:ring-3 focus:ring-blue-600/10 text-base sm:text-sm font-bold font-mono tracking-wider text-slate-900 placeholder:text-slate-300 placeholder:font-mono bg-white outline-hidden text-center disabled:opacity-60"
                 />
               </div>
               <p className="text-[11px] text-slate-500 mt-1.5 text-right">
@@ -285,7 +285,7 @@ export function CourseContentBrowser({ items, courseCode, isLocked }: CourseCont
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder={`ابحث داخل محتويات ${courseCode} (محاضرة، PDF، فيديو)...`}
-            className="w-full pr-10 sm:pr-11 pl-12 sm:pl-14 py-2 sm:py-2.5 rounded-lg sm:rounded-xl border border-slate-200 bg-slate-50/50 hover:bg-white focus:bg-white focus:border-blue-600 focus:ring-3 focus:ring-blue-600/10 text-xs sm:text-sm text-slate-800 placeholder:text-slate-600 transition-all outline-hidden"
+            className="w-full pr-10 sm:pr-11 pl-12 sm:pl-14 py-2 sm:py-2.5 rounded-lg sm:rounded-xl border border-slate-200 bg-slate-50/50 hover:bg-white focus:bg-white focus:border-blue-600 focus:ring-3 focus:ring-blue-600/10 text-base sm:text-sm text-slate-800 placeholder:text-slate-600 transition-all outline-hidden"
           />
           {searchQuery && (
             <button
@@ -299,23 +299,24 @@ export function CourseContentBrowser({ items, courseCode, isLocked }: CourseCont
         </div>
 
         {/* Category Tabs: Swipeable on Mobile */}
-        <div role="tablist" aria-label="تصنيفات المحتوى الأكاديمي" className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto no-scrollbar pb-1 pt-3 border-t border-slate-100">
-          <button
-            type="button"
-            role="tab"
-            aria-selected={activeTab === 'all'}
-            onClick={() => setActiveTab('all')}
-            className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-3.5 py-2 rounded-xl text-xs font-bold transition-all shrink-0 ${
-              activeTab === 'all'
-                ? 'bg-blue-600 text-white shadow-sm shadow-blue-600/20'
-                : 'bg-slate-50 text-slate-600 hover:bg-slate-100 hover:text-slate-900 border border-slate-200/70'
-            }`}
-          >
-            <span>جميع المحتويات</span>
-            <span className={`text-[10px] px-1.5 py-0.2 rounded-md ${activeTab === 'all' ? 'bg-blue-700 text-white' : 'bg-slate-200 text-slate-700'}`}>
-              {counts.all}
-            </span>
-          </button>
+        <div className="relative border-t border-slate-100 pt-3">
+          <div role="tablist" aria-label="تصنيفات المحتوى الأكاديمي" className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto no-scrollbar pb-1 pe-6">
+            <button
+              type="button"
+              role="tab"
+              aria-selected={activeTab === 'all'}
+              onClick={() => setActiveTab('all')}
+              className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-3.5 py-2 rounded-xl text-xs font-bold transition-all shrink-0 ${
+                activeTab === 'all'
+                  ? 'bg-blue-600 text-white shadow-sm shadow-blue-600/20'
+                  : 'bg-slate-50 text-slate-600 hover:bg-slate-100 hover:text-slate-900 border border-slate-200/70'
+              }`}
+            >
+              <span>جميع المحتويات</span>
+              <span className={`text-[10px] px-1.5 py-0.2 rounded-md ${activeTab === 'all' ? 'bg-blue-700 text-white' : 'bg-slate-200 text-slate-700'}`}>
+                {counts.all}
+              </span>
+            </button>
 
           <button
             type="button"
@@ -389,6 +390,11 @@ export function CourseContentBrowser({ items, courseCode, isLocked }: CourseCont
             </span>
           </button>
         </div>
+        <div
+          className="pointer-events-none absolute inset-y-0 left-0 w-8 bg-gradient-to-r from-white to-transparent"
+          aria-hidden="true"
+        />
+      </div>
       </div>
 
       {/* Content Rendering: Organized Individual Cards */}

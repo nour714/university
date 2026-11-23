@@ -341,7 +341,7 @@ export function CodesManager({ initialCodes }: CodesManagerProps = {}) {
                     autoComplete="off"
                     autoCorrect="off"
                     spellCheck={false}
-                    className="w-full px-4 py-2.5 sm:py-3 rounded-xl border-2 border-slate-200 focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 text-sm sm:text-base font-bold font-mono tracking-widest text-slate-800 placeholder:text-slate-300 placeholder:font-mono bg-white hover:border-slate-300 transition-all outline-hidden text-center sm:text-right"
+                    className="w-full px-4 py-2.5 sm:py-3 rounded-xl border-2 border-slate-200 focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 text-base sm:text-sm font-bold font-mono tracking-widest text-slate-800 placeholder:text-slate-300 placeholder:font-mono bg-white hover:border-slate-300 transition-all outline-hidden text-center sm:text-right"
                   />
                 </div>
 

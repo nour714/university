@@ -359,7 +359,7 @@ export function LoginForm({ reason: propReason }: LoginFormProps = {}) {
                     aria-describedby={identifierError ? "loginIdentifierError" : undefined}
                     className={`w-full h-10 sm:h-11 px-3.5 ps-9 rounded-xl bg-slate-50 border ${
                       identifierError ? 'border-rose-500 bg-rose-50/20' : 'border-slate-200'
-                    } focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 text-xs sm:text-sm text-slate-900 transition-all outline-hidden font-medium`}
+                    } focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 text-base sm:text-sm text-slate-900 transition-all outline-hidden font-medium`}
                   />
                   <User className="w-4 h-4 text-slate-600 absolute start-3 top-1/2 -translate-y-1/2 pointer-events-none" />
                 </div>
@@ -398,15 +398,15 @@ export function LoginForm({ reason: propReason }: LoginFormProps = {}) {
                     placeholder="أدخل كلمة المرور الخاصة بحسابك"
                     aria-invalid={!!passwordError}
                     aria-describedby={passwordError ? "loginPasswordError" : undefined}
-                    className={`w-full h-10 sm:h-11 px-3.5 ps-9 pe-9 rounded-xl bg-slate-50 border ${
+                    className={`w-full h-10 sm:h-11 px-3.5 ps-9 pe-11 sm:pe-9 rounded-xl bg-slate-50 border ${
                       passwordError ? 'border-rose-500 bg-rose-50/20' : 'border-slate-200'
-                    } focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 text-xs sm:text-sm text-slate-900 transition-all outline-hidden font-medium`}
+                    } focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 text-base sm:text-sm text-slate-900 transition-all outline-hidden font-medium`}
                   />
                   <Lock className="w-4 h-4 text-slate-600 absolute start-3 top-1/2 -translate-y-1/2 pointer-events-none" />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute end-2.5 top-1/2 -translate-y-1/2 text-slate-600 hover:text-slate-800 cursor-pointer p-1 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-blue-500 rounded-sm"
+                    className="absolute end-0 top-1/2 -translate-y-1/2 min-w-[44px] min-h-[44px] flex items-center justify-center text-slate-600 hover:text-slate-800 cursor-pointer focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-blue-500 rounded-sm"
                     title={showPassword ? 'إخفاء' : 'إظهار'}
                     aria-label={showPassword ? 'إخفاء كلمة المرور' : 'إظهار كلمة المرور'}
                   >
@@ -498,7 +498,7 @@ export function LoginForm({ reason: propReason }: LoginFormProps = {}) {
             <button
               type="button"
               onClick={() => setIsForgotModalOpen(false)}
-              className="absolute top-4 left-4 w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center transition-colors cursor-pointer"
+              className="absolute top-2.5 left-2.5 sm:top-4 sm:left-4 min-w-[44px] min-h-[44px] sm:min-w-0 sm:min-h-0 w-11 h-11 sm:w-8 sm:h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center transition-colors cursor-pointer"
               title="إغلاق"
               aria-label="إغلاق نافذة استعادة كلمة المرور"
             >
@@ -563,7 +563,7 @@ export function LoginForm({ reason: propReason }: LoginFormProps = {}) {
             <button
               type="button"
               onClick={() => setIsHelpModalOpen(false)}
-              className="absolute top-4 left-4 w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center transition-colors cursor-pointer"
+              className="absolute top-2.5 left-2.5 sm:top-4 sm:left-4 min-w-[44px] min-h-[44px] sm:min-w-0 sm:min-h-0 w-11 h-11 sm:w-8 sm:h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center transition-colors cursor-pointer"
               title="إغلاق"
               aria-label="إغلاق نافذة مركز المساعدة"
             >
@@ -595,7 +595,7 @@ export function LoginForm({ reason: propReason }: LoginFormProps = {}) {
                       value={helpIdentifier}
                       onChange={(e) => setHelpIdentifier(e.target.value)}
                       placeholder="مثال: 30405120102513 أو 010xxxxxxxx"
-                      className="w-full h-10 px-3.5 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 text-xs text-slate-900 transition-all outline-hidden font-medium"
+                      className="w-full h-10 px-3.5 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 text-base sm:text-sm text-slate-900 transition-all outline-hidden font-medium"
                     />
                   </div>
 
@@ -611,7 +611,7 @@ export function LoginForm({ reason: propReason }: LoginFormProps = {}) {
                       aria-haspopup="listbox"
                       aria-expanded={isIssueTypeDropdownOpen}
                       onClick={() => setIsIssueTypeDropdownOpen(!isIssueTypeDropdownOpen)}
-                      className="w-full h-10 px-3.5 rounded-xl bg-slate-50 hover:bg-slate-100/70 border border-slate-200 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 text-xs text-slate-900 transition-all outline-hidden font-medium flex items-center justify-between cursor-pointer"
+                      className="w-full h-10 px-3.5 rounded-xl bg-slate-50 hover:bg-slate-100/70 border border-slate-200 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 text-base sm:text-sm text-slate-900 transition-all outline-hidden font-medium flex items-center justify-between cursor-pointer"
                     >
                       <div className="flex items-center gap-2 truncate">
                         <selectedIssue.icon className="w-3.5 h-3.5 text-blue-600 shrink-0" />
@@ -690,7 +690,7 @@ export function LoginForm({ reason: propReason }: LoginFormProps = {}) {
                       aria-describedby={helpMessageError ? "helpMessageError" : undefined}
                       className={`w-full p-3 rounded-xl bg-slate-50 border ${
                         helpMessageError ? 'border-rose-500 bg-rose-50/20' : 'border-slate-200'
-                      } focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 text-xs text-slate-900 transition-all outline-hidden font-medium resize-none`}
+                      } focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 text-base sm:text-sm text-slate-900 transition-all outline-hidden font-medium resize-none`}
                     />
                     {helpMessageError && (
                       <p id="helpMessageError" role="alert" className="mt-1 text-[11px] font-bold text-rose-600 flex items-center gap-1 animate-fadeIn">

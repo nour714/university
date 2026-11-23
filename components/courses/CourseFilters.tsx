@@ -56,7 +56,7 @@ export function CourseFilters({ value, onChange }: CourseFiltersProps) {
           value={internalQuery}
           onChange={(e) => handleChange(e.target.value)}
           placeholder="ابحث باسم المادة (مثال: تعلم الآلة) أو كود المادة (مثل AI301)..."
-          className="w-full pr-10 pl-10 py-2 sm:py-2.5 rounded-lg border border-slate-200/90 bg-slate-50/50 hover:bg-white focus:bg-white focus:border-blue-600 focus:ring-3 focus:ring-blue-600/10 text-xs sm:text-sm text-slate-800 placeholder:text-slate-600 transition-all outline-hidden"
+          className="w-full pr-10 pl-10 py-2 sm:py-2.5 rounded-lg border border-slate-200/90 bg-slate-50/50 hover:bg-white focus:bg-white focus:border-blue-600 focus:ring-3 focus:ring-blue-600/10 text-base sm:text-sm text-slate-800 placeholder:text-slate-600 transition-all outline-hidden"
         />
         {internalQuery && (
           <button

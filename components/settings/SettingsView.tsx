@@ -224,25 +224,24 @@ export function SettingsView({ student: initialStudent }: { student?: StudentPro
         </div>
 
         {/* Student Mini Profile Info */}
-        <div className="flex items-center justify-between gap-2.5">
-          <div className="flex items-center gap-2.5 min-w-0">
-            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 text-white flex items-center justify-center font-bold text-xs shadow-inner shrink-0 border border-white/20">
-              <User className="w-5 h-5 stroke-[2.2]" />
-            </div>
-            <div className="min-w-0">
+        <div className="flex items-center gap-2.5 min-w-0">
+          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 text-white flex items-center justify-center font-bold text-xs shadow-inner shrink-0 border border-white/20">
+            <User className="w-5 h-5 stroke-[2.2]" />
+          </div>
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center justify-between gap-2">
               <h1 className="text-sm font-extrabold text-white truncate leading-tight">
                 {student?.fullName || 'طالب أكاديمي'}
               </h1>
-              <p className="text-[11px] text-blue-200/90 font-medium truncate mt-0.5">
-                طالب • المستوى 3 • الذكاء الاصطناعي
-              </p>
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 shrink-0">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                حساب نشط
+              </span>
             </div>
+            <p className="text-[11px] text-blue-200/90 font-medium mt-0.5">
+              طالب • المستوى 3 • الذكاء الاصطناعي
+            </p>
           </div>
-
-          <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 shrink-0">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-            حساب نشط
-          </span>
         </div>
       </div>
 
@@ -408,7 +407,7 @@ export function SettingsView({ student: initialStudent }: { student?: StudentPro
                   <button
                     type="button"
                     onClick={() => setShowCurrentPassword(!showCurrentPassword)}
-                    className="absolute inset-y-0 end-0 px-3.5 flex items-center text-slate-600 hover:text-slate-800 cursor-pointer"
+                    className="absolute inset-y-0 end-0 min-w-[44px] min-h-[44px] flex items-center justify-center text-slate-600 hover:text-slate-800 cursor-pointer"
                     title={showCurrentPassword ? 'إخفاء' : 'إظهار'}
                     aria-label={showCurrentPassword ? 'إخفاء كلمة المرور الحالية' : 'إظهار كلمة المرور الحالية'}
                   >
@@ -435,7 +434,7 @@ export function SettingsView({ student: initialStudent }: { student?: StudentPro
                   <button
                     type="button"
                     onClick={() => setShowNewPassword(!showNewPassword)}
-                    className="absolute inset-y-0 end-0 px-3.5 flex items-center text-slate-600 hover:text-slate-800 cursor-pointer"
+                    className="absolute inset-y-0 end-0 min-w-[44px] min-h-[44px] flex items-center justify-center text-slate-600 hover:text-slate-800 cursor-pointer"
                     title={showNewPassword ? 'إخفاء' : 'إظهار'}
                     aria-label={showNewPassword ? 'إخفاء كلمة المرور الجديدة' : 'إظهار كلمة المرور الجديدة'}
                   >
@@ -462,7 +461,7 @@ export function SettingsView({ student: initialStudent }: { student?: StudentPro
                   <button
                     type="button"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="absolute inset-y-0 end-0 px-3.5 flex items-center text-slate-600 hover:text-slate-800 cursor-pointer"
+                    className="absolute inset-y-0 end-0 min-w-[44px] min-h-[44px] flex items-center justify-center text-slate-600 hover:text-slate-800 cursor-pointer"
                     title={showConfirmPassword ? 'إخفاء' : 'إظهار'}
                     aria-label={showConfirmPassword ? 'إخفاء تأكيد كلمة المرور' : 'إظهار تأكيد كلمة المرور'}
                   >

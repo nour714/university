@@ -183,7 +183,7 @@ export function KeyActivationModal({
             type="button"
             onClick={handleClose}
             aria-label="إغلاق نافذة التفعيل"
-            className="w-9 h-9 rounded-xl flex items-center justify-center text-blue-200 hover:text-white hover:bg-white/10 transition-colors cursor-pointer shrink-0"
+            className="w-11 h-11 sm:w-9 sm:h-9 min-w-[44px] min-h-[44px] sm:min-w-0 sm:min-h-0 rounded-xl flex items-center justify-center text-blue-200 hover:text-white hover:bg-white/10 transition-colors cursor-pointer shrink-0"
           >
             <X className="w-5 h-5" />
           </button>
@@ -268,7 +268,7 @@ export function KeyActivationModal({
                     autoCorrect="off"
                     spellCheck={false}
                     disabled={isLoading}
-                    className="w-full h-12 px-4 rounded-xl border-2 border-slate-200 focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 text-sm sm:text-base font-bold font-mono tracking-widest text-slate-900 placeholder:text-slate-300 placeholder:font-mono bg-white hover:border-slate-300 transition-all outline-hidden text-center disabled:opacity-60"
+                    className="w-full h-12 px-4 rounded-xl border-2 border-slate-200 focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 text-base sm:text-sm font-bold font-mono tracking-widest text-slate-900 placeholder:text-slate-300 placeholder:font-mono bg-white hover:border-slate-300 transition-all outline-hidden text-center disabled:opacity-60"
                   />
                   {inputCode && !isLoading && (
                     <button

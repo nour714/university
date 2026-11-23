@@ -115,16 +115,17 @@ function CoursesCatalogInner({ courses, studentLevelName }: CoursesCatalogProps)
               role="tab"
               aria-selected={activeTab === 'enrolled'}
               onClick={() => setActiveTab('enrolled')}
-              className={`flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-bold transition-all min-h-[38px] cursor-pointer ${
+              className={`flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-2.5 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-bold transition-all min-h-[38px] cursor-pointer whitespace-nowrap ${
                 activeTab === 'enrolled'
                   ? 'bg-white text-blue-700 shadow-xs'
                   : 'text-slate-600 hover:text-slate-900'
               }`}
             >
-              <CheckCircle2 className="w-3.5 h-3.5 text-blue-600" />
-              <span>مقرراتي المفعلة</span>
+              <CheckCircle2 className="w-3.5 h-3.5 text-blue-600 shrink-0" />
+              <span className="hidden sm:inline">مقرراتي المفعلة</span>
+              <span className="sm:hidden">مقرراتي</span>
               <span
-                className={`text-[10px] px-1.5 py-0.5 rounded-full font-mono ${
+                className={`text-[10px] px-1.5 py-0.5 rounded-full font-mono shrink-0 ${
                   activeTab === 'enrolled'
                     ? 'bg-blue-100 text-blue-800'
                     : 'bg-slate-200 text-slate-700'
@@ -139,16 +140,26 @@ function CoursesCatalogInner({ courses, studentLevelName }: CoursesCatalogProps)
               role="tab"
               aria-selected={activeTab === 'all'}
               onClick={() => setActiveTab('all')}
-              className={`flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-bold transition-all min-h-[38px] cursor-pointer ${
+              className={`flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-2.5 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-bold transition-all min-h-[38px] cursor-pointer whitespace-nowrap ${
                 activeTab === 'all'
                   ? 'bg-white text-blue-700 shadow-xs'
                   : 'text-slate-600 hover:text-slate-900'
               }`}
             >
-              <BookOpen className="w-3.5 h-3.5 text-slate-500" />
-              <span>{studentLevelName ? `مقررات ${studentLevelName}` : 'دليل المقررات الأكاديمية'}</span>
+              <BookOpen className="w-3.5 h-3.5 text-slate-500 shrink-0" />
+              {studentLevelName ? (
+                <>
+                  <span className="hidden sm:inline">مقررات {studentLevelName}</span>
+                  <span className="sm:hidden">{studentLevelName}</span>
+                </>
+              ) : (
+                <>
+                  <span className="hidden sm:inline">دليل المقررات الأكاديمية</span>
+                  <span className="sm:hidden">دليل المقررات</span>
+                </>
+              )}
               <span
-                className={`text-[10px] px-1.5 py-0.5 rounded-full font-mono ${
+                className={`text-[10px] px-1.5 py-0.5 rounded-full font-mono shrink-0 ${
                   activeTab === 'all'
                     ? 'bg-blue-100 text-blue-800'
                     : 'bg-slate-200 text-slate-700'
@@ -189,7 +200,7 @@ function CoursesCatalogInner({ courses, studentLevelName }: CoursesCatalogProps)
                 ? `ابحث في مقررات ${studentLevelName} (مثال: تعلم الآلة، AI301، اسم الدكتور)...`
                 : 'ابحث في دليل المقررات (مثال: تعلم الآلة، AI301، اسم الدكتور)...'
             }
-            className="w-full pr-10 pl-10 py-2.5 rounded-xl border border-slate-200 bg-slate-50/60 hover:bg-white focus:bg-white focus:border-blue-600 focus:ring-3 focus:ring-blue-600/10 text-xs sm:text-sm text-slate-800 placeholder:text-slate-600 transition-all outline-hidden font-medium min-h-[42px]"
+            className="w-full pr-10 pl-10 py-2.5 rounded-xl border border-slate-200 bg-slate-50/60 hover:bg-white focus:bg-white focus:border-blue-600 focus:ring-3 focus:ring-blue-600/10 text-base sm:text-sm text-slate-800 placeholder:text-slate-600 transition-all outline-hidden font-medium min-h-[42px]"
           />
           {searchQuery && (
             <button

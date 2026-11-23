@@ -84,7 +84,7 @@ export function CustomSelect({
           {selectedOption?.icon && (
             <span className="shrink-0 text-slate-500">{selectedOption.icon}</span>
           )}
-          <span className="text-xs sm:text-sm font-bold text-slate-800 truncate">
+          <span className="text-base sm:text-sm font-bold text-slate-800 truncate">
             {selectedOption ? selectedOption.label : placeholder}
           </span>
           {selectedOption?.badge && (

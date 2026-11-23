@@ -27,6 +27,27 @@ test.describe('End-to-End Auth, mustChangePassword Gate, Portal Navigation & Log
     // 1. Visit Login
     await page.goto('/login');
     await expect(page).toHaveURL(/\/login/);
+    await page.locator('#loginIdentifier').waitFor({ state: 'visible' });
+
+    if (isMobile) {
+      const isLoginOverflowing = await page.evaluate(() => {
+        return document.documentElement.scrollWidth > window.innerWidth || document.body.scrollWidth > window.innerWidth;
+      });
+      expect(isLoginOverflowing).toBe(false);
+
+      // Verify 16px font size on inputs to prevent iOS auto-zoom
+      const idFontSize = await page.locator('#loginIdentifier').evaluate((el) => window.getComputedStyle(el).fontSize);
+      expect(idFontSize).toBe('16px');
+      const pwFontSize = await page.locator('#loginPassword').evaluate((el) => window.getComputedStyle(el).fontSize);
+      expect(pwFontSize).toBe('16px');
+
+      // Verify password eye toggle touch target is at least 44x44px
+      const eyeBtn = page.locator('button[aria-label="إظهار كلمة المرور"]');
+      await eyeBtn.waitFor({ state: 'visible' });
+      const eyeBox = await eyeBtn.boundingBox();
+      expect(eyeBox?.width).toBeGreaterThanOrEqual(44);
+      expect(eyeBox?.height).toBeGreaterThanOrEqual(44);
+    }
 
     const initialPassword = 'Student@2026';
     const updatedPassword = 'NewSecurePassword2026!';
@@ -65,6 +86,13 @@ test.describe('End-to-End Auth, mustChangePassword Gate, Portal Navigation & Log
     await expect(page.locator('header h2').filter({ hasText: 'كلية الذكاء الاصطناعي' })).toBeVisible();
     await expect(page.locator('main h1').filter({ hasText: studentName })).toBeVisible();
 
+    if (isMobile) {
+      const isHomeOverflowing = await page.evaluate(() => {
+        return document.documentElement.scrollWidth > window.innerWidth || document.body.scrollWidth > window.innerWidth;
+      });
+      expect(isHomeOverflowing).toBe(false);
+    }
+
     // Verify sidebar/header logo has valid dimensions (not broken)
     const logoImg = page.locator('img[alt*="شعار"]:visible').first();
     await expect(logoImg).toBeVisible();
@@ -77,6 +105,18 @@ test.describe('End-to-End Auth, mustChangePassword Gate, Portal Navigation & Log
       await page.goto(route);
       await expect(page).toHaveURL(new RegExp(route));
       await page.waitForLoadState('networkidle');
+
+      if (isMobile) {
+        const isOverflowing = await page.evaluate(() => {
+          return document.documentElement.scrollWidth > window.innerWidth || document.body.scrollWidth > window.innerWidth;
+        });
+        expect(isOverflowing).toBe(false);
+
+        if (route === '/settings') {
+          // Verify full subtitle text displays cleanly without truncation
+          await expect(page.locator('text=طالب • المستوى 3 • الذكاء الاصطناعي')).toBeVisible();
+        }
+      }
     }
 
     // Verify zero console errors and zero failed network requests during authenticated browsing

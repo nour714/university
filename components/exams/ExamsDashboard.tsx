@@ -99,7 +99,7 @@ export function ExamsDashboard({ initialExams }: ExamsDashboardProps) {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="ابحث باسم المادة، كود المقرر، عنوان الاختبار، أو اسم الدكتور..."
-              className="w-full pr-10 pl-12 py-2.5 min-h-[44px] rounded-xl border border-slate-200 bg-slate-50/60 hover:bg-white focus:bg-white focus:border-blue-600 focus:ring-3 focus:ring-blue-600/10 text-xs sm:text-sm text-slate-900 transition-all outline-hidden font-medium"
+              className="w-full pr-10 pl-12 py-2.5 min-h-[44px] rounded-xl border border-slate-200 bg-slate-50/60 hover:bg-white focus:bg-white focus:border-blue-600 focus:ring-3 focus:ring-blue-600/10 text-base sm:text-sm text-slate-900 transition-all outline-hidden font-medium"
             />
             {searchQuery && (
               <button
@@ -125,8 +125,8 @@ export function ExamsDashboard({ initialExams }: ExamsDashboardProps) {
         </div>
 
         {/* Tab Filters */}
-        <div className="pt-2 border-t border-slate-100 -mx-1 px-1">
-          <div role="tablist" aria-label="حالة الاختبارات الأكاديمية" className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto no-scrollbar scroll-smooth touch-pan-x pb-1">
+        <div className="relative pt-2 border-t border-slate-100 -mx-1 px-1">
+          <div role="tablist" aria-label="حالة الاختبارات الأكاديمية" className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto no-scrollbar scroll-smooth touch-pan-x pb-1 pe-6">
             <button
               type="button"
               role="tab"
@@ -216,6 +216,10 @@ export function ExamsDashboard({ initialExams }: ExamsDashboardProps) {
               </span>
             </button>
           </div>
+          <div
+            className="pointer-events-none absolute inset-y-0 left-0 w-8 bg-gradient-to-r from-white to-transparent"
+            aria-hidden="true"
+          />
         </div>
       </div>
 
